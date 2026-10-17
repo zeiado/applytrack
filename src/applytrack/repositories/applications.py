@@ -1,26 +1,19 @@
 import uuid
-from collections.abc import Sequence
-from dataclasses import dataclass
+from collections.abc import Iterator, Sequence
 from datetime import date
 from typing import Any
 
 from sqlalchemy import ColumnElement, Select, func, select
 from sqlalchemy.orm import Session
 
-from applytrack.models import Application, ApplicationSource, ApplicationStatus, StatusChange
+from applytrack.models import Application, ApplicationStatus, StatusChange
+from applytrack.repositories.filters import ApplicationFilters
 
 _SORT_COLUMNS = {
     "created_at": Application.created_at,
     "applied_on": Application.applied_on,
     "company": func.lower(Application.company),
 }
-
-
-@dataclass(frozen=True)
-class ApplicationFilters:
-    statuses: Sequence[ApplicationStatus] | None = None
-    sources: Sequence[ApplicationSource] | None = None
-    company: str | None = None
 
 
 class ApplicationRepository:
@@ -70,6 +63,18 @@ class ApplicationRepository:
             query.order_by(*self._order_by(sort)).limit(limit).offset(offset)
         ).all()
         return list(items), total
+
+    def iter_for_user(
+        self, user_id: uuid.UUID, filters: ApplicationFilters, *, sort: str, batch_size: int = 500
+    ) -> Iterator[Application]:
+        """Every matching application, fetched `batch_size` rows at a time (a server-side
+        cursor on PostgreSQL), so exporting thousands of rows doesn't load them all at once."""
+        query = (
+            self._filtered(user_id, filters)
+            .order_by(*self._order_by(sort))
+            .execution_options(yield_per=batch_size)
+        )
+        yield from self.session.scalars(query)
 
     def due_for_follow_up(
         self,

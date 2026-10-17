@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from applytrack.core.errors import NotFoundError, ValidationFailedError
 from applytrack.models import Application, ApplicationStatus, StatusChange, User
-from applytrack.repositories.applications import ApplicationFilters, ApplicationRepository
+from applytrack.repositories.applications import ApplicationRepository
 from applytrack.schemas.applications import (
     ApplicationCreate,
     ApplicationListParams,
@@ -32,11 +32,12 @@ class ApplicationService:
         return application
 
     def search(self, params: ApplicationListParams) -> tuple[list[Application], int]:
-        filters = ApplicationFilters(
-            statuses=params.status, sources=params.source, company=params.company or None
-        )
         return self.repo.list_for_user(
-            self.user.id, filters, sort=params.sort, limit=params.limit, offset=params.offset
+            self.user.id,
+            params.filters(),
+            sort=params.sort,
+            limit=params.limit,
+            offset=params.offset,
         )
 
     def get(self, application_id: uuid.UUID, *, for_update: bool = False) -> Application:

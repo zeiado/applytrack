@@ -15,6 +15,7 @@ from pydantic import (
 )
 
 from applytrack.models import ApplicationSource, ApplicationStatus
+from applytrack.repositories.filters import ApplicationFilters
 from applytrack.schemas.pagination import MAX_PAGE_SIZE
 from applytrack.services.workflow import next_statuses
 
@@ -133,8 +134,8 @@ class StatusChangeRead(BaseModel):
 SortField = Literal["created_at", "-created_at", "applied_on", "-applied_on", "company", "-company"]
 
 
-class ApplicationListParams(BaseModel):
-    """Query parameters for listing applications. Unknown parameters are rejected."""
+class ApplicationFilterParams(BaseModel):
+    """Filters and sort shared by the list and export endpoints. Unknown parameters are rejected."""
 
     model_config = ConfigDict(extra="forbid")
 
@@ -146,5 +147,21 @@ class ApplicationListParams(BaseModel):
         Field(default=None, description="Case-insensitive partial match")
     )
     sort: SortField = Field(default="-created_at", description="Prefix with - for descending")
+
+    def filters(self) -> "ApplicationFilters":
+        return ApplicationFilters(
+            statuses=self.status, sources=self.source, company=self.company or None
+        )
+
+
+class ApplicationListParams(ApplicationFilterParams):
     limit: int = Field(default=20, ge=1, le=MAX_PAGE_SIZE)
     offset: int = Field(default=0, ge=0)
+
+
+class ApplicationExportParams(ApplicationFilterParams):
+    bom: bool = Field(
+        default=True,
+        description="Start the file with a UTF-8 byte order mark so Excel shows non-English "
+        "text (e.g. Arabic) correctly. Set false for other tools.",
+    )
