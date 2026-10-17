@@ -1,3 +1,4 @@
+from datetime import UTC, datetime
 from typing import Annotated
 
 from fastapi import Depends, Request
@@ -39,3 +40,11 @@ def get_current_user(
 
 
 CurrentUser = Annotated[User, Depends(get_current_user)]
+
+
+def get_now() -> datetime:
+    """The current time. A dependency, so tests can freeze it with dependency_overrides."""
+    return datetime.now(UTC)
+
+
+Now = Annotated[datetime, Depends(get_now)]

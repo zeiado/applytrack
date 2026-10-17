@@ -1,6 +1,7 @@
 import uuid
 from collections.abc import Sequence
 from dataclasses import dataclass
+from datetime import date
 from typing import Any
 
 from sqlalchemy import ColumnElement, Select, func, select
@@ -67,6 +68,32 @@ class ApplicationRepository:
         total = self.session.scalar(select(func.count()).select_from(query.subquery())) or 0
         items = self.session.scalars(
             query.order_by(*self._order_by(sort)).limit(limit).offset(offset)
+        ).all()
+        return list(items), total
+
+    def due_for_follow_up(
+        self,
+        user_id: uuid.UUID,
+        *,
+        on_or_before: date,
+        exclude_statuses: Sequence[ApplicationStatus],
+        limit: int,
+        offset: int,
+    ) -> tuple[list[Application], int]:
+        """Applications with a follow-up date on or before `on_or_before`, most overdue first."""
+        query = select(Application).where(
+            Application.user_id == user_id,
+            Application.follow_up_on.is_not(None),
+            Application.follow_up_on <= on_or_before,
+            Application.status.not_in(exclude_statuses),
+        )
+        total = self.session.scalar(select(func.count()).select_from(query.subquery())) or 0
+        items = self.session.scalars(
+            query.order_by(
+                Application.follow_up_on, func.lower(Application.company), Application.id
+            )
+            .limit(limit)
+            .offset(offset)
         ).all()
         return list(items), total
 
