@@ -3,9 +3,9 @@
 Each item becomes a GitHub issue, grouped into milestones.
 
 ## Milestone v0.1 – Foundation
-- [ ] #1 chore: project scaffold, tooling and CI
-- [ ] #2 feat: health and readiness endpoints
-- [ ] #3 feat: database setup and migrations
+- [ ] #1 chore: project scaffold, tooling, CI and `/health`
+- [ ] #2 feat: database setup, migrations and `/ready`
+- [ ] #3 feat: consistent error format
 
 ## Milestone v0.2 – Core (MVP)
 - [ ] #4 feat(auth): register and login with JWT (US-01)
