@@ -20,7 +20,7 @@ and documented design decisions.
 - [x] Status workflow with validated transitions and full history
 - [x] Interview log
 - [x] Follow-up reminders (timezone-aware)
-- [ ] Stats: response rate, offers by source, time in each stage
+- [x] Stats: response rate, offers by source, time in each stage
 
 See [docs/backlog.md](docs/backlog.md) for the roadmap.
 
