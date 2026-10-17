@@ -1,10 +1,20 @@
-.PHONY: install run lint format typecheck test check
+.PHONY: install run db migrate migration lint format typecheck test check
 
 install:
 	uv sync
 
 run:
 	uv run uvicorn applytrack.main:app --reload
+
+db:
+	docker compose up -d db
+
+migrate:
+	uv run alembic upgrade head
+
+# Usage: make migration m="add users table"
+migration:
+	uv run alembic revision --autogenerate -m "$(m)"
 
 lint:
 	uv run ruff check .

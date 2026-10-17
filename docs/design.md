@@ -107,9 +107,35 @@ All routes are under `/api/v1`. Data routes require `Authorization: Bearer <toke
 
 ### Error format
 
+Every error, whether raised by our code or by the framework, uses one shape:
+
 ```json
 { "error": { "code": "invalid_transition", "message": "Cannot move from rejected to applied" } }
 ```
+
+Validation errors add a `details` list:
+
+```json
+{
+  "error": {
+    "code": "validation_error",
+    "message": "Request validation failed",
+    "details": [{ "field": "body.salary_min", "message": "Input should be a valid integer", "type": "int_parsing" }]
+  }
+}
+```
+
+| Status | `code` | Raised by |
+|--------|--------|-----------|
+| 401 | `unauthorized` | `UnauthorizedError` (adds `WWW-Authenticate: Bearer`) |
+| 404 | `not_found` | `NotFoundError`, unknown routes |
+| 405 | `method_not_allowed` | wrong HTTP method |
+| 409 | `conflict` or a specific code | `ConflictError` |
+| 422 | `validation_error` | invalid request body, query or path |
+| 500 | `internal_error` | anything unexpected; logged with a stack trace, details never sent to the client |
+
+Services raise `AppError` subclasses from `core/errors.py`, never `HTTPException`,
+so business logic doesn't depend on the web framework.
 
 ## Testing strategy
 

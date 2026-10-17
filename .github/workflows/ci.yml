@@ -13,6 +13,23 @@ jobs:
   quality:
     name: Lint, type check, test
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: applytrack
+          POSTGRES_PASSWORD: applytrack
+          POSTGRES_DB: applytrack
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U applytrack"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+    env:
+      APPLYTRACK_DATABASE_URL: postgresql+psycopg://applytrack:applytrack@localhost:5432/applytrack
+      APPLYTRACK_TEST_DATABASE_URL: postgresql+psycopg://applytrack:applytrack@localhost:5432/applytrack
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
@@ -26,7 +43,12 @@ jobs:
           uv run ruff format --check .
       - name: Type check
         run: uv run mypy
-      - name: Test
+      - name: Migrations apply cleanly and match the models
+        run: |
+          uv run alembic upgrade head
+          uv run alembic check
+          uv run alembic downgrade base
+      - name: Test (PostgreSQL)
         run: uv run pytest --cov-report=xml
 
   docker:
