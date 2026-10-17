@@ -55,10 +55,11 @@ applications
   created_at / updated_at timestamptz
 
 status_changes
-  id              UUID PK
+  id              integer PK (insertion order)
   application_id  UUID FK → applications.id (on delete cascade)
   from_status     enum, nullable (null for the first entry)
   to_status       enum
+  note            text
   changed_at      timestamptz
 
 interviews
@@ -74,14 +75,30 @@ interviews
 
 ```
 wishlist ──► applied ──► screening ──► interviewing ──► offer ──► accepted
-                │            │              │              │
-                └────────────┴──────────────┴──────────────┴──► rejected
+                │  └─────────────────────►┘ │              │
+                └──────────┴────────────────┴──────────────┴──► rejected
 any non-final status ──► withdrawn
 ```
 
-Final statuses: `accepted`, `rejected`, `withdrawn`. Moving out of a final
-status is not allowed. The transition table lives in one place in
-`services/` and is covered by table-driven tests.
+- Final statuses: `accepted`, `rejected`, `withdrawn`. Nothing moves out of them.
+- `applied → interviewing` is allowed because many companies have no screening step.
+- Declining an offer is `offer → withdrawn`; a rescinded offer is `offer → rejected`.
+- The rules live in one pure module, `services/workflow.py`, tested for all 64
+  (from, to) pairs against a table written separately in the test.
+- An invalid move returns `409 invalid_transition` with the allowed statuses in
+  `details`. Every application response includes `next_statuses`, so clients can
+  show only valid options.
+
+**History.** Each change appends a row to `status_changes` (from, to, optional note,
+time). Creating an application records the first row (`from_status = null`). Rows are
+never updated. They're ordered by an integer id, so the order is exact even when two
+changes share a timestamp.
+
+**Concurrency.** A status change locks the application row (`SELECT ... FOR UPDATE`)
+until it commits. Without the lock, two simultaneous requests could both read
+`applied`, both pass validation, and leave a history that never happened. A
+PostgreSQL-only test runs two threads against the same application and checks
+that exactly one succeeds. It fails when the lock is removed.
 
 ## API (v1)
 

@@ -3,13 +3,14 @@ import uuid
 from sqlalchemy.orm import Session
 
 from applytrack.core.errors import NotFoundError, ValidationFailedError
-from applytrack.models import Application, User
+from applytrack.models import Application, ApplicationStatus, StatusChange, User
 from applytrack.repositories.applications import ApplicationFilters, ApplicationRepository
 from applytrack.schemas.applications import (
     ApplicationCreate,
     ApplicationListParams,
     ApplicationUpdate,
 )
+from applytrack.services.workflow import ensure_can_transition
 
 
 class ApplicationService:
@@ -21,10 +22,16 @@ class ApplicationService:
     def create(self, data: ApplicationCreate) -> Application:
         application = Application(user_id=self.user.id, **data.model_dump())
         self.repo.add(application)
+        # The first history entry records the starting status.
+        self.repo.add_status_change(
+            StatusChange(
+                application_id=application.id, from_status=None, to_status=application.status
+            )
+        )
         self.session.commit()
         return application
 
-    def list(self, params: ApplicationListParams) -> tuple[list[Application], int]:
+    def search(self, params: ApplicationListParams) -> tuple[list[Application], int]:
         filters = ApplicationFilters(
             statuses=params.status, sources=params.source, company=params.company or None
         )
@@ -32,8 +39,8 @@ class ApplicationService:
             self.user.id, filters, sort=params.sort, limit=params.limit, offset=params.offset
         )
 
-    def get(self, application_id: uuid.UUID) -> Application:
-        application = self.repo.get_for_user(self.user.id, application_id)
+    def get(self, application_id: uuid.UUID, *, for_update: bool = False) -> Application:
+        application = self.repo.get_for_user(self.user.id, application_id, for_update=for_update)
         if application is None:
             # Same answer whether it doesn't exist or belongs to someone else.
             raise NotFoundError("Application not found")
@@ -54,6 +61,27 @@ class ApplicationService:
             setattr(application, field, value)
         self.session.commit()
         return application
+
+    def change_status(
+        self, application_id: uuid.UUID, target: ApplicationStatus, note: str | None = None
+    ) -> Application:
+        application = self.get(application_id, for_update=True)
+        ensure_can_transition(application.status, target)
+
+        self.repo.add_status_change(
+            StatusChange(
+                application_id=application.id,
+                from_status=application.status,
+                to_status=target,
+                note=note,
+            )
+        )
+        application.status = target
+        self.session.commit()
+        return application
+
+    def history(self, application_id: uuid.UUID) -> list[StatusChange]:
+        return self.repo.history(self.get(application_id).id)
 
     def delete(self, application_id: uuid.UUID) -> None:
         self.repo.delete(self.get(application_id))

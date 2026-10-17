@@ -6,7 +6,7 @@ from typing import Any
 from sqlalchemy import ColumnElement, Select, func, select
 from sqlalchemy.orm import Session
 
-from applytrack.models import Application, ApplicationSource, ApplicationStatus
+from applytrack.models import Application, ApplicationSource, ApplicationStatus, StatusChange
 
 _SORT_COLUMNS = {
     "created_at": Application.created_at,
@@ -28,10 +28,28 @@ class ApplicationRepository:
     def __init__(self, session: Session) -> None:
         self.session = session
 
-    def get_for_user(self, user_id: uuid.UUID, application_id: uuid.UUID) -> Application | None:
-        return self.session.scalar(
-            select(Application).where(
-                Application.id == application_id, Application.user_id == user_id
+    def get_for_user(
+        self, user_id: uuid.UUID, application_id: uuid.UUID, *, for_update: bool = False
+    ) -> Application | None:
+        """Load one application. `for_update` locks the row until commit (PostgreSQL),
+        so two concurrent status changes can't both read the same old status."""
+        query = select(Application).where(
+            Application.id == application_id, Application.user_id == user_id
+        )
+        if for_update:
+            query = query.with_for_update()
+        return self.session.scalar(query)
+
+    def add_status_change(self, change: StatusChange) -> None:
+        self.session.add(change)
+        self.session.flush()
+
+    def history(self, application_id: uuid.UUID) -> list[StatusChange]:
+        return list(
+            self.session.scalars(
+                select(StatusChange)
+                .where(StatusChange.application_id == application_id)
+                .order_by(StatusChange.id)
             )
         )
 
