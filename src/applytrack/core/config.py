@@ -23,6 +23,11 @@ class Settings(BaseSettings):
     jwt_algorithm: Literal["HS256"] = "HS256"
     access_token_expire_minutes: int = 30
 
+    # Failed-login limits (see ADR 0005)
+    login_max_failures_per_account: int = 5
+    login_max_failures_per_ip: int = 20
+    login_window_seconds: int = 60
+
     @model_validator(mode="after")
     def _require_real_secret_in_production(self) -> Self:
         secret = self.jwt_secret_key.get_secret_value()

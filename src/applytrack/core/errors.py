@@ -43,12 +43,17 @@ class AppError(Exception):
         *,
         code: str | None = None,
         details: list[dict[str, Any]] | None = None,
+        headers: dict[str, str] | None = None,
     ) -> None:
         super().__init__(message)
         self.message = message
         self.details = details
+        self.headers = {**self.default_headers(), **(headers or {})}
         if code is not None:
             self.code = code
+
+    def default_headers(self) -> dict[str, str]:
+        return {}
 
 
 class NotFoundError(AppError):
@@ -71,6 +76,18 @@ class ValidationFailedError(AppError):
 class UnauthorizedError(AppError):
     status_code = status.HTTP_401_UNAUTHORIZED
     code = "unauthorized"
+
+    def default_headers(self) -> dict[str, str]:
+        return {"WWW-Authenticate": "Bearer"}
+
+
+class TooManyRequestsError(AppError):
+    status_code = status.HTTP_429_TOO_MANY_REQUESTS
+    code = "too_many_requests"
+
+    def __init__(self, message: str, *, retry_after: int, code: str | None = None) -> None:
+        super().__init__(message, code=code, headers={"Retry-After": str(retry_after)})
+        self.retry_after = retry_after
 
 
 def _error_response(
@@ -98,9 +115,8 @@ def _code_for_status(status_code: int) -> str:
 def register_exception_handlers(app: FastAPI) -> None:
     @app.exception_handler(AppError)
     async def app_error_handler(_: Request, exc: AppError) -> JSONResponse:
-        headers = {"WWW-Authenticate": "Bearer"} if isinstance(exc, UnauthorizedError) else None
         return _error_response(
-            exc.status_code, exc.code, exc.message, details=exc.details, headers=headers
+            exc.status_code, exc.code, exc.message, details=exc.details, headers=exc.headers or None
         )
 
     @app.exception_handler(StarletteHTTPException)
