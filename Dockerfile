@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # ---- Build stage: install dependencies into a virtualenv ----
-FROM python:3.12-slim AS builder
+FROM python:3.14-slim AS builder
 COPY --from=ghcr.io/astral-sh/uv:0.11 /uv /usr/local/bin/uv
 ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy
 WORKDIR /app
@@ -14,7 +14,7 @@ COPY migrations ./migrations
 COPY scripts/start.sh ./scripts/start.sh
 
 # ---- Runtime stage: small image, non-root user ----
-FROM python:3.12-slim
+FROM python:3.14-slim
 RUN useradd --create-home --uid 1000 app
 WORKDIR /app
 COPY --from=builder --chown=app:app /app /app
