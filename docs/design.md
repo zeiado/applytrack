@@ -151,6 +151,30 @@ earlier, most overdue first, with `days_overdue` on each item.
   `app.dependency_overrides` instead of mocking.
 - Served by an index on `(user_id, follow_up_on)`.
 
+### Stats
+
+`GET /stats` returns counts by status, a funnel, rates, results by source and the
+average time spent in each stage.
+
+| Term | Definition |
+|------|------------|
+| applied | ever reached `applied` (wishlist items never sent don't count) |
+| responded | after applying, reached screening, interviewing, offer, accepted **or rejected**. A rejection is a reply; withdrawing yourself isn't |
+| interviewed / offers | reached `interviewing` / `offer` (or later) |
+| rates | `responded`, `interviewed`, `offers` divided by `applied`; `null` when nothing was applied to |
+| days in stage | average over **completed** stays (entered the stage, then left it); stages you're still in aren't counted yet |
+
+How it's built:
+
+- `services/stats.py` is a pure function over plain data classes, unit-tested with
+  hand-made histories where every number can be checked by hand.
+- The repository loads everything in **two queries** (applications, then history),
+  however many applications there are. A test counts the SQL statements for 1 and
+  for 10 applications and fails if they differ (an N+1 guard).
+- Computing in Python rather than SQL keeps the definitions readable and testable.
+  One user has at most hundreds of rows, so this is cheap. If stats were ever needed
+  across all users, the same definitions would move into SQL aggregates.
+
 ### Lists and pagination
 
 List endpoints return one page plus the total number of matches:
