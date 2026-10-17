@@ -6,6 +6,7 @@ from fastapi import FastAPI
 from applytrack import __version__
 from applytrack.api.routes import health
 from applytrack.core.config import Settings, get_settings
+from applytrack.core.errors import ErrorResponse, register_exception_handlers
 from applytrack.db.session import build_engine, build_session_factory
 
 
@@ -19,11 +20,20 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         yield
         engine.dispose()
 
-    app = FastAPI(title=settings.app_name, version=__version__, lifespan=lifespan)
+    app = FastAPI(
+        title=settings.app_name,
+        version=__version__,
+        lifespan=lifespan,
+        responses={
+            422: {"model": ErrorResponse, "description": "Validation error"},
+            500: {"model": ErrorResponse, "description": "Unexpected error"},
+        },
+    )
     app.state.settings = settings
     app.state.engine = engine
     app.state.session_factory = build_session_factory(engine)
 
+    register_exception_handlers(app)
     app.include_router(health.router)
     return app
 
