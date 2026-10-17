@@ -1,9 +1,25 @@
 import uuid
+from collections.abc import Sequence
+from dataclasses import dataclass
+from typing import Any
 
-from sqlalchemy import select
+from sqlalchemy import ColumnElement, Select, func, select
 from sqlalchemy.orm import Session
 
-from applytrack.models import Application
+from applytrack.models import Application, ApplicationSource, ApplicationStatus
+
+_SORT_COLUMNS = {
+    "created_at": Application.created_at,
+    "applied_on": Application.applied_on,
+    "company": func.lower(Application.company),
+}
+
+
+@dataclass(frozen=True)
+class ApplicationFilters:
+    statuses: Sequence[ApplicationStatus] | None = None
+    sources: Sequence[ApplicationSource] | None = None
+    company: str | None = None
 
 
 class ApplicationRepository:
@@ -19,6 +35,23 @@ class ApplicationRepository:
             )
         )
 
+    def list_for_user(
+        self,
+        user_id: uuid.UUID,
+        filters: ApplicationFilters,
+        *,
+        sort: str,
+        limit: int,
+        offset: int,
+    ) -> tuple[list[Application], int]:
+        """Return one page of matching applications and the total number of matches."""
+        query = self._filtered(user_id, filters)
+        total = self.session.scalar(select(func.count()).select_from(query.subquery())) or 0
+        items = self.session.scalars(
+            query.order_by(*self._order_by(sort)).limit(limit).offset(offset)
+        ).all()
+        return list(items), total
+
     def add(self, application: Application) -> Application:
         self.session.add(application)
         self.session.flush()
@@ -27,3 +60,24 @@ class ApplicationRepository:
     def delete(self, application: Application) -> None:
         self.session.delete(application)
         self.session.flush()
+
+    @staticmethod
+    def _filtered(user_id: uuid.UUID, filters: ApplicationFilters) -> Select[Application]:
+        query = select(Application).where(Application.user_id == user_id)
+        if filters.statuses:
+            query = query.where(Application.status.in_(filters.statuses))
+        if filters.sources:
+            query = query.where(Application.source.in_(filters.sources))
+        if filters.company:
+            # autoescape: a search for "50%" matches the text "50%", not "50 then anything".
+            query = query.where(Application.company.icontains(filters.company, autoescape=True))
+        return query
+
+    @staticmethod
+    def _order_by(sort: str) -> list[ColumnElement[Any]]:
+        descending = sort.startswith("-")
+        column = _SORT_COLUMNS[sort.removeprefix("-")]
+        ordered = column.desc() if descending else column.asc()
+        # NULLS LAST in both directions (databases disagree on the default), then id
+        # as a tie-breaker so pages never overlap or skip rows.
+        return [ordered.nulls_last(), Application.id.asc()]

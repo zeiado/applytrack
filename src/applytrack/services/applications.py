@@ -4,8 +4,12 @@ from sqlalchemy.orm import Session
 
 from applytrack.core.errors import NotFoundError, ValidationFailedError
 from applytrack.models import Application, User
-from applytrack.repositories.applications import ApplicationRepository
-from applytrack.schemas.applications import ApplicationCreate, ApplicationUpdate
+from applytrack.repositories.applications import ApplicationFilters, ApplicationRepository
+from applytrack.schemas.applications import (
+    ApplicationCreate,
+    ApplicationListParams,
+    ApplicationUpdate,
+)
 
 
 class ApplicationService:
@@ -19,6 +23,14 @@ class ApplicationService:
         self.repo.add(application)
         self.session.commit()
         return application
+
+    def list(self, params: ApplicationListParams) -> tuple[list[Application], int]:
+        filters = ApplicationFilters(
+            statuses=params.status, sources=params.source, company=params.company or None
+        )
+        return self.repo.list_for_user(
+            self.user.id, filters, sort=params.sort, limit=params.limit, offset=params.offset
+        )
 
     def get(self, application_id: uuid.UUID) -> Application:
         application = self.repo.get_for_user(self.user.id, application_id)
