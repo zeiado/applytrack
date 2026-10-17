@@ -18,7 +18,7 @@ and documented design decisions.
 - [x] Applications: create, read, update, delete, scoped to the logged-in user
 - [x] Filtering, sorting and pagination
 - [x] Status workflow with validated transitions and full history
-- [ ] Interview log
+- [x] Interview log
 - [ ] Follow-up reminders
 - [ ] Stats: response rate, offers by source, time in each stage
 
