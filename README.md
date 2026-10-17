@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/zeiado/applytrack/actions/workflows/ci.yml/badge.svg)](https://github.com/zeiado/applytrack/actions/workflows/ci.yml)
 [![CodeQL](https://github.com/zeiado/applytrack/actions/workflows/codeql.yml/badge.svg)](https://github.com/zeiado/applytrack/actions/workflows/codeql.yml)
-![Python](https://img.shields.io/badge/python-3.12-blue)
+![Python](https://img.shields.io/badge/python-3.12%20%7C%203.14-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 A REST API for tracking job applications: where you applied, what stage each one is in,

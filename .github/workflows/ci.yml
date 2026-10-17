@@ -15,8 +15,14 @@ permissions:
 
 jobs:
   quality:
-    name: Lint, type check, test
+    name: Lint, type check, test (Python ${{ matrix.python }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # 3.12 is the oldest version we support (requires-python); the Docker image
+        # ships whatever the Dockerfile's base image is. Keep that version in this list.
+        python: ["3.12", "3.14"]
     services:
       postgres:
         image: postgres:17-alpine
@@ -39,6 +45,7 @@ jobs:
       - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
         with:
           enable-cache: true
+          python-version: ${{ matrix.python }}
       - name: Install dependencies
         run: uv sync --frozen
       - name: Lint
