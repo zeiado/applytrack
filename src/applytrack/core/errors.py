@@ -37,9 +37,16 @@ class AppError(Exception):
     status_code: int = status.HTTP_400_BAD_REQUEST
     code: str = "bad_request"
 
-    def __init__(self, message: str, *, code: str | None = None) -> None:
+    def __init__(
+        self,
+        message: str,
+        *,
+        code: str | None = None,
+        details: list[dict[str, Any]] | None = None,
+    ) -> None:
         super().__init__(message)
         self.message = message
+        self.details = details
         if code is not None:
             self.code = code
 
@@ -92,7 +99,9 @@ def register_exception_handlers(app: FastAPI) -> None:
     @app.exception_handler(AppError)
     async def app_error_handler(_: Request, exc: AppError) -> JSONResponse:
         headers = {"WWW-Authenticate": "Bearer"} if isinstance(exc, UnauthorizedError) else None
-        return _error_response(exc.status_code, exc.code, exc.message, headers=headers)
+        return _error_response(
+            exc.status_code, exc.code, exc.message, details=exc.details, headers=headers
+        )
 
     @app.exception_handler(StarletteHTTPException)
     async def http_error_handler(_: Request, exc: StarletteHTTPException) -> JSONResponse:
