@@ -16,6 +16,7 @@ dependencies = [
     "pwdlib[argon2]>=0.3.1",
     "pydantic-settings>=2.16.0",
     "pyjwt>=2.15.1",
+    "python-multipart>=0.0.32",
     "sqlalchemy>=2.1.5",
     "uvicorn[standard]>=0.54.0",
 ]
@@ -42,7 +43,7 @@ target-version = "py312"
 select = ["E", "F", "W", "I", "B", "UP", "N", "S", "SIM", "RUF"]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**" = ["S101", "S105", "S106"]
+"tests/**" = ["S101", "S105", "S106", "S107"]
 "migrations/**" = ["E501"]
 
 [tool.mypy]

@@ -14,7 +14,7 @@ and documented design decisions.
 
 - [x] Health and readiness checks
 - [x] PostgreSQL with Alembic migrations
-- [ ] JWT authentication
+- [x] Register and log in with JWT (Argon2 password hashing)
 - [ ] Applications CRUD with filtering, sorting and pagination
 - [ ] Status workflow with validated transitions and full history
 - [ ] Interview log
@@ -47,14 +47,34 @@ make run      # start the API with auto-reload
 make check    # lint, type check, test (tests use in-memory SQLite, no database needed)
 ```
 
+## Try it
+
+1. Open http://localhost:8000/docs
+2. `POST /api/v1/auth/register` with an email and password
+3. Click **Authorize**, enter the same email (as username) and password
+4. Call `GET /api/v1/users/me`
+
+Or with curl:
+
+```bash
+curl -X POST localhost:8000/api/v1/auth/register -H 'Content-Type: application/json' \
+  -d '{"email": "ada@example.com", "password": "correct-horse"}'
+TOKEN=$(curl -s -X POST localhost:8000/api/v1/auth/login \
+  -d 'username=ada@example.com&password=correct-horse' | jq -r .access_token)
+curl localhost:8000/api/v1/users/me -H "Authorization: Bearer $TOKEN"
+```
+
 ## Project structure
 
 ```
 src/applytrack/
-  api/          HTTP routers (thin) and dependencies
-  core/         settings, security, logging
-  db/           engine and per-request sessions
+  api/          HTTP routers (thin) and dependencies (DB session, current user)
+  services/     business rules
+  repositories/ database queries
+  schemas/      Pydantic request/response models (the API contract)
   models/       SQLAlchemy ORM models
+  core/         settings, security, errors
+  db/           engine and per-request sessions
 migrations/     Alembic migration scripts
 docs/
   requirements.md   user stories and requirements

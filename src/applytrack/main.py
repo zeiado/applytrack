@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 from applytrack import __version__
+from applytrack.api.router import api_router
 from applytrack.api.routes import health
 from applytrack.core.config import Settings, get_settings
 from applytrack.core.errors import ErrorResponse, register_exception_handlers
@@ -35,6 +36,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     register_exception_handlers(app)
     app.include_router(health.router)
+    app.include_router(api_router)
     return app
 
 
