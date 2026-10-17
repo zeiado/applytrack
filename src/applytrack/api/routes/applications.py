@@ -1,12 +1,16 @@
 import uuid
+from collections.abc import Iterator
 from typing import Annotated, Any
 
-from fastapi import APIRouter, Query, Response, status
+from fastapi import APIRouter, Query, Request, Response, status
+from fastapi.responses import StreamingResponse
 
-from applytrack.api.deps import CurrentUser, DbSession
+from applytrack.api.deps import CurrentUser, DbSession, Now
 from applytrack.core.errors import ErrorResponse
+from applytrack.repositories.applications import ApplicationRepository
 from applytrack.schemas.applications import (
     ApplicationCreate,
+    ApplicationExportParams,
     ApplicationListParams,
     ApplicationRead,
     ApplicationUpdate,
@@ -15,6 +19,7 @@ from applytrack.schemas.applications import (
 )
 from applytrack.schemas.pagination import Page
 from applytrack.services.applications import ApplicationService
+from applytrack.services.export import to_csv
 
 router = APIRouter(
     prefix="/applications",
@@ -35,6 +40,39 @@ def list_applications(
         total=total,
         limit=params.limit,
         offset=params.offset,
+    )
+
+
+# Declared before /{application_id} so "export.csv" isn't parsed as an id.
+@router.get(
+    "/export.csv",
+    response_class=StreamingResponse,
+    responses={200: {"content": {"text/csv": {}}, "description": "CSV file"}},
+)
+def export_applications(
+    params: Annotated[ApplicationExportParams, Query()],
+    request: Request,
+    user: CurrentUser,
+    now: Now,
+) -> StreamingResponse:
+    """Download your applications as CSV. Takes the same filters and sort as the list."""
+    session_factory = request.app.state.session_factory
+    user_id = user.id
+
+    def chunks() -> Iterator[str]:
+        # The response is sent while this runs, after the request's own session has
+        # closed, so the export opens a session of its own.
+        with session_factory() as session:
+            rows = ApplicationRepository(session).iter_for_user(
+                user_id, params.filters(), sort=params.sort
+            )
+            yield from to_csv(rows, bom=params.bom)
+
+    filename = f"applications-{now.date().isoformat()}.csv"
+    return StreamingResponse(
+        chunks(),
+        media_type="text/csv; charset=utf-8",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
     )
 
 

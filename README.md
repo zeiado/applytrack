@@ -21,6 +21,7 @@ and documented design decisions.
 - [x] Interview log
 - [x] Follow-up reminders (timezone-aware)
 - [x] Stats: response rate, offers by source, time in each stage
+- [x] CSV export (streamed, safe to open in Excel)
 
 See [docs/backlog.md](docs/backlog.md) for the roadmap.
 
