@@ -19,6 +19,22 @@ make test             # run tests
 make run              # start the API on http://localhost:8000
 ```
 
+## Database migrations
+
+```bash
+make migration m="describe the change"   # autogenerate from the models
+```
+
+Always read the generated file before committing. Known autogenerate problems:
+
+- Columns using our string enums (ADR 0004) get their CHECK constraint twice. Keep the
+  `op.f("ck_...")` one and set `create_constraint=False` on the `sa.Enum`.
+- It never writes data migrations (backfills); add those by hand.
+- It doesn't compare CHECK constraints, so changes to `models/enums.py` need a
+  hand-written migration.
+
+CI applies every migration on PostgreSQL, runs `alembic check`, and downgrades to base.
+
 ## Definition of done
 
 - Acceptance criteria met and covered by tests

@@ -9,7 +9,7 @@ from applytrack.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
 from applytrack.models.enums import ApplicationSource, ApplicationStatus
 
 
-def _enum_column(enum_cls: type[StrEnum], name: str) -> Enum:
+def enum_column(enum_cls: type[StrEnum], name: str) -> Enum:
     # Stored as VARCHAR + CHECK constraint instead of a native PostgreSQL ENUM,
     # so adding a value later is a simple migration (see ADR 0004).
     return Enum(
@@ -41,10 +41,10 @@ class Application(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     role_title: Mapped[str] = mapped_column(String(200))
     job_url: Mapped[str | None] = mapped_column(String(2048))
     source: Mapped[ApplicationSource] = mapped_column(
-        _enum_column(ApplicationSource, "application_source"), default=ApplicationSource.OTHER
+        enum_column(ApplicationSource, "application_source"), default=ApplicationSource.OTHER
     )
     status: Mapped[ApplicationStatus] = mapped_column(
-        _enum_column(ApplicationStatus, "application_status"),
+        enum_column(ApplicationStatus, "application_status"),
         default=ApplicationStatus.APPLIED,
         index=True,
     )
