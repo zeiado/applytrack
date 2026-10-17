@@ -4,7 +4,7 @@ from fastapi.testclient import TestClient
 
 from applytrack.core.rate_limit import InMemoryRateLimiter, LoginRateLimiter
 from applytrack.services import auth as auth_service
-from tests.conftest import AuthHelper
+from tests.conftest import AuthHelper, error_without_request_id
 from tests.test_rate_limit import FakeClock
 
 LOGIN = "/api/v1/auth/login"
@@ -50,7 +50,7 @@ def test_sixth_failure_in_a_minute_is_blocked(client: TestClient) -> None:
 
     assert response.status_code == 429
     assert response.headers["retry-after"] == "60"
-    assert response.json() == {
+    assert error_without_request_id(response) == {
         "error": {
             "code": "too_many_login_attempts",
             "message": "Too many failed login attempts. Try again in 60 seconds.",

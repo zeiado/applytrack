@@ -6,6 +6,7 @@ from fastapi.testclient import TestClient
 from pydantic import BaseModel
 
 from applytrack.core.errors import ConflictError, NotFoundError, UnauthorizedError
+from tests.conftest import error_without_request_id
 
 
 class Payload(BaseModel):
@@ -53,7 +54,9 @@ def test_app_error_uses_standard_shape(error_client: TestClient) -> None:
     response = error_client.get("/_test/not-found")
 
     assert response.status_code == 404
-    assert response.json() == {"error": {"code": "not_found", "message": "Application not found"}}
+    assert error_without_request_id(response) == {
+        "error": {"code": "not_found", "message": "Application not found"}
+    }
 
 
 def test_app_error_can_override_code(error_client: TestClient) -> None:
@@ -105,7 +108,7 @@ def test_unexpected_errors_hide_internals(
     response = error_client.get("/_test/crash")
 
     assert response.status_code == 500
-    assert response.json() == {
+    assert error_without_request_id(response) == {
         "error": {"code": "internal_error", "message": "An unexpected error occurred"}
     }
     assert "hunter2" not in response.text
