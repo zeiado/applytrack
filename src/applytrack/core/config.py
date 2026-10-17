@@ -16,6 +16,7 @@ class Settings(BaseSettings):
     app_name: str = "ApplyTrack"
     environment: Literal["local", "test", "production"] = "local"
     log_level: str = "INFO"
+    log_format: Literal["auto", "json", "text"] = "auto"  # auto: json in production, else text
     database_url: str = "postgresql+psycopg://applytrack:applytrack@localhost:5432/applytrack"
     database_echo: bool = False
 
@@ -36,6 +37,12 @@ class Settings(BaseSettings):
                 "APPLYTRACK_JWT_SECRET_KEY must be set to a random 32+ character value"
             )
         return self
+
+
+def resolved_log_format(settings: Settings) -> Literal["json", "text"]:
+    if settings.log_format == "auto":
+        return "json" if settings.environment == "production" else "text"
+    return settings.log_format
 
 
 @lru_cache

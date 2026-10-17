@@ -6,8 +6,10 @@ from fastapi import FastAPI
 from applytrack import __version__
 from applytrack.api.router import api_router
 from applytrack.api.routes import health
-from applytrack.core.config import Settings, get_settings
+from applytrack.core.config import Settings, get_settings, resolved_log_format
 from applytrack.core.errors import ErrorResponse, register_exception_handlers
+from applytrack.core.logging import configure_logging
+from applytrack.core.middleware import RequestContextMiddleware
 from applytrack.core.rate_limit import InMemoryRateLimiter, LoginRateLimiter
 from applytrack.db.session import build_engine, build_session_factory
 
@@ -46,9 +48,17 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     )
 
     register_exception_handlers(app)
+    app.add_middleware(RequestContextMiddleware)
     app.include_router(health.router)
     app.include_router(api_router)
     return app
 
 
-app = create_app()
+def create_production_app() -> FastAPI:
+    """Entry point for uvicorn: configure logging once for the process, then build the app."""
+    settings = get_settings()
+    configure_logging(level=settings.log_level, log_format=resolved_log_format(settings))
+    return create_app(settings)
+
+
+app = create_production_app()

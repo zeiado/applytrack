@@ -3,7 +3,6 @@
 ``{"error": {"code": "...", "message": "...", "details": [...]}}``
 """
 
-import logging
 from collections.abc import Mapping
 from http import HTTPStatus
 from typing import Any
@@ -12,16 +11,19 @@ from fastapi import FastAPI, Request, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-logger = logging.getLogger(__name__)
+from applytrack.core.logging import request_id_var
 
 
 class ErrorDetail(BaseModel):
     code: str
     message: str
     details: list[dict[str, Any]] | None = None
+    request_id: str | None = Field(
+        default=None, description="Quote this when reporting a problem; it's in the server logs"
+    )
 
 
 class ErrorResponse(BaseModel):
@@ -97,7 +99,15 @@ def _error_response(
     details: list[dict[str, Any]] | None = None,
     headers: Mapping[str, str] | None = None,
 ) -> JSONResponse:
-    body = ErrorResponse(error=ErrorDetail(code=code, message=message, details=details))
+    request_id = request_id_var.get()
+    body = ErrorResponse(
+        error=ErrorDetail(
+            code=code,
+            message=message,
+            details=details,
+            request_id=request_id if request_id != "-" else None,
+        )
+    )
     return JSONResponse(
         status_code=status_code,
         content=body.model_dump(exclude_none=True),
@@ -145,12 +155,9 @@ def register_exception_handlers(app: FastAPI) -> None:
             details=details,
         )
 
-    @app.exception_handler(Exception)
-    async def unhandled_error_handler(request: Request, exc: Exception) -> JSONResponse:
-        # Log the full stack trace, but never send internals to the client.
-        logger.exception("Unhandled error on %s %s", request.method, request.url.path, exc_info=exc)
-        return _error_response(
-            status.HTTP_500_INTERNAL_SERVER_ERROR,
-            "internal_error",
-            "An unexpected error occurred",
-        )
+
+def internal_error_response() -> JSONResponse:
+    """The generic 500 body. Used by the request middleware for unhandled exceptions."""
+    return _error_response(
+        status.HTTP_500_INTERNAL_SERVER_ERROR, "internal_error", "An unexpected error occurred"
+    )

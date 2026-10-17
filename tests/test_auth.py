@@ -6,7 +6,7 @@ from fastapi.testclient import TestClient
 
 from applytrack.core.config import Settings
 from applytrack.core.security import create_access_token
-from tests.conftest import AuthHelper
+from tests.conftest import AuthHelper, error_without_request_id
 
 REGISTER = "/api/v1/auth/register"
 LOGIN = "/api/v1/auth/login"
@@ -85,7 +85,7 @@ def test_login_failures_look_the_same(
     response = client.post(LOGIN, data={"username": email, "password": password})
 
     assert response.status_code == 401
-    assert response.json() == {
+    assert error_without_request_id(response) == {
         "error": {"code": "invalid_credentials", "message": "Incorrect email or password"}
     }
 

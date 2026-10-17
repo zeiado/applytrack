@@ -4,7 +4,7 @@ install:
 	uv sync
 
 run:
-	uv run uvicorn applytrack.main:app --reload
+	uv run uvicorn applytrack.main:app --reload --no-access-log
 
 db:
 	docker compose up -d db

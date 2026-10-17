@@ -89,3 +89,11 @@ class AuthHelper:
 @pytest.fixture
 def auth(client: TestClient) -> AuthHelper:
     return AuthHelper(client)
+
+
+def error_without_request_id(response: Any) -> dict[str, Any]:
+    """The response's JSON body minus error.request_id, after checking that id
+    matches the X-Request-ID header. Lets tests compare the rest of the body exactly."""
+    body: dict[str, Any] = response.json()
+    assert body["error"].pop("request_id") == response.headers["x-request-id"]
+    return body
