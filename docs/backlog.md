@@ -23,6 +23,6 @@ Tracked as [GitHub issues](https://github.com/zeiado/applytrack/issues), grouped
 ## v1.0 Production
 - [x] [#13](https://github.com/zeiado/applytrack/issues/13) feat(security): rate-limit login
 - [x] [#14](https://github.com/zeiado/applytrack/issues/14) chore: structured JSON logging and request ids
-- [ ] [#15](https://github.com/zeiado/applytrack/issues/15) chore: security scanning and Dependabot
+- [x] [#15](https://github.com/zeiado/applytrack/issues/15) chore: security scanning and Dependabot
 - [ ] [#16](https://github.com/zeiado/applytrack/issues/16) chore: release workflow and Docker image publishing
 - [ ] [#17](https://github.com/zeiado/applytrack/issues/17) chore: deploy to a cloud host

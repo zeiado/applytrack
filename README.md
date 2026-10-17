@@ -1,6 +1,7 @@
 # ApplyTrack
 
 [![CI](https://github.com/zeiado/applytrack/actions/workflows/ci.yml/badge.svg)](https://github.com/zeiado/applytrack/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/zeiado/applytrack/actions/workflows/codeql.yml/badge.svg)](https://github.com/zeiado/applytrack/actions/workflows/codeql.yml)
 ![Python](https://img.shields.io/badge/python-3.12-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
@@ -97,6 +98,7 @@ This repo follows a lightweight but complete software development lifecycle:
 | Implementation | Feature branches, Conventional Commits, PR template ([CONTRIBUTING.md](CONTRIBUTING.md)) |
 | Testing | pytest unit and integration tests, 85% coverage gate |
 | CI | GitHub Actions: ruff, mypy (strict), migration checks and tests on PostgreSQL, Docker build |
+| Security | [SECURITY.md](SECURITY.md): dependency audit and CodeQL in CI, Dependabot, pinned actions |
 | Release | Semantic Versioning and a changelog |
 
 ## License
