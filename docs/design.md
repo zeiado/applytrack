@@ -246,6 +246,41 @@ Validation errors add a `details` list:
 Services raise `AppError` subclasses from `core/errors.py`, never `HTTPException`,
 so business logic doesn't depend on the web framework.
 
+## Observability
+
+**Request ids.** Every request gets an id: the caller's `X-Request-ID` if it's 1–64
+characters of `[A-Za-z0-9._-]`, otherwise a new random one. Accepting the caller's
+id lets one id follow a request across services. Rejecting anything else stops
+clients from injecting newlines that would forge fake log lines. The id is
+returned in the `X-Request-ID` header, attached to every log line written during
+the request, and included in error bodies as `error.request_id`, so a user
+reporting a problem can quote it.
+
+**Logs** go to stdout (the platform collects them):
+
+- `APPLYTRACK_LOG_FORMAT=auto` (default): JSON lines in production, readable text elsewhere.
+- One access line per request from `applytrack.access`: method, path, status,
+  `duration_ms` and client IP. The query string is left out because it can hold
+  personal data such as emails. 5xx responses log at `ERROR`. Uvicorn's own access
+  log is turned off (`--no-access-log`) so requests aren't logged twice.
+
+```json
+{"time": "2026-10-17T19:30:48.984+00:00", "level": "INFO", "logger": "applytrack.access",
+ "message": "GET /api/v1/users/me 401", "request_id": "demo-42",
+ "http": {"method": "GET", "path": "/api/v1/users/me", "status": 401, "duration_ms": 7.6, "client": "127.0.0.1"}}
+```
+
+**Unhandled errors** are caught by the same middleware. It logs the stack trace
+and returns the standard `500 internal_error` body with the request id; internals
+never reach the client. If the response had already started (for example
+mid-way through a CSV export), the error is re-raised and the server closes the
+connection, because a status code can't be changed once it's sent.
+
+It's a plain ASGI middleware rather than Starlette's `BaseHTTPMiddleware`, which
+has known problems with streaming responses and context variables. It uses only
+the standard `logging` module: a JSON formatter is about 20 lines, so a
+dependency like structlog wasn't worth adding.
+
 ## Testing strategy
 
 | Level | What | Tools |
