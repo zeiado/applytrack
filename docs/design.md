@@ -175,6 +175,23 @@ How it's built:
   One user has at most hundreds of rows, so this is cheap. If stats were ever needed
   across all users, the same definitions would move into SQL aggregates.
 
+### CSV export
+
+`GET /applications/export.csv` takes the same filters and `sort` as the list (but no
+`limit`/`offset`) and downloads `applications-YYYY-MM-DD.csv`.
+
+- **Streamed:** rows are read in batches of 500 (a server-side cursor on PostgreSQL)
+  and written as they arrive, so memory use doesn't grow with the export. The response
+  is sent after the request's own database session closes, so the export opens its own.
+  If the database fails mid-export the download is cut short; the 200 status has
+  already been sent by then, which is the trade-off of streaming.
+- **CSV injection:** a cell starting with `=`, `+`, `-`, `@`, tab or carriage return is
+  prefixed with `'`, so spreadsheet apps show it as text instead of running it as a
+  formula (OWASP guidance).
+- **Excel:** the file starts with a UTF-8 byte order mark by default, without which
+  Excel on Windows garbles non-English text such as Arabic. `bom=false` turns it off
+  for other tools.
+
 ### Lists and pagination
 
 List endpoints return one page plus the total number of matches:
