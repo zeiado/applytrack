@@ -1,12 +1,14 @@
 """Alembic environment. The database URL comes from app settings, never from alembic.ini."""
 
 from logging.config import fileConfig
+from typing import Any
 
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
 from applytrack.core.config import get_settings
 from applytrack.models import Base
+from applytrack.models.base import UTCDateTime
 
 config = context.config
 if config.config_file_name is not None:
@@ -18,6 +20,13 @@ if not config.get_main_option("sqlalchemy.url"):
 target_metadata = Base.metadata
 
 
+def render_item(type_: str, obj: Any, autogen_context: Any) -> str | bool:
+    """Write our UTCDateTime as a plain timezone-aware DateTime, so migrations don't import app code."""
+    if type_ == "type" and isinstance(obj, UTCDateTime):
+        return "sa.DateTime(timezone=True)"
+    return False
+
+
 def run_migrations_offline() -> None:
     """Emit SQL to stdout instead of running it (``alembic upgrade head --sql``)."""
     context.configure(
@@ -25,6 +34,7 @@ def run_migrations_offline() -> None:
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
+        render_item=render_item,
         render_as_batch=True,
     )
     with context.begin_transaction():
@@ -42,6 +52,7 @@ def run_migrations_online() -> None:
             connection=connection,
             target_metadata=target_metadata,
             compare_type=True,
+            render_item=render_item,
             render_as_batch=True,  # lets ALTER TABLE work on SQLite too
         )
         with context.begin_transaction():
