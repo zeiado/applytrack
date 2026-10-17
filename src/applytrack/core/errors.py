@@ -54,6 +54,13 @@ class ConflictError(AppError):
     code = "conflict"
 
 
+class ValidationFailedError(AppError):
+    """Input that is well-formed but breaks a business rule (e.g. salary_min > salary_max)."""
+
+    status_code = status.HTTP_422_UNPROCESSABLE_CONTENT
+    code = "validation_error"
+
+
 class UnauthorizedError(AppError):
     status_code = status.HTTP_401_UNAUTHORIZED
     code = "unauthorized"

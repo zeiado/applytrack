@@ -16,14 +16,15 @@ def _request_for(factory: Any) -> Request:
 
 
 def test_get_db_yields_a_session_and_closes_it() -> None:
-    factory = build_session_factory(build_engine("sqlite+pysqlite:///:memory:"))
-    gen = get_db(_request_for(factory))
+    engine = build_engine("sqlite+pysqlite:///:memory:")
+    gen = get_db(_request_for(build_session_factory(engine)))
 
     session = next(gen)
     assert isinstance(session, Session)
 
     with pytest.raises(StopIteration):
         next(gen)
+    engine.dispose()
 
 
 def test_get_db_rolls_back_when_the_request_fails() -> None:
@@ -50,6 +51,7 @@ def test_get_db_rolls_back_when_the_request_fails() -> None:
 def test_file_based_sqlite_does_not_use_static_pool(tmp_path: Any) -> None:
     engine = build_engine(f"sqlite+pysqlite:///{tmp_path}/test.db")
     assert type(engine.pool).__name__ != "StaticPool"
+    engine.dispose()
 
 
 def test_utc_datetime_rejects_naive_and_normalizes_to_utc() -> None:
@@ -58,7 +60,9 @@ def test_utc_datetime_rejects_naive_and_normalizes_to_utc() -> None:
     from applytrack.models.base import UTCDateTime
 
     col = UTCDateTime()
-    dialect = build_engine("sqlite+pysqlite:///:memory:").dialect
+    engine = build_engine("sqlite+pysqlite:///:memory:")
+    dialect = engine.dialect
+    engine.dispose()
     cairo = timezone(timedelta(hours=3))
 
     with pytest.raises(ValueError, match="Naive"):
