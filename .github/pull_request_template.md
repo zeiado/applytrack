@@ -17,4 +17,5 @@ Closes #
 - [ ] Tests added or updated
 - [ ] `make check` passes locally
 - [ ] Docs / ADR updated if behavior or design changed
+- [ ] `CHANGELOG.md` updated under Unreleased (if users would notice)
 - [ ] Migration added if the schema changed
