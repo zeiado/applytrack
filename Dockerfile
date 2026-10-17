@@ -9,6 +9,9 @@ COPY pyproject.toml uv.lock README.md ./
 RUN uv sync --frozen --no-dev --no-install-project
 COPY src ./src
 RUN uv sync --frozen --no-dev
+COPY alembic.ini ./
+COPY migrations ./migrations
+COPY scripts/start.sh ./scripts/start.sh
 
 # ---- Runtime stage: small image, non-root user ----
 FROM python:3.12-slim
@@ -19,4 +22,4 @@ ENV PATH="/app/.venv/bin:$PATH" PYTHONUNBUFFERED=1
 USER app
 EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=3s CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"
-CMD ["uvicorn", "applytrack.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["./scripts/start.sh"]
