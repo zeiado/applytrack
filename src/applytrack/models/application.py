@@ -2,7 +2,7 @@ import uuid
 from datetime import date
 from enum import StrEnum
 
-from sqlalchemy import CheckConstraint, Date, Enum, ForeignKey, Integer, String, Text
+from sqlalchemy import CheckConstraint, Date, Enum, ForeignKey, Index, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from applytrack.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
@@ -31,11 +31,12 @@ class Application(UUIDPrimaryKeyMixin, TimestampMixin, Base):
             name="salary_range",
         ),
         CheckConstraint("salary_min IS NULL OR salary_min >= 0", name="salary_min_non_negative"),
+        # Serves the default list query (one user's rows, newest first) and any lookup
+        # by user_id alone, so a separate user_id index isn't needed.
+        Index("ix_applications_user_id_created_at", "user_id", "created_at"),
     )
 
-    user_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("users.id", ondelete="CASCADE"), index=True
-    )
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
     company: Mapped[str] = mapped_column(String(200))
     role_title: Mapped[str] = mapped_column(String(200))
     job_url: Mapped[str | None] = mapped_column(String(2048))
