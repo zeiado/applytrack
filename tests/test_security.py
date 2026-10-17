@@ -86,3 +86,12 @@ def test_production_refuses_weak_jwt_secret(secret: str) -> None:
 def test_production_accepts_strong_jwt_secret() -> None:
     settings = Settings(environment="production", jwt_secret_key=SecretStr("s" * 48))
     assert settings.environment == "production"
+
+
+@pytest.mark.real_hashing
+def test_production_hasher_uses_secure_argon2_settings() -> None:
+    """The fast test hasher must never be what the app really uses."""
+    hashed = hash_password("x")
+
+    assert hashed.startswith("$argon2id$")
+    assert "m=65536,t=3" in hashed  # pwdlib's recommended memory and time cost

@@ -5,14 +5,29 @@ from typing import Any
 import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
+from pwdlib import PasswordHash
+from pwdlib.hashers.argon2 import Argon2Hasher
 from pydantic import SecretStr
 
+from applytrack.core import security
 from applytrack.core.config import Settings
 from applytrack.main import create_app
 from applytrack.models import Base
 
 # CI sets this to a real PostgreSQL database; locally tests default to in-memory SQLite.
 TEST_DATABASE_URL = os.environ.get("APPLYTRACK_TEST_DATABASE_URL", "sqlite+pysqlite:///:memory:")
+
+
+@pytest.fixture(autouse=True)
+def fast_password_hashing(request: pytest.FixtureRequest, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Argon2 is slow on purpose (~60 ms). Tests use the cheapest settings, which are
+    still real Argon2 hashes; production keeps the secure defaults.
+    Mark a test with @pytest.mark.real_hashing to opt out."""
+    if request.node.get_closest_marker("real_hashing"):
+        return
+    fast = PasswordHash((Argon2Hasher(time_cost=1, memory_cost=1024, parallelism=1),))
+    monkeypatch.setattr(security, "_password_hash", fast)
+    monkeypatch.setattr(security, "_DUMMY_HASH", fast.hash("not-a-real-password"))
 
 
 @pytest.fixture

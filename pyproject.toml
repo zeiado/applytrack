@@ -56,6 +56,9 @@ files = ["src", "tests"]
 testpaths = ["tests"]
 addopts = "-ra --strict-markers --cov=applytrack --cov-report=term-missing --cov-fail-under=85"
 # New warnings fail the build. Known upstream ones are listed explicitly.
+markers = [
+    "real_hashing: use the production Argon2 settings instead of the fast test ones",
+]
 filterwarnings = [
     "error",
     "ignore:Using `httpx` with `starlette.testclient` is deprecated",
