@@ -37,6 +37,12 @@ docker compose up --build
 This starts PostgreSQL, applies migrations and runs the API.
 API: http://localhost:8000 · Interactive docs: http://localhost:8000/docs
 
+### Released image
+
+```bash
+docker pull ghcr.io/zeiado/applytrack:latest
+```
+
 ### Local development
 
 Requires [uv](https://docs.astral.sh/uv/).
@@ -99,7 +105,7 @@ This repo follows a lightweight but complete software development lifecycle:
 | Testing | pytest unit and integration tests, 85% coverage gate |
 | CI | GitHub Actions: ruff, mypy (strict), migration checks and tests on PostgreSQL, Docker build |
 | Security | [SECURITY.md](SECURITY.md): dependency audit and CodeQL in CI, Dependabot, pinned actions |
-| Release | Semantic Versioning and a changelog |
+| Release | Semantic Versioning, [CHANGELOG.md](CHANGELOG.md), tag-driven releases to GHCR with SBOM and provenance |
 
 ## License
 

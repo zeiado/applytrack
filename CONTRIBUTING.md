@@ -56,9 +56,36 @@ table has an unnamed or duplicated CHECK constraint.
   can be moved to point at different code, but a SHA can't. Dependabot updates both.
 - Report vulnerabilities privately, as described in [SECURITY.md](SECURITY.md).
 
+## Releasing
+
+Versions follow [Semantic Versioning](https://semver.org/). The version lives only in
+`pyproject.toml`; the app reads it from there.
+
+1. On a branch, bump the version: `uv version --bump minor` (or `major` / `patch`).
+2. In `CHANGELOG.md`, rename `## [Unreleased]` to `## [X.Y.Z] - YYYY-MM-DD` and add a
+   fresh empty `## [Unreleased]` above it.
+3. Open a PR (`chore(release): vX.Y.Z`), get CI green, merge.
+4. Tag the merge commit and push the tag:
+   ```bash
+   git checkout main && git pull
+   git tag -a vX.Y.Z -m "vX.Y.Z" && git push origin vX.Y.Z
+   ```
+
+The **Release** workflow then:
+
+1. checks the tag matches `pyproject.toml` and the changelog has that version,
+2. runs the full CI,
+3. pushes `ghcr.io/zeiado/applytrack:X.Y.Z`, `:X.Y`, `:X` and `:latest` with build
+   provenance and an SBOM,
+4. creates a GitHub Release whose notes are that version's changelog section.
+
+If any step fails, nothing after it runs. Fix the problem, delete the tag
+(`git push --delete origin vX.Y.Z`), and tag again.
+
 ## Definition of done
 
 - Acceptance criteria met and covered by tests
 - Lint, type check and tests pass in CI
 - Coverage stays at or above 85%
 - Docs updated (README, design doc or a new ADR when a decision changes)
+- User-visible changes added under `## [Unreleased]` in `CHANGELOG.md`

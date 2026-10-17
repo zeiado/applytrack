@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_call: # the release workflow runs the full CI before publishing
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -48,10 +49,8 @@ jobs:
           python-version: ${{ matrix.python }}
       - name: Install dependencies
         run: uv sync --frozen
-      - name: Lint
-        run: |
-          uv run ruff check .
-          uv run ruff format --check .
+      - name: Lint (Python and workflow files)
+        run: make lint
       - name: Type check
         run: uv run mypy
       - name: Migrations apply cleanly and match the models

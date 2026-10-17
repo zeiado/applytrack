@@ -19,6 +19,7 @@ migration:
 lint:
 	uv run ruff check .
 	uv run ruff format --check .
+	uvx --from actionlint-py==1.7.12.25 actionlint
 
 format:
 	uv run ruff check --fix .
