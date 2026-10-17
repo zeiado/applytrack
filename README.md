@@ -15,7 +15,8 @@ and documented design decisions.
 - [x] Health and readiness checks
 - [x] PostgreSQL with Alembic migrations
 - [x] Register and log in with JWT (Argon2 password hashing)
-- [ ] Applications CRUD with filtering, sorting and pagination
+- [x] Applications: create, read, update, delete, scoped to the logged-in user
+- [ ] Filtering, sorting and pagination
 - [ ] Status workflow with validated transitions and full history
 - [ ] Interview log
 - [ ] Follow-up reminders

@@ -30,6 +30,7 @@ def app(settings: Settings) -> Iterator[FastAPI]:
     Base.metadata.create_all(app.state.engine)
     yield app
     Base.metadata.drop_all(app.state.engine)
+    app.state.engine.dispose()
 
 
 @pytest.fixture

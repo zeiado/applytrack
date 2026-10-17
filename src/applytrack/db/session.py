@@ -1,7 +1,8 @@
 from collections.abc import Generator
+from typing import Any
 
 from fastapi import Request
-from sqlalchemy import Engine, create_engine
+from sqlalchemy import Engine, create_engine, event
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool
 
@@ -12,7 +13,9 @@ def build_engine(database_url: str, *, echo: bool = False) -> Engine:
         kwargs: dict[str, object] = {"connect_args": {"check_same_thread": False}}
         if ":memory:" in database_url or database_url.endswith("://"):
             kwargs["poolclass"] = StaticPool
-        return create_engine(database_url, echo=echo, **kwargs)
+        engine = create_engine(database_url, echo=echo, **kwargs)
+        event.listen(engine, "connect", _enable_sqlite_foreign_keys)
+        return engine
     return create_engine(database_url, echo=echo, pool_pre_ping=True)
 
 
@@ -29,3 +32,10 @@ def get_db(request: Request) -> Generator[Session]:
         except Exception:
             session.rollback()
             raise
+
+
+def _enable_sqlite_foreign_keys(dbapi_connection: Any, _: Any) -> None:
+    """SQLite ignores foreign keys (and ON DELETE CASCADE) unless asked, unlike PostgreSQL."""
+    cursor = dbapi_connection.cursor()
+    cursor.execute("PRAGMA foreign_keys=ON")
+    cursor.close()
