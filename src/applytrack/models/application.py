@@ -34,6 +34,8 @@ class Application(UUIDPrimaryKeyMixin, TimestampMixin, Base):
         # Serves the default list query (one user's rows, newest first) and any lookup
         # by user_id alone, so a separate user_id index isn't needed.
         Index("ix_applications_user_id_created_at", "user_id", "created_at"),
+        # Serves the due-reminders query: one user's rows with follow_up_on <= a date.
+        Index("ix_applications_user_id_follow_up_on", "user_id", "follow_up_on"),
     )
 
     user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
@@ -51,5 +53,5 @@ class Application(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     salary_min: Mapped[int | None] = mapped_column(Integer)
     salary_max: Mapped[int | None] = mapped_column(Integer)
     applied_on: Mapped[date | None] = mapped_column(Date)
-    follow_up_on: Mapped[date | None] = mapped_column(Date, index=True)
+    follow_up_on: Mapped[date | None] = mapped_column(Date)
     notes: Mapped[str | None] = mapped_column(Text)
