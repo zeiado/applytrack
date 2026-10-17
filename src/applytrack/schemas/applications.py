@@ -10,11 +10,13 @@ from pydantic import (
     HttpUrl,
     StringConstraints,
     TypeAdapter,
+    computed_field,
     model_validator,
 )
 
 from applytrack.models import ApplicationSource, ApplicationStatus
 from applytrack.schemas.pagination import MAX_PAGE_SIZE
+from applytrack.services.workflow import next_statuses
 
 Name = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=200)]
 _http_url = TypeAdapter(HttpUrl)
@@ -104,6 +106,28 @@ class ApplicationRead(BaseModel):
     notes: str | None
     created_at: datetime
     updated_at: datetime
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def next_statuses(self) -> list[ApplicationStatus]:
+        """Statuses this application can move to next."""
+        return next_statuses(self.status)
+
+
+class StatusChangeRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    status: ApplicationStatus
+    note: Notes | None = None
+
+
+class StatusChangeRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    from_status: ApplicationStatus | None
+    to_status: ApplicationStatus
+    note: str | None
+    changed_at: datetime
 
 
 SortField = Literal["created_at", "-created_at", "applied_on", "-applied_on", "company", "-company"]

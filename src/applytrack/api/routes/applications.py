@@ -10,6 +10,8 @@ from applytrack.schemas.applications import (
     ApplicationListParams,
     ApplicationRead,
     ApplicationUpdate,
+    StatusChangeRead,
+    StatusChangeRequest,
 )
 from applytrack.schemas.pagination import Page
 from applytrack.services.applications import ApplicationService
@@ -27,7 +29,7 @@ def list_applications(
     params: Annotated[ApplicationListParams, Query()], db: DbSession, user: CurrentUser
 ) -> Page[ApplicationRead]:
     """List your applications, filtered, sorted and paginated."""
-    items, total = ApplicationService(db, user).list(params)
+    items, total = ApplicationService(db, user).search(params)
     return Page[ApplicationRead](
         items=[ApplicationRead.model_validate(a) for a in items],
         total=total,
@@ -65,3 +67,24 @@ def update_application(
 def delete_application(application_id: uuid.UUID, db: DbSession, user: CurrentUser) -> None:
     """Delete an application."""
     ApplicationService(db, user).delete(application_id)
+
+
+@router.post(
+    "/{application_id}/status",
+    responses={**NOT_FOUND, status.HTTP_409_CONFLICT: {"model": ErrorResponse}},
+)
+def change_status(
+    application_id: uuid.UUID, body: StatusChangeRequest, db: DbSession, user: CurrentUser
+) -> ApplicationRead:
+    """Move an application to a new status. Invalid moves return 409 with the allowed ones."""
+    application = ApplicationService(db, user).change_status(application_id, body.status, body.note)
+    return ApplicationRead.model_validate(application)
+
+
+@router.get("/{application_id}/history", responses=NOT_FOUND)
+def status_history(
+    application_id: uuid.UUID, db: DbSession, user: CurrentUser
+) -> list[StatusChangeRead]:
+    """Every status the application has been in, oldest first."""
+    changes = ApplicationService(db, user).history(application_id)
+    return [StatusChangeRead.model_validate(c) for c in changes]
