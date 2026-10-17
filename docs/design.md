@@ -135,6 +135,22 @@ Interviews are nested under their application:
   for every interview route. An interview id only works under its own application.
 - Interviews are listed earliest first. Deleting an application deletes its interviews.
 
+### Reminders
+
+`GET /reminders/due` lists open applications whose `follow_up_on` is today or
+earlier, most overdue first, with `days_overdue` on each item.
+
+- **Whose "today"?** At 23:30 UTC it's already tomorrow in Tokyo. Clients pass
+  `tz` (an IANA name such as `Africa/Cairo`, default `UTC`), and the response echoes
+  the `today` it used. Unknown names return `422`.
+- `within_days=N` (0–30) also includes follow-ups coming up in the next N days
+  (`days_overdue` is negative for those).
+- Accepted, rejected and withdrawn applications are never due.
+- **Time is a dependency.** Routes get the current time from `get_now`, never by
+  calling `datetime.now()` themselves, so tests freeze the clock with
+  `app.dependency_overrides` instead of mocking.
+- Served by an index on `(user_id, follow_up_on)`.
+
 ### Lists and pagination
 
 List endpoints return one page plus the total number of matches:
