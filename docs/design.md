@@ -63,12 +63,13 @@ status_changes
   changed_at      timestamptz
 
 interviews
-  id              UUID PK
-  application_id  UUID FK → applications.id (on delete cascade)
-  scheduled_at    timestamptz
-  kind            enum(phone_screen, technical, behavioral, onsite, other)
-  interviewer     text
-  notes           text
+  id                UUID PK
+  application_id    UUID FK → applications.id (on delete cascade)
+  scheduled_at      timestamptz          index (application_id, scheduled_at)
+  kind              enum(phone_screen, technical, behavioral, onsite, other)
+  duration_minutes  int, 1–1440
+  interviewer       text
+  notes             text
 ```
 
 ## Status workflow
@@ -121,6 +122,18 @@ All routes are under `/api/v1`. Data routes require `Authorization: Bearer <toke
 | GET | `/stats` | Aggregate stats |
 | GET | `/health` | Liveness (no auth) |
 | GET | `/ready` | Readiness: checks the database (no auth) |
+
+### Interviews
+
+Interviews are nested under their application:
+`/applications/{id}/interviews` and `/applications/{id}/interviews/{interview_id}`.
+
+- `scheduled_at` must include a timezone (`2026-10-20T14:00:00+03:00`); a time
+  without one is rejected, because "2pm" means different moments in Cairo and
+  London. It's stored and returned in UTC.
+- The application is checked first, so another user's application gives `404`
+  for every interview route. An interview id only works under its own application.
+- Interviews are listed earliest first. Deleting an application deletes its interviews.
 
 ### Lists and pagination
 

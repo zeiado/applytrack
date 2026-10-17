@@ -34,6 +34,18 @@ Always read the generated file before committing. Known autogenerate problems:
   hand-written migration.
 
 CI applies every migration on PostgreSQL, runs `alembic check`, and downgrades to base.
+`tests/test_migrations.py` does the same on SQLite during `make test`, and fails if a
+table has an unnamed or duplicated CHECK constraint.
+
+## Tests
+
+- `make test` uses in-memory SQLite. To run against PostgreSQL like CI does:
+  `APPLYTRACK_TEST_DATABASE_URL=postgresql+psycopg://... make test`
+  (tests marked PostgreSQL-only, such as row locking, run only then).
+- Tests use cheap Argon2 settings for speed. Mark a test `@pytest.mark.real_hashing`
+  to use the production ones.
+- Any warning fails the run. Add an explicit `filterwarnings` entry only for known
+  upstream warnings.
 
 ## Definition of done
 
