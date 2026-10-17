@@ -14,6 +14,7 @@ from pydantic import (
 )
 
 from applytrack.models import ApplicationSource, ApplicationStatus
+from applytrack.schemas.pagination import MAX_PAGE_SIZE
 
 Name = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=200)]
 _http_url = TypeAdapter(HttpUrl)
@@ -103,3 +104,23 @@ class ApplicationRead(BaseModel):
     notes: str | None
     created_at: datetime
     updated_at: datetime
+
+
+SortField = Literal["created_at", "-created_at", "applied_on", "-applied_on", "company", "-company"]
+
+
+class ApplicationListParams(BaseModel):
+    """Query parameters for listing applications. Unknown parameters are rejected."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    status: list[ApplicationStatus] | None = Field(
+        default=None, description="Repeat to match any of several: ?status=applied&status=screening"
+    )
+    source: list[ApplicationSource] | None = None
+    company: Annotated[str, StringConstraints(strip_whitespace=True, max_length=200)] | None = (
+        Field(default=None, description="Case-insensitive partial match")
+    )
+    sort: SortField = Field(default="-created_at", description="Prefix with - for descending")
+    limit: int = Field(default=20, ge=1, le=MAX_PAGE_SIZE)
+    offset: int = Field(default=0, ge=0)

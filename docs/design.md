@@ -105,6 +105,27 @@ All routes are under `/api/v1`. Data routes require `Authorization: Bearer <toke
 | GET | `/health` | Liveness (no auth) |
 | GET | `/ready` | Readiness: checks the database (no auth) |
 
+### Lists and pagination
+
+List endpoints return one page plus the total number of matches:
+
+```json
+{ "items": [ ... ], "total": 42, "limit": 20, "offset": 0 }
+```
+
+- `limit` defaults to 20 (max 100); `offset` defaults to 0.
+- `GET /applications` filters: `status` and `source` (repeat to match several:
+  `?status=applied&status=screening`), `company` (case-insensitive substring;
+  `%` and `_` are matched literally).
+- `sort`: `created_at`, `applied_on` or `company`; prefix with `-` for descending.
+  Default `-created_at`. Missing dates sort last in both directions, and `id` breaks
+  ties, so pages never overlap or skip rows.
+- Unknown query parameters return `422` instead of being silently ignored.
+
+Offset pagination is simple and lets clients jump to any page. Its weakness (slow deep
+pages, rows shifting while you page) doesn't matter at one user's scale; keyset
+pagination would be the upgrade if lists grew large.
+
 ### Error format
 
 Every error, whether raised by our code or by the framework, uses one shape:

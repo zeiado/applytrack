@@ -1,11 +1,17 @@
 import uuid
-from typing import Any
+from typing import Annotated, Any
 
-from fastapi import APIRouter, Response, status
+from fastapi import APIRouter, Query, Response, status
 
 from applytrack.api.deps import CurrentUser, DbSession
 from applytrack.core.errors import ErrorResponse
-from applytrack.schemas.applications import ApplicationCreate, ApplicationRead, ApplicationUpdate
+from applytrack.schemas.applications import (
+    ApplicationCreate,
+    ApplicationListParams,
+    ApplicationRead,
+    ApplicationUpdate,
+)
+from applytrack.schemas.pagination import Page
 from applytrack.services.applications import ApplicationService
 
 router = APIRouter(
@@ -14,6 +20,20 @@ router = APIRouter(
     responses={status.HTTP_401_UNAUTHORIZED: {"model": ErrorResponse}},
 )
 NOT_FOUND: dict[int | str, dict[str, Any]] = {status.HTTP_404_NOT_FOUND: {"model": ErrorResponse}}
+
+
+@router.get("")
+def list_applications(
+    params: Annotated[ApplicationListParams, Query()], db: DbSession, user: CurrentUser
+) -> Page[ApplicationRead]:
+    """List your applications, filtered, sorted and paginated."""
+    items, total = ApplicationService(db, user).list(params)
+    return Page[ApplicationRead](
+        items=[ApplicationRead.model_validate(a) for a in items],
+        total=total,
+        limit=params.limit,
+        offset=params.offset,
+    )
 
 
 @router.post("", status_code=status.HTTP_201_CREATED)
