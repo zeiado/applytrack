@@ -47,6 +47,15 @@ table has an unnamed or duplicated CHECK constraint.
 - Any warning fails the run. Add an explicit `filterwarnings` entry only for known
   upstream warnings.
 
+## Dependencies and security
+
+- `make audit` checks every locked dependency against known vulnerabilities (CI runs it too).
+- Dependabot opens weekly PRs for Python packages, GitHub Actions and the Docker base image.
+  Minor and patch updates come grouped; review the changelog for majors.
+- GitHub Actions are pinned to full commit SHAs, with the version in a comment. A tag
+  can be moved to point at different code, but a SHA can't. Dependabot updates both.
+- Report vulnerabilities privately, as described in [SECURITY.md](SECURITY.md).
+
 ## Definition of done
 
 - Acceptance criteria met and covered by tests

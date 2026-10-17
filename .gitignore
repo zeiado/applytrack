@@ -14,3 +14,4 @@ build/
 *.db
 .idea/
 .vscode/
+.audit-requirements.txt
