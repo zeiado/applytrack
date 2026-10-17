@@ -2,42 +2,362 @@
 
 [![CI](https://github.com/zeiado/applytrack/actions/workflows/ci.yml/badge.svg)](https://github.com/zeiado/applytrack/actions/workflows/ci.yml)
 [![CodeQL](https://github.com/zeiado/applytrack/actions/workflows/codeql.yml/badge.svg)](https://github.com/zeiado/applytrack/actions/workflows/codeql.yml)
+![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)
 ![Python](https://img.shields.io/badge/python-3.12%20%7C%203.14-blue)
+![mypy](https://img.shields.io/badge/mypy-strict-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
-A REST API for tracking job applications: where you applied, what stage each one is in,
-upcoming interviews, and when to follow up.
+**A production-style REST API for tracking a job search:** every application, the stage it's
+in, its full status history, interviews, follow-up reminders and stats on what's working.
 
-Built with **FastAPI**, **PostgreSQL**, **SQLAlchemy 2.0** and **Alembic**, with CI, Docker,
-and documented design decisions.
+It's built as a small but complete piece of software engineering: written requirements
+and design docs, architecture decision records, issue-driven development through
+reviewed pull requests, 328 automated tests on two databases, strict typing, security
+scanning, and tag-driven releases of a Docker image with build provenance.
+
+---
+
+## Contents
+
+- [Why](#why)
+- [Features](#features)
+- [Tech stack](#tech-stack)
+- [Architecture](#architecture)
+- [API](#api)
+- [Engineering highlights](#engineering-highlights)
+- [Quality and testing](#quality-and-testing)
+- [CI/CD](#cicd)
+- [Getting started](#getting-started)
+- [Configuration](#configuration)
+- [Project structure](#project-structure)
+- [How this project was built](#how-this-project-was-built)
+- [Roadmap](#roadmap)
+
+---
+
+## Why
+
+Job seekers juggle dozens of applications across spreadsheets, inboxes and memory.
+Follow-ups get forgotten, interview dates get lost, and nobody can say whether referrals
+actually work better than job boards. ApplyTrack keeps it all in one place and answers
+that question with data. See the [requirements](docs/requirements.md) for the user
+stories and priorities.
 
 ## Features
 
-- [x] Health and readiness checks
-- [x] PostgreSQL with Alembic migrations
-- [x] Register and log in with JWT (Argon2 password hashing, failed-login rate limiting)
-- [x] Applications: create, read, update, delete, scoped to the logged-in user
-- [x] Filtering, sorting and pagination
-- [x] Status workflow with validated transitions and full history
-- [x] Interview log
-- [x] Follow-up reminders (timezone-aware)
-- [x] Stats: response rate, offers by source, time in each stage
-- [x] CSV export (streamed, safe to open in Excel)
+| Area | What it does |
+|------|--------------|
+| **Accounts** | Register and log in. Argon2id password hashing, short-lived JWT access tokens, failed-login rate limiting |
+| **Applications** | Create, read, update (partial) and delete. Company, role, link, source, salary range, dates, notes |
+| **Search** | Filter by status, source and company (case-insensitive), sort on three fields, paginate with totals |
+| **Status workflow** | `wishlist → applied → screening → interviewing → offer → accepted` with validated transitions, `rejected`/`withdrawn` exits, and an append-only history |
+| **Interviews** | Log interviews per application, with timezone-aware times stored in UTC |
+| **Reminders** | Applications due for a follow-up today *in your timezone*, most overdue first |
+| **Stats** | Response, interview and offer rates; results by source; average days spent in each stage |
+| **Export** | Streamed CSV download, safe to open in Excel (formula-injection escaping, UTF-8 BOM for Arabic text) |
+| **Operations** | Liveness and readiness probes, request ids, structured JSON logs, one consistent error format |
 
-See [docs/backlog.md](docs/backlog.md) for the roadmap.
+## Tech stack
 
-## Quick start
+| Layer | Choice | Why |
+|-------|--------|-----|
+| Language | Python 3.12+ (tested on 3.12 and 3.14) | Typed, fast to build with |
+| Web framework | FastAPI + Pydantic v2 | Validation from type hints, OpenAPI docs for free, dependency injection |
+| Database | PostgreSQL 17 | Relational data with constraints ([ADR 0002](docs/adr/0002-fastapi-postgres-sqlalchemy.md)) |
+| ORM and migrations | SQLAlchemy 2.0 (typed) + Alembic | Explicit queries, versioned schema |
+| Auth | PyJWT + pwdlib (Argon2id) | Stateless tokens ([ADR 0003](docs/adr/0003-jwt-authentication.md)) |
+| Tooling | uv, Ruff, mypy `--strict`, pytest, pre-commit | Fast, reproducible, strict |
+| Delivery | Docker (multi-stage, non-root), GitHub Actions, GHCR | Same image from CI to production |
+| Security | pip-audit, CodeQL, Dependabot, actionlint | Known-vulnerability and code scanning on every PR |
 
-### With Docker
+---
+
+## Architecture
+
+A single service with a strict layered design. Routers handle HTTP only, services hold
+the business rules, and repositories are the only code that talks to the database.
+That keeps the rules testable without HTTP, and every query scoped to one user.
+
+```mermaid
+flowchart LR
+    client([Client]) --> mw
+
+    subgraph app [FastAPI app]
+        direction LR
+        mw["RequestContext middleware<br/><sub>request id · access log · last-resort 500</sub>"]
+        mw --> routers["api/routes<br/><sub>validate input, shape output</sub>"]
+        routers --> deps["api/deps<br/><sub>DB session · current user · clock</sub>"]
+        routers --> services["services<br/><sub>workflow · stats · reminders · export</sub>"]
+        services --> repos["repositories<br/><sub>user-scoped SQL</sub>"]
+    end
+
+    repos --> db[(PostgreSQL)]
+    routers -.->|"errors (AppError)"| handlers["core/errors<br/><sub>one JSON error shape</sub>"]
+```
+
+Some of the business logic is written as **pure functions with no I/O**, so it's
+unit-tested with hand-made data: the status workflow (`services/workflow.py`), stats
+(`services/stats.py`) and CSV writing (`services/export.py`).
+
+### Data model
+
+```mermaid
+erDiagram
+    USERS ||--o{ APPLICATIONS : owns
+    APPLICATIONS ||--o{ STATUS_CHANGES : "history of"
+    APPLICATIONS ||--o{ INTERVIEWS : has
+
+    USERS {
+        uuid id PK
+        string email UK
+        string password_hash
+        timestamptz created_at
+    }
+    APPLICATIONS {
+        uuid id PK
+        uuid user_id FK
+        string company
+        string role_title
+        string status "CHECK constraint"
+        string source "CHECK constraint"
+        int salary_min "CHECK min <= max"
+        int salary_max
+        date applied_on
+        date follow_up_on
+        text notes
+    }
+    STATUS_CHANGES {
+        int id PK "insertion order"
+        uuid application_id FK
+        string from_status
+        string to_status
+        text note
+        timestamptz changed_at
+    }
+    INTERVIEWS {
+        uuid id PK
+        uuid application_id FK
+        timestamptz scheduled_at
+        string kind
+        int duration_minutes
+        string interviewer
+    }
+```
+
+All foreign keys cascade on delete. Indexes match the real queries:
+`(user_id, created_at)` for the default list and `(user_id, follow_up_on)` for
+reminders. Enums are stored as strings with CHECK constraints so that adding a value
+is a simple migration ([ADR 0004](docs/adr/0004-store-enums-as-strings.md)).
+
+### Status workflow
+
+```mermaid
+stateDiagram-v2
+    direction LR
+    [*] --> wishlist
+    [*] --> applied
+    wishlist --> applied
+    applied --> screening
+    applied --> interviewing : no screening step
+    screening --> interviewing
+    interviewing --> offer
+    offer --> accepted
+    applied --> rejected
+    screening --> rejected
+    interviewing --> rejected
+    offer --> rejected : offer rescinded
+    wishlist --> withdrawn
+    applied --> withdrawn
+    screening --> withdrawn
+    interviewing --> withdrawn
+    offer --> withdrawn : offer declined
+    accepted --> [*]
+    rejected --> [*]
+    withdrawn --> [*]
+```
+
+An invalid move returns `409` with the statuses that *are* allowed, and every response
+includes `next_statuses` so a client only offers valid options. The rules are tested
+for all 64 `(from, to)` pairs.
+
+More detail is in the **[design doc](docs/design.md)**.
+
+---
+
+## API
+
+Interactive docs (Swagger UI) are at `/docs` when the app is running. All data routes
+need `Authorization: Bearer <token>`, and other users' resources return `404`.
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/health` | Liveness probe and version |
+| `GET` | `/ready` | Readiness probe: checks the database, `503` if it's down |
+| `POST` | `/api/v1/auth/register` | Create an account |
+| `POST` | `/api/v1/auth/login` | Get an access token (OAuth2 password form) |
+| `GET` | `/api/v1/users/me` | The current user |
+| `GET` | `/api/v1/applications` | List: `status`, `source`, `company`, `sort`, `limit`, `offset` |
+| `POST` | `/api/v1/applications` | Create |
+| `GET` `PATCH` `DELETE` | `/api/v1/applications/{id}` | Read, partially update, delete |
+| `POST` | `/api/v1/applications/{id}/status` | Move to a new status (validated) |
+| `GET` | `/api/v1/applications/{id}/history` | Every status change, oldest first |
+| `GET` `POST` | `/api/v1/applications/{id}/interviews` | List, add interviews |
+| `GET` `PATCH` `DELETE` | `/api/v1/applications/{id}/interviews/{iid}` | One interview |
+| `GET` | `/api/v1/applications/export.csv` | Download as CSV (same filters as the list) |
+| `GET` | `/api/v1/reminders/due` | Follow-ups due: `tz`, `within_days` |
+| `GET` | `/api/v1/stats` | Funnel, rates, by-source results, days in stage |
+
+<details>
+<summary><b>Example session</b></summary>
 
 ```bash
+# Register and log in
+curl -X POST localhost:8000/api/v1/auth/register -H 'Content-Type: application/json' \
+  -d '{"email": "ada@example.com", "password": "correct-horse"}'
+TOKEN=$(curl -s -X POST localhost:8000/api/v1/auth/login \
+  -d 'username=ada@example.com&password=correct-horse' | jq -r .access_token)
+AUTH="Authorization: Bearer $TOKEN"
+
+# Add an application and move it forward
+ID=$(curl -s -X POST localhost:8000/api/v1/applications -H "$AUTH" -H 'Content-Type: application/json' \
+  -d '{"company": "Acme", "role_title": "Backend Engineer", "source": "referral", "follow_up_on": "2026-10-24"}' \
+  | jq -r .id)
+curl -X POST localhost:8000/api/v1/applications/$ID/status -H "$AUTH" -H 'Content-Type: application/json' \
+  -d '{"status": "screening", "note": "Recruiter call booked"}'
+
+# What's due, and how is it going?
+curl "localhost:8000/api/v1/reminders/due?tz=Africa/Cairo" -H "$AUTH"
+curl localhost:8000/api/v1/stats -H "$AUTH"
+```
+
+</details>
+
+**Errors** always have the same shape, including a `request_id` that's also in the
+server logs:
+
+```json
+{
+  "error": {
+    "code": "invalid_transition",
+    "message": "Cannot move from wishlist to offer. Allowed: applied, withdrawn",
+    "details": [{ "from": "wishlist", "to": "offer", "allowed": ["applied", "withdrawn"] }],
+    "request_id": "3c729026ad4a49b2894e1b3d128aabd6"
+  }
+}
+```
+
+---
+
+## Engineering highlights
+
+The problems worth talking about, and how each was solved. Each one has tests, and most
+link to the PR or ADR with the reasoning.
+
+**Correctness**
+- **Race-free status changes.** A status change locks the row (`SELECT … FOR UPDATE`).
+  A PostgreSQL test fires two simultaneous changes and checks that exactly one wins;
+  it fails 3 out of 3 times with the lock removed. ([#24](https://github.com/zeiado/applytrack/pull/24))
+- **Timezones handled explicitly.** Interview times must include a timezone and are
+  stored in UTC. "Due today" is computed in the caller's timezone, and the current
+  time is an injected dependency, so tests freeze it without mocking. ([#25](https://github.com/zeiado/applytrack/pull/25), [#26](https://github.com/zeiado/applytrack/pull/26))
+- **Same behaviour on SQLite and PostgreSQL.** A custom column type keeps timestamps
+  UTC-aware on both, and SQLite foreign keys are switched on. Both gaps were found by
+  tests. ([#21](https://github.com/zeiado/applytrack/pull/21), [#22](https://github.com/zeiado/applytrack/pull/22))
+- **Stable pagination.** A deterministic sort with an `id` tie-breaker and nulls last,
+  so paging never skips or repeats rows. ([#23](https://github.com/zeiado/applytrack/pull/23))
+
+**Performance**
+- **No N+1 queries.** Stats load everything in two queries. A test counts the SQL
+  statements for 1 and 10 applications and requires exactly 3 either way. ([#27](https://github.com/zeiado/applytrack/pull/27))
+- **Streaming export.** Rows are read in batches of 500 through a server-side cursor,
+  so memory stays flat, and the export opens its own DB session because the response
+  outlives the request's. ([#28](https://github.com/zeiado/applytrack/pull/28))
+- **Indexes match the queries.** Composite indexes are created before the old ones are
+  dropped, so a migration never leaves a column unindexed. ([#23](https://github.com/zeiado/applytrack/pull/23), [#26](https://github.com/zeiado/applytrack/pull/26))
+
+**Security**
+- **Ownership by construction.** Repositories only have user-scoped queries, and
+  another user's resources return `404`, not `403`, so their existence isn't leaked.
+- **Brute-force protection.** A sliding-window limit per (IP, email) and per IP is
+  checked *before* the Argon2 hash, so blocked attempts cost no CPU. It blocks
+  attempts rather than locking accounts, so it can't be used to lock someone out.
+  ([ADR 0005](docs/adr/0005-in-memory-login-rate-limiting.md))
+- **Injection defences beyond SQL.** CSV formula injection is escaped. Incoming
+  request ids are validated so they can't forge log lines. Login timing is the same
+  for unknown emails and wrong passwords. ([#28](https://github.com/zeiado/applytrack/pull/28), [#30](https://github.com/zeiado/applytrack/pull/30), [#21](https://github.com/zeiado/applytrack/pull/21))
+- **Supply chain.** Actions are pinned to commit SHAs, and every locked dependency is
+  audited. Released images carry provenance and an SBOM. Details are in [SECURITY.md](SECURITY.md).
+
+**Process**
+- **Guard rails instead of reminders.** Bugs that could come back are turned into tests:
+  autogenerated migrations duplicating CHECK constraints, the Docker image running a
+  Python version CI doesn't test, warnings slipping in (any warning fails the run).
+
+---
+
+## Quality and testing
+
+| Check | Result |
+|-------|--------|
+| Automated tests | **328** (unit, API integration, migrations, concurrency) |
+| Coverage | **100%** line and branch (CI fails below 85%) |
+| Databases | Full suite on **PostgreSQL 17** in CI and in-memory **SQLite** locally |
+| Python versions | **3.12** (minimum) and **3.14** (what Docker ships) |
+| Static checks | Ruff (incl. bandit security rules), mypy `--strict`, actionlint for workflows |
+| Migrations | Upgrade → `alembic check` (models match) → downgrade → upgrade, every run |
+| Strictness | Any Python warning fails the test run |
+
+Testing approach:
+
+- **Unit tests** for the pure logic: workflow (all 64 transitions), stats (hand-checked
+  numbers), rate limiter (fake clock), CSV escaping.
+- **API tests** through FastAPI's `TestClient` for every endpoint, covering the success
+  path, validation, ownership (`404` for other users) and authentication.
+- **Fakes, not mocks:** the clock and the rate limiter's time source are injected, and
+  the database is real.
+- Fast: the full suite runs in about 13 seconds without coverage, because tests use
+  cheap Argon2 settings and production keeps the secure ones (a test checks that).
+
+## CI/CD
+
+```mermaid
+flowchart LR
+    pr[Pull request] --> lint["Lint<br/><sub>ruff · actionlint</sub>"]
+    pr --> types["mypy --strict"]
+    pr --> tests["Tests on PostgreSQL<br/><sub>Python 3.12 + 3.14</sub>"]
+    pr --> mig["Migrations<br/><sub>up · check · down</sub>"]
+    pr --> audit["pip-audit"]
+    pr --> codeql["CodeQL"]
+    tests --> docker["Docker build"]
+
+    tag["git tag vX.Y.Z"] --> verify["Tag = pyproject version<br/>and changelog entry"]
+    verify --> ci["Full CI"]
+    ci --> ghcr["Push image to GHCR<br/><sub>SBOM + provenance</sub>"]
+    ghcr --> release["GitHub Release<br/><sub>notes from CHANGELOG</sub>"]
+```
+
+- Every change goes through a PR with the [template](.github/pull_request_template.md),
+  and CI must pass before merging.
+- Dependabot opens weekly PRs for Python packages, Actions and the Docker base image.
+- Releases are cut by pushing a tag. The steps are in
+  [CONTRIBUTING.md › Releasing](CONTRIBUTING.md#releasing), and changes are in [CHANGELOG.md](CHANGELOG.md).
+
+---
+
+## Getting started
+
+### Run with Docker
+
+```bash
+git clone https://github.com/zeiado/applytrack.git
+cd applytrack
 docker compose up --build
 ```
 
-This starts PostgreSQL, applies migrations and runs the API.
-API: http://localhost:8000 · Interactive docs: http://localhost:8000/docs
+This starts PostgreSQL, applies migrations and serves the API at
+**http://localhost:8000**, with interactive docs at **http://localhost:8000/docs**.
 
-### Released image
+Once a version is released, you can also pull the image:
 
 ```bash
 docker pull ghcr.io/zeiado/applytrack:latest
@@ -45,68 +365,108 @@ docker pull ghcr.io/zeiado/applytrack:latest
 
 ### Local development
 
-Requires [uv](https://docs.astral.sh/uv/).
+Requires [uv](https://docs.astral.sh/uv/) and Docker (for PostgreSQL).
 
 ```bash
-uv sync
+uv sync                      # install dependencies from the lockfile
 cp .env.example .env
-make db       # start PostgreSQL in Docker
-make migrate  # apply migrations
-make run      # start the API with auto-reload
-make check    # lint, type check, test (tests use in-memory SQLite, no database needed)
+make db                      # start PostgreSQL
+make migrate                 # apply migrations
+make run                     # API with auto-reload on :8000
 ```
 
-## Try it
+| Command | What it does |
+|---------|--------------|
+| `make check` | Lint, type check and test: what CI runs |
+| `make test` | Tests only (in-memory SQLite; no database needed) |
+| `make audit` | Check dependencies for known vulnerabilities |
+| `make migration m="add x"` | Autogenerate a migration (then review it) |
+| `make format` | Auto-fix lint and formatting |
 
-1. Open http://localhost:8000/docs
-2. `POST /api/v1/auth/register` with an email and password
-3. Click **Authorize**, enter the same email (as username) and password
-4. Call `GET /api/v1/users/me`
-
-Or with curl:
+To run the tests against PostgreSQL like CI does:
 
 ```bash
-curl -X POST localhost:8000/api/v1/auth/register -H 'Content-Type: application/json' \
-  -d '{"email": "ada@example.com", "password": "correct-horse"}'
-TOKEN=$(curl -s -X POST localhost:8000/api/v1/auth/login \
-  -d 'username=ada@example.com&password=correct-horse' | jq -r .access_token)
-curl localhost:8000/api/v1/users/me -H "Authorization: Bearer $TOKEN"
+APPLYTRACK_TEST_DATABASE_URL=postgresql+psycopg://applytrack:applytrack@localhost:5432/applytrack make test
 ```
+
+## Configuration
+
+All settings are environment variables (or a `.env` file). See [.env.example](.env.example).
+
+| Variable | Default | Notes |
+|----------|---------|-------|
+| `APPLYTRACK_ENVIRONMENT` | `local` | `local`, `test` or `production` |
+| `APPLYTRACK_DATABASE_URL` | local PostgreSQL | SQLAlchemy URL, e.g. `postgresql+psycopg://…` |
+| `APPLYTRACK_JWT_SECRET_KEY` | dev-only value | **Required in production**: 32+ random characters, or the app won't start |
+| `APPLYTRACK_ACCESS_TOKEN_EXPIRE_MINUTES` | `30` | Access token lifetime |
+| `APPLYTRACK_LOGIN_MAX_FAILURES_PER_ACCOUNT` | `5` | Failed logins per (IP, email) per window |
+| `APPLYTRACK_LOGIN_MAX_FAILURES_PER_IP` | `20` | Failed logins per IP per window |
+| `APPLYTRACK_LOGIN_WINDOW_SECONDS` | `60` | Rate-limit window |
+| `APPLYTRACK_LOG_LEVEL` | `INFO` | |
+| `APPLYTRACK_LOG_FORMAT` | `auto` | `auto` = JSON in production, text elsewhere |
+| `FORWARDED_ALLOW_IPS` | unset | Proxy addresses uvicorn trusts for the client IP (needed behind a load balancer) |
+
+---
 
 ## Project structure
 
 ```
 src/applytrack/
-  api/          HTTP routers (thin) and dependencies (DB session, current user)
-  services/     business rules
-  repositories/ database queries
-  schemas/      Pydantic request/response models (the API contract)
-  models/       SQLAlchemy ORM models
-  core/         settings, security, errors
-  db/           engine and per-request sessions
-migrations/     Alembic migration scripts
+├── api/
+│   ├── routes/        # one module per resource; thin HTTP layer
+│   ├── deps.py        # DB session, current user, clock
+│   └── router.py      # mounts everything under /api/v1
+├── services/          # business rules (workflow, stats, reminders, export are pure)
+├── repositories/      # all SQL, always scoped to a user
+├── schemas/           # Pydantic request/response models: the API contract
+├── models/            # SQLAlchemy tables and enums
+├── core/              # settings, security, errors, logging, middleware, rate limiting
+├── db/                # engine and per-request sessions
+└── main.py            # app factory
+migrations/            # Alembic migrations (reviewed by hand, tested in CI)
+tests/                 # ~2,900 lines of tests for ~2,400 lines of app code
 docs/
-  requirements.md   user stories and requirements
-  design.md         architecture, data model, API
-  adr/              architecture decision records
-tests/
+├── requirements.md    # user stories (MoSCoW), functional and non-functional requirements
+├── design.md          # architecture, data model, API conventions, trade-offs
+├── adr/               # architecture decision records
+└── backlog.md         # milestones and issues
+scripts/               # container entrypoint, changelog extraction
 ```
 
-## How this project is run
+## How this project was built
 
-This repo follows a lightweight but complete software development lifecycle:
+It follows a full software development lifecycle, and every stage left something
+you can read:
 
-| Stage | Where |
-|-------|-------|
-| Requirements | [docs/requirements.md](docs/requirements.md): user stories, MoSCoW priorities, non-functional requirements |
-| Design | [docs/design.md](docs/design.md) and [ADRs](docs/adr/) |
-| Planning | GitHub issues and milestones ([backlog](docs/backlog.md)) |
-| Implementation | Feature branches, Conventional Commits, PR template ([CONTRIBUTING.md](CONTRIBUTING.md)) |
-| Testing | pytest unit and integration tests, 85% coverage gate |
-| CI | GitHub Actions: ruff, mypy (strict), migration checks and tests on PostgreSQL, Docker build |
-| Security | [SECURITY.md](SECURITY.md): dependency audit and CodeQL in CI, Dependabot, pinned actions |
-| Release | Semantic Versioning, [CHANGELOG.md](CHANGELOG.md), tag-driven releases to GHCR with SBOM and provenance |
+| Stage | Artifact |
+|-------|----------|
+| **Requirements** | [docs/requirements.md](docs/requirements.md): problem, user stories with MoSCoW priorities, non-functional requirements |
+| **Design** | [docs/design.md](docs/design.md) and five [ADRs](docs/adr/) recording each major decision with its alternatives |
+| **Planning** | [GitHub issues](https://github.com/zeiado/applytrack/issues?q=is%3Aissue) with acceptance criteria, grouped into [milestones](https://github.com/zeiado/applytrack/milestones) |
+| **Implementation** | One branch and PR per issue, [Conventional Commits](https://www.conventionalcommits.org/), each commit passing tests on its own ([CONTRIBUTING.md](CONTRIBUTING.md)) |
+| **Review** | [Pull requests](https://github.com/zeiado/applytrack/pulls?q=is%3Apr) that explain what, why, design notes and how to test |
+| **Testing** | A test for every acceptance criterion, plus a guard test for every bug class that could come back |
+| **Release** | Semantic Versioning, [CHANGELOG.md](CHANGELOG.md), tag-driven releases |
+| **Maintenance** | Dependabot, weekly CodeQL, [SECURITY.md](SECURITY.md) |
+
+### Architecture decision records
+
+| # | Decision |
+|---|----------|
+| [0001](docs/adr/0001-record-architecture-decisions.md) | Record architecture decisions |
+| [0002](docs/adr/0002-fastapi-postgres-sqlalchemy.md) | FastAPI, PostgreSQL and SQLAlchemy 2.0 |
+| [0003](docs/adr/0003-jwt-authentication.md) | Stateless JWT access tokens |
+| [0004](docs/adr/0004-store-enums-as-strings.md) | Store enums as strings with CHECK constraints |
+| [0005](docs/adr/0005-in-memory-login-rate-limiting.md) | In-memory rate limiting for failed logins |
+
+## Roadmap
+
+- [ ] Deploy a public demo ([#17](https://github.com/zeiado/applytrack/issues/17))
+- [ ] Refresh tokens, so sessions outlive the 30-minute access token
+- [ ] Redis-backed rate limiter for multi-instance deployments (the interface is ready; see ADR 0005)
+- [ ] Keyset pagination if lists grow large
+- [ ] Container image scanning with a verified Trivy binary
 
 ## License
 
-[MIT](LICENSE)
+[MIT](LICENSE) © Zeyad Gamal
