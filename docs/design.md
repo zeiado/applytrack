@@ -239,6 +239,7 @@ Validation errors add a `details` list:
 | 404 | `not_found` | `NotFoundError`, unknown routes |
 | 405 | `method_not_allowed` | wrong HTTP method |
 | 409 | `conflict` or a specific code | `ConflictError` |
+| 429 | `too_many_login_attempts` | failed-login limit reached (adds `Retry-After`; see ADR 0005) |
 | 422 | `validation_error` | invalid request body, query or path |
 | 500 | `internal_error` | anything unexpected; logged with a stack trace, details never sent to the client |
 

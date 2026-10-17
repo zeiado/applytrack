@@ -14,7 +14,7 @@ and documented design decisions.
 
 - [x] Health and readiness checks
 - [x] PostgreSQL with Alembic migrations
-- [x] Register and log in with JWT (Argon2 password hashing)
+- [x] Register and log in with JWT (Argon2 password hashing, failed-login rate limiting)
 - [x] Applications: create, read, update, delete, scoped to the logged-in user
 - [x] Filtering, sorting and pagination
 - [x] Status workflow with validated transitions and full history
