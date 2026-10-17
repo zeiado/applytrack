@@ -2,8 +2,18 @@
 
 from applytrack.models.application import Application
 from applytrack.models.base import Base
-from applytrack.models.enums import ApplicationSource, ApplicationStatus
+from applytrack.models.enums import ApplicationSource, ApplicationStatus, InterviewKind
+from applytrack.models.interview import Interview
 from applytrack.models.status_change import StatusChange
 from applytrack.models.user import User
 
-__all__ = ["Application", "ApplicationSource", "ApplicationStatus", "Base", "StatusChange", "User"]
+__all__ = [
+    "Application",
+    "ApplicationSource",
+    "ApplicationStatus",
+    "Base",
+    "Interview",
+    "InterviewKind",
+    "StatusChange",
+    "User",
+]

@@ -18,3 +18,11 @@ class ApplicationSource(StrEnum):
     COMPANY_SITE = "company_site"
     RECRUITER = "recruiter"
     OTHER = "other"
+
+
+class InterviewKind(StrEnum):
+    PHONE_SCREEN = "phone_screen"
+    TECHNICAL = "technical"
+    BEHAVIORAL = "behavioral"
+    ONSITE = "onsite"
+    OTHER = "other"
