@@ -12,7 +12,8 @@ and documented design decisions.
 
 ## Features
 
-- [x] Health check
+- [x] Health and readiness checks
+- [x] PostgreSQL with Alembic migrations
 - [ ] JWT authentication
 - [ ] Applications CRUD with filtering, sorting and pagination
 - [ ] Status workflow with validated transitions and full history
@@ -30,6 +31,7 @@ See [docs/backlog.md](docs/backlog.md) for the roadmap.
 docker compose up --build
 ```
 
+This starts PostgreSQL, applies migrations and runs the API.
 API: http://localhost:8000 · Interactive docs: http://localhost:8000/docs
 
 ### Local development
@@ -38,16 +40,22 @@ Requires [uv](https://docs.astral.sh/uv/).
 
 ```bash
 uv sync
+cp .env.example .env
+make db       # start PostgreSQL in Docker
+make migrate  # apply migrations
 make run      # start the API with auto-reload
-make check    # lint, type check, test
+make check    # lint, type check, test (tests use in-memory SQLite, no database needed)
 ```
 
 ## Project structure
 
 ```
 src/applytrack/
-  api/          HTTP routers (thin)
+  api/          HTTP routers (thin) and dependencies
   core/         settings, security, logging
+  db/           engine and per-request sessions
+  models/       SQLAlchemy ORM models
+migrations/     Alembic migration scripts
 docs/
   requirements.md   user stories and requirements
   design.md         architecture, data model, API
@@ -66,7 +74,7 @@ This repo follows a lightweight but complete software development lifecycle:
 | Planning | GitHub issues and milestones ([backlog](docs/backlog.md)) |
 | Implementation | Feature branches, Conventional Commits, PR template ([CONTRIBUTING.md](CONTRIBUTING.md)) |
 | Testing | pytest unit and integration tests, 85% coverage gate |
-| CI | GitHub Actions: ruff, mypy (strict), tests on PostgreSQL, Docker build |
+| CI | GitHub Actions: ruff, mypy (strict), migration checks and tests on PostgreSQL, Docker build |
 | Release | Semantic Versioning and a changelog |
 
 ## License
