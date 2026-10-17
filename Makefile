@@ -1,4 +1,4 @@
-.PHONY: install run db migrate migration lint format typecheck test check
+.PHONY: install run db migrate migration lint format typecheck test audit check
 
 install:
 	uv sync
@@ -29,5 +29,11 @@ typecheck:
 
 test:
 	uv run pytest
+
+# Checks every locked dependency (not just direct ones) against known vulnerabilities.
+audit:
+	uv export --frozen --no-hashes --no-emit-project --format requirements-txt -o .audit-requirements.txt
+	uvx pip-audit==2.10.1 -r .audit-requirements.txt --strict --progress-spinner off
+	rm -f .audit-requirements.txt
 
 check: lint typecheck test
