@@ -50,3 +50,25 @@ def test_get_db_rolls_back_when_the_request_fails() -> None:
 def test_file_based_sqlite_does_not_use_static_pool(tmp_path: Any) -> None:
     engine = build_engine(f"sqlite+pysqlite:///{tmp_path}/test.db")
     assert type(engine.pool).__name__ != "StaticPool"
+
+
+def test_utc_datetime_rejects_naive_and_normalizes_to_utc() -> None:
+    from datetime import UTC, datetime, timedelta, timezone
+
+    from applytrack.models.base import UTCDateTime
+
+    col = UTCDateTime()
+    dialect = build_engine("sqlite+pysqlite:///:memory:").dialect
+    cairo = timezone(timedelta(hours=3))
+
+    with pytest.raises(ValueError, match="Naive"):
+        col.process_bind_param(datetime(2026, 1, 1), dialect)
+    assert col.process_bind_param(None, dialect) is None
+    assert col.process_bind_param(datetime(2026, 1, 1, 3, tzinfo=cairo), dialect) == datetime(
+        2026, 1, 1, tzinfo=UTC
+    )
+    assert col.process_result_value(None, dialect) is None
+    assert col.process_result_value(datetime(2026, 1, 1), dialect) == datetime(
+        2026, 1, 1, tzinfo=UTC
+    )
+    assert col.process_result_value(datetime(2026, 1, 1, 3, tzinfo=cairo), dialect).tzinfo is UTC  # type: ignore[union-attr]
