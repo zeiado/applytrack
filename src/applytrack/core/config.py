@@ -12,6 +12,8 @@ class Settings(BaseSettings):
     app_name: str = "ApplyTrack"
     environment: Literal["local", "test", "production"] = "local"
     log_level: str = "INFO"
+    database_url: str = "postgresql+psycopg://applytrack:applytrack@localhost:5432/applytrack"
+    database_echo: bool = False
 
 
 @lru_cache
