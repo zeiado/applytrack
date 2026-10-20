@@ -67,7 +67,7 @@ def test_cli(
 def test_real_changelog_is_well_formed() -> None:
     text = (ROOT / "CHANGELOG.md").read_text()
 
-    assert changelog.section(text, "Unreleased")
+    changelog.section(text, "Unreleased")  # exists; empty right after a release
     headings = re.findall(r"^## \[([^\]]+)\]", text, re.MULTILINE)
     assert headings[0] == "Unreleased"
     for version in headings[1:]:
