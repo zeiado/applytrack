@@ -12,8 +12,10 @@ in, its full status history, interviews, follow-up reminders and stats on what's
 
 It's built as a small but complete piece of software engineering: written requirements
 and design docs, architecture decision records, issue-driven development through
-reviewed pull requests, 328 automated tests on two databases, strict typing, security
+reviewed pull requests, 350+ automated tests on two databases, strict typing, security
 scanning, and tag-driven releases of a Docker image with build provenance.
+
+**Live:** [production API docs](https://applytrack-production-jxnw.onrender.com/docs) · [staging](https://applytrack-staging-jxnw.onrender.com/docs) (free plan: the first request after 15 idle minutes takes about a minute)
 
 ---
 

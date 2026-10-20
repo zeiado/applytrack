@@ -13,9 +13,9 @@ services:
       - key: APPLYTRACK_ENVIRONMENT
         value: production # production settings: JSON logs, a real JWT secret required
       - key: APPLYTRACK_LOG_LEVEL
-        value: DEBUG # logs X-Forwarded-For entry counts, to measure the proxy hops
+        value: INFO # DEBUG also logs X-Forwarded-For entry counts (docs/deployment.md)
       - key: APPLYTRACK_TRUSTED_PROXY_HOPS
-        value: "0" # set after measuring on staging (docs/deployment.md)
+        value: "3" # measured on staging on 2026-10-20 (docs/deployment.md)
       - key: APPLYTRACK_DATABASE_URL
         sync: false # Neon `staging` branch, entered when the Blueprint is created
       - key: APPLYTRACK_JWT_SECRET_KEY
@@ -35,7 +35,7 @@ services:
       - key: APPLYTRACK_LOG_LEVEL
         value: INFO
       - key: APPLYTRACK_TRUSTED_PROXY_HOPS
-        value: "0" # same value as staging once measured
+        value: "3" # same as staging
       - key: APPLYTRACK_DATABASE_URL
         sync: false # Neon `main` branch
       - key: APPLYTRACK_JWT_SECRET_KEY
