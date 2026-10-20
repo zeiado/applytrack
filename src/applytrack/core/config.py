@@ -23,6 +23,7 @@ class Settings(BaseSettings):
     jwt_secret_key: SecretStr = SecretStr(DEV_JWT_SECRET)
     jwt_algorithm: Literal["HS256"] = "HS256"
     access_token_expire_minutes: int = 30
+    refresh_token_expire_days: int = 30
 
     # Failed-login limits (see ADR 0005)
     login_max_failures_per_account: int = 5
