@@ -19,13 +19,13 @@ Only the latest release gets security fixes.
 | Area | Measure |
 |------|---------|
 | Passwords | Argon2id hashing; never logged or returned |
-| Auth | Short-lived JWTs signed with a secret that production refuses to start without (ADR 0003) |
+| Auth | Short-lived JWTs signed with a secret that production refuses to start without (ADR 0003); rotating refresh tokens stored as hashes, with reuse detection (ADR 0006) |
 | Brute force | Failed-login rate limiting per (IP, email) and per IP (ADR 0005) |
 | Data access | Every query scoped to the logged-in user; other users' data returns 404 |
 | Input | Strict validation; unknown fields and query parameters rejected |
 | Output | No internal details in 500 responses; CSV export escapes formula injection |
 | Logs | Request ids validated against log injection; query strings not logged |
 | Dependencies | `pip-audit` on every CI run and Dependabot weekly updates |
-| Code | Ruff security rules (bandit) on every commit; CodeQL on every PR and weekly |
+| Code | Ruff security rules (bandit) on every commit; Semgrep on every PR and weekly |
 | CI | Actions pinned to commit SHAs; workflows get read-only permissions by default |
 | Container | Runs as a non-root user |

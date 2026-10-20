@@ -1,4 +1,4 @@
-.PHONY: install run db migrate migration lint format typecheck test audit check
+.PHONY: install run db migrate migration lint format typecheck test audit sast check
 
 install:
 	uv sync
@@ -36,5 +36,9 @@ audit:
 	uv export --frozen --no-hashes --no-emit-project --format requirements-txt -o .audit-requirements.txt
 	uvx pip-audit==2.10.1 -r .audit-requirements.txt --strict --progress-spinner off
 	rm -f .audit-requirements.txt
+
+# Static security analysis. Free Semgrep registry rules, no account needed; fails on any finding.
+sast:
+	uvx semgrep==1.181.0 scan --metrics=off --error 		--config p/python --config p/secrets --config p/dockerfile --config p/github-actions
 
 check: lint typecheck test

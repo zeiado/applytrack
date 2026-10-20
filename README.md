@@ -1,7 +1,7 @@
 # ApplyTrack
 
 [![CI](https://github.com/zeiado/applytrack/actions/workflows/ci.yml/badge.svg)](https://github.com/zeiado/applytrack/actions/workflows/ci.yml)
-[![CodeQL](https://github.com/zeiado/applytrack/actions/workflows/codeql.yml/badge.svg)](https://github.com/zeiado/applytrack/actions/workflows/codeql.yml)
+[![Semgrep](https://github.com/zeiado/applytrack/actions/workflows/semgrep.yml/badge.svg)](https://github.com/zeiado/applytrack/actions/workflows/semgrep.yml)
 ![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)
 ![Python](https://img.shields.io/badge/python-3.12%20%7C%203.14-blue)
 ![mypy](https://img.shields.io/badge/mypy-strict-blue)
@@ -68,7 +68,7 @@ stories and priorities.
 | Auth | PyJWT + pwdlib (Argon2id) | Stateless tokens ([ADR 0003](docs/adr/0003-jwt-authentication.md)) |
 | Tooling | uv, Ruff, mypy `--strict`, pytest, pre-commit | Fast, reproducible, strict |
 | Delivery | Docker (multi-stage, non-root), GitHub Actions, GHCR | Same image from CI to production |
-| Security | pip-audit, CodeQL, Dependabot, actionlint | Known-vulnerability and code scanning on every PR |
+| Security | pip-audit, Semgrep, Dependabot, actionlint | Known-vulnerability and code scanning on every PR |
 
 ---
 
@@ -329,7 +329,7 @@ flowchart LR
     pr --> tests["Tests on PostgreSQL<br/><sub>Python 3.12 + 3.14</sub>"]
     pr --> mig["Migrations<br/><sub>up · check · down</sub>"]
     pr --> audit["pip-audit"]
-    pr --> codeql["CodeQL"]
+    pr --> sast["Semgrep"]
     tests --> docker["Docker build"]
 
     tag["git tag vX.Y.Z"] --> verify["Tag = pyproject version<br/>and changelog entry"]
@@ -443,13 +443,13 @@ you can read:
 | Stage | Artifact |
 |-------|----------|
 | **Requirements** | [docs/requirements.md](docs/requirements.md): problem, user stories with MoSCoW priorities, non-functional requirements |
-| **Design** | [docs/design.md](docs/design.md) and five [ADRs](docs/adr/) recording each major decision with its alternatives |
+| **Design** | [docs/design.md](docs/design.md) and six [ADRs](docs/adr/) recording each major decision with its alternatives |
 | **Planning** | [GitHub issues](https://github.com/zeiado/applytrack/issues?q=is%3Aissue) with acceptance criteria, grouped into [milestones](https://github.com/zeiado/applytrack/milestones) |
 | **Implementation** | One branch and PR per issue, [Conventional Commits](https://www.conventionalcommits.org/), each commit passing tests on its own ([CONTRIBUTING.md](CONTRIBUTING.md)) |
 | **Review** | [Pull requests](https://github.com/zeiado/applytrack/pulls?q=is%3Apr) that explain what, why, design notes and how to test |
 | **Testing** | A test for every acceptance criterion, plus a guard test for every bug class that could come back |
 | **Release** | Semantic Versioning, [CHANGELOG.md](CHANGELOG.md), tag-driven releases |
-| **Maintenance** | Dependabot, weekly CodeQL, [SECURITY.md](SECURITY.md) |
+| **Maintenance** | Dependabot, weekly Semgrep scan, [SECURITY.md](SECURITY.md) |
 
 ### Architecture decision records
 
