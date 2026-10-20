@@ -24,6 +24,7 @@ changes, a minor version for new features, and a patch version for fixes.
 
 ### Security
 
+- Semgrep security scan on every PR and weekly, replacing CodeQL, whose results can't be uploaded from a private repo without paid GitHub Code Security
 - Reusing a revoked refresh token signs the user out of every session ([#39])
 - Failed-login rate limiting per (IP, email) and per IP ([#29])
 - CSV export escapes cells that spreadsheets would run as formulas ([#28])

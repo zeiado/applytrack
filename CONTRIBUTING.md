@@ -50,6 +50,9 @@ table has an unnamed or duplicated CHECK constraint.
 ## Dependencies and security
 
 - `make audit` checks every locked dependency against known vulnerabilities (CI runs it too).
+- `make sast` runs the Semgrep security scan (CI runs it on every PR and weekly). Semgrep
+  doesn't run natively on Windows; there, use Docker:
+  `docker run --rm -v "$PWD:/src" -w /src semgrep/semgrep:1.181.0 semgrep scan --metrics=off --error --config p/python --config p/secrets --config p/dockerfile --config p/github-actions`
 - Dependabot opens weekly PRs for Python packages, GitHub Actions and the Docker base image.
   Minor and patch updates come grouped; review the changelog for majors.
 - GitHub Actions are pinned to full commit SHAs, with the version in a comment. A tag
