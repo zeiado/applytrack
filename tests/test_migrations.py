@@ -32,7 +32,7 @@ def test_upgrade_downgrade_round_trip(alembic_config: tuple[Config, str]) -> Non
     engine = create_engine(url)
     tables = set(inspect(engine).get_table_names())
     engine.dispose()
-    assert {"users", "applications", "status_changes", "interviews"} <= tables
+    assert {"users", "applications", "status_changes", "interviews", "refresh_tokens"} <= tables
 
 
 def test_check_constraints_are_named_and_not_duplicated(alembic_config: tuple[Config, str]) -> None:

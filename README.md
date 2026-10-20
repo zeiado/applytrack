@@ -47,7 +47,7 @@ stories and priorities.
 
 | Area | What it does |
 |------|--------------|
-| **Accounts** | Register and log in. Argon2id password hashing, short-lived JWT access tokens, failed-login rate limiting |
+| **Accounts** | Register and log in. Argon2id password hashing, short-lived JWT access tokens, rotating refresh tokens with reuse detection, logout, failed-login rate limiting |
 | **Applications** | Create, read, update (partial) and delete. Company, role, link, source, salary range, dates, notes |
 | **Search** | Filter by status, source and company (case-insensitive), sort on three fields, paginate with totals |
 | **Status workflow** | `wishlist → applied → screening → interviewing → offer → accepted` with validated transitions, `rejected`/`withdrawn` exits, and an append-only history |
@@ -194,7 +194,9 @@ need `Authorization: Bearer <token>`, and other users' resources return `404`.
 | `GET` | `/health` | Liveness probe and version |
 | `GET` | `/ready` | Readiness probe: checks the database, `503` if it's down |
 | `POST` | `/api/v1/auth/register` | Create an account |
-| `POST` | `/api/v1/auth/login` | Get an access token (OAuth2 password form) |
+| `POST` | `/api/v1/auth/login` | Get an access token and a refresh token (OAuth2 password form) |
+| `POST` | `/api/v1/auth/refresh` | Swap a refresh token for a new pair (single use) |
+| `POST` | `/api/v1/auth/logout` | Revoke a refresh token |
 | `GET` | `/api/v1/users/me` | The current user |
 | `GET` | `/api/v1/applications` | List: `status`, `source`, `company`, `sort`, `limit`, `offset` |
 | `POST` | `/api/v1/applications` | Create |
@@ -458,11 +460,12 @@ you can read:
 | [0003](docs/adr/0003-jwt-authentication.md) | Stateless JWT access tokens |
 | [0004](docs/adr/0004-store-enums-as-strings.md) | Store enums as strings with CHECK constraints |
 | [0005](docs/adr/0005-in-memory-login-rate-limiting.md) | In-memory rate limiting for failed logins |
+| [0006](docs/adr/0006-rotating-refresh-tokens.md) | Rotating refresh tokens with reuse detection |
 
 ## Roadmap
 
 - [ ] Deploy a public demo ([#17](https://github.com/zeiado/applytrack/issues/17))
-- [ ] Refresh tokens, so sessions outlive the 30-minute access token
+- [x] Refresh tokens, so sessions outlive the 30-minute access token ([ADR 0006](docs/adr/0006-rotating-refresh-tokens.md))
 - [ ] Redis-backed rate limiter for multi-instance deployments (the interface is ready; see ADR 0005)
 - [ ] Keyset pagination if lists grow large
 - [ ] Container image scanning with a verified Trivy binary

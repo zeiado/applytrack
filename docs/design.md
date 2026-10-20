@@ -62,6 +62,13 @@ status_changes
   note            text
   changed_at      timestamptz
 
+refresh_tokens
+  id          UUID PK
+  user_id     UUID FK → users.id (on delete cascade), indexed
+  family_id   UUID, indexed (all tokens from one login)
+  token_hash  text unique (SHA-256 of the token; the token itself is never stored)
+  created_at / expires_at / revoked_at timestamptz
+
 interviews
   id                UUID PK
   application_id    UUID FK → applications.id (on delete cascade)
@@ -108,7 +115,9 @@ All routes are under `/api/v1`. Data routes require `Authorization: Bearer <toke
 | Method | Path | Description |
 |--------|------|-------------|
 | POST | `/auth/register` | Create account |
-| POST | `/auth/login` | Get access token |
+| POST | `/auth/login` | Get access and refresh tokens |
+| POST | `/auth/refresh` | Rotate a refresh token for a new pair ([ADR 0006](adr/0006-rotating-refresh-tokens.md)) |
+| POST | `/auth/logout` | Revoke a refresh token |
 | GET | `/users/me` | Current user |
 | GET | `/applications` | List (filters: `status`, `company`, `source`; `limit`, `offset`, `sort`) |
 | POST | `/applications` | Create |

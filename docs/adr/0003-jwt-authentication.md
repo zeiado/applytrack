@@ -27,5 +27,5 @@ in v1, so cookie sessions are not a natural fit.
 ## Consequences
 
 - Tokens can't be revoked before they expire; the short expiry limits the risk.
-  Refresh tokens are a possible later addition.
+  Refresh tokens were added later ([ADR 0006](0006-rotating-refresh-tokens.md)).
 - The signing secret comes from the environment and is never committed.

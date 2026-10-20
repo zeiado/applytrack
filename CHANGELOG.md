@@ -9,6 +9,7 @@ changes, a minor version for new features, and a patch version for fixes.
 
 ### Added
 
+- Refresh tokens with rotation, `/auth/refresh` and `/auth/logout` ([#39])
 - Applications: create, read, update and delete, scoped to the logged-in user ([#22])
 - Listing with filters (status, source, company), sorting and pagination ([#23])
 - Status workflow with validated transitions, `next_statuses` and full history ([#24])
@@ -23,6 +24,7 @@ changes, a minor version for new features, and a patch version for fixes.
 
 ### Security
 
+- Reusing a revoked refresh token signs the user out of every session ([#39])
 - Failed-login rate limiting per (IP, email) and per IP ([#29])
 - CSV export escapes cells that spreadsheets would run as formulas ([#28])
 - Incoming request ids are validated to prevent log injection ([#30])
@@ -50,3 +52,4 @@ changes, a minor version for new features, and a patch version for fixes.
 [#30]: https://github.com/zeiado/applytrack/pull/30
 [#31]: https://github.com/zeiado/applytrack/pull/31
 [#35]: https://github.com/zeiado/applytrack/pull/35
+[#39]: https://github.com/zeiado/applytrack/issues/39

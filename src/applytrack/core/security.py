@@ -1,5 +1,10 @@
-"""Password hashing and JWT access tokens (see docs/adr/0003-jwt-authentication.md)."""
+"""Password hashing, JWT access tokens and refresh tokens.
 
+See docs/adr/0003-jwt-authentication.md and docs/adr/0006-rotating-refresh-tokens.md.
+"""
+
+import hashlib
+import secrets
 import uuid
 from datetime import UTC, datetime, timedelta
 
@@ -60,3 +65,13 @@ def decode_access_token(token: str, settings: Settings) -> uuid.UUID:
         return uuid.UUID(payload["sub"])
     except ValueError as exc:
         raise UnauthorizedError("Invalid token", code="invalid_token") from exc
+
+
+def new_refresh_token() -> str:
+    """A random, URL-safe refresh token with 256 bits of entropy."""
+    return secrets.token_urlsafe(32)
+
+
+def hash_refresh_token(token: str) -> str:
+    """SHA-256 hex digest. A fast hash is enough here: the token is random, not a password."""
+    return hashlib.sha256(token.encode()).hexdigest()
