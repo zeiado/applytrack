@@ -22,6 +22,7 @@ Only the latest release gets security fixes.
 | Auth | Short-lived JWTs signed with a secret that production refuses to start without (ADR 0003); rotating refresh tokens stored as hashes, with reuse detection (ADR 0006) |
 | Brute force | Failed-login rate limiting per (IP, email) and per IP (ADR 0005) |
 | Data access | Every query scoped to the logged-in user; other users' data returns 404 |
+| Data rights | Users can export all their data and delete their account; deletion needs the password and is rate limited |
 | Input | Strict validation; unknown fields and query parameters rejected |
 | Output | No internal details in 500 responses; CSV export escapes formula injection |
 | Logs | Request ids validated against log injection; query strings not logged |

@@ -119,6 +119,8 @@ All routes are under `/api/v1`. Data routes require `Authorization: Bearer <toke
 | POST | `/auth/refresh` | Rotate a refresh token for a new pair ([ADR 0006](adr/0006-rotating-refresh-tokens.md)) |
 | POST | `/auth/logout` | Revoke a refresh token |
 | GET | `/users/me` | Current user |
+| GET | `/users/me/export` | All the user's data as one JSON file |
+| DELETE | `/users/me` | Delete the account and all its data (body: current password) |
 | GET | `/applications` | List (filters: `status`, `company`, `source`; `limit`, `offset`, `sort`) |
 | POST | `/applications` | Create |
 | GET | `/applications/{id}` | Get one |
@@ -201,6 +203,23 @@ How it's built:
   Excel on Windows garbles non-English text such as Arabic. `bom=false` turns it off
   for other tools.
 
+### Your data: export and deletion
+
+Egypt's Personal Data Protection Law (151/2020) gives people the right to get their data
+and to have it erased.
+
+- `GET /users/me/export` returns the profile and every application with its full status
+  history and interviews, as a download (`applytrack-export-YYYY-MM-DD.json`). Applications
+  use the same shape as the applications API. Three queries load everything, however many
+  applications there are (a test guards against N+1).
+- `DELETE /users/me` takes `{"password": "..."}`. The user row is deleted and the database
+  cascades to applications, history, interviews and refresh tokens, so existing tokens
+  stop working at once and the email can sign up again.
+- A wrong password returns `403 invalid_password` and counts toward the failed-login limits
+  (ADR 0005), so a stolen access token can't be used to guess the password.
+- Deletion is immediate and permanent; there's no grace period yet. Database backups (Neon
+  history) still hold the data until they age out, which the privacy policy must say.
+
 ### Lists and pagination
 
 List endpoints return one page plus the total number of matches:
@@ -246,6 +265,7 @@ Validation errors add a `details` list:
 |--------|--------|-----------|
 | 401 | `unauthorized` | `UnauthorizedError` (adds `WWW-Authenticate: Bearer`) |
 | 404 | `not_found` | `NotFoundError`, unknown routes |
+| 403 | `forbidden` or a specific code | `ForbiddenError` (e.g. `invalid_password` when deleting an account) |
 | 405 | `method_not_allowed` | wrong HTTP method |
 | 409 | `conflict` or a specific code | `ConflictError` |
 | 429 | `too_many_login_attempts` | failed-login limit reached (adds `Retry-After`; see ADR 0005) |

@@ -31,6 +31,7 @@ Priority uses MoSCoW: **M**ust, **S**hould, **C**ould, **W**on't (for v1).
 | US-09 | see stats (response rate, offers by source, average days per stage) | I learn which strategies work | C |
 | US-10 | export my applications as CSV | I can use them elsewhere | C |
 | US-11 | share a board with a mentor | they can give feedback | W |
+| US-12 | download all my data and delete my account | I control my personal data (Egypt PDPL 151/2020) | M |
 
 ## Functional requirements
 
