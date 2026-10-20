@@ -24,6 +24,7 @@ changes, a minor version for new features, and a patch version for fixes.
 
 ### Security
 
+- Login rate limits and access logs use the real client IP behind a reverse proxy (`APPLYTRACK_TRUSTED_PROXY_HOPS`), ignoring forged `X-Forwarded-For` entries ([#50])
 - Semgrep security scan on every PR and weekly, replacing CodeQL, whose results can't be uploaded from a private repo without paid GitHub Code Security
 - Reusing a revoked refresh token signs the user out of every session ([#39])
 - Failed-login rate limiting per (IP, email) and per IP ([#29])
@@ -54,3 +55,4 @@ changes, a minor version for new features, and a patch version for fixes.
 [#31]: https://github.com/zeiado/applytrack/pull/31
 [#35]: https://github.com/zeiado/applytrack/pull/35
 [#39]: https://github.com/zeiado/applytrack/issues/39
+[#50]: https://github.com/zeiado/applytrack/issues/50

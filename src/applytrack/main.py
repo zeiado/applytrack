@@ -48,7 +48,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     )
 
     register_exception_handlers(app)
-    app.add_middleware(RequestContextMiddleware)
+    app.add_middleware(RequestContextMiddleware, trusted_proxy_hops=settings.trusted_proxy_hops)
     app.include_router(health.router)
     app.include_router(api_router)
     return app
