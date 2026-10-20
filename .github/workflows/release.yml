@@ -99,3 +99,41 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --notes-file notes.md --verify-tag
+
+  deploy-production:
+    name: Deploy to production (Render)
+    needs: [verify, github-release]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger the deploy hook with the tagged commit
+        id: trigger
+        env:
+          DEPLOY_HOOK: ${{ secrets.RENDER_PRODUCTION_DEPLOY_HOOK }}
+        run: |
+          if [ -z "$DEPLOY_HOOK" ]; then
+            echo "::notice::RENDER_PRODUCTION_DEPLOY_HOOK isn't set; skipping the deploy (docs/deployment.md)"
+            echo "triggered=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          curl --fail --silent --show-error --request POST "${DEPLOY_HOOK}&ref=${GITHUB_SHA}" > /dev/null
+          echo "triggered=true" >> "$GITHUB_OUTPUT"
+      - name: Wait until production reports the new version
+        if: steps.trigger.outputs.triggered == 'true'
+        env:
+          PRODUCTION_URL: ${{ vars.PRODUCTION_URL }}
+          VERSION: ${{ needs.verify.outputs.version }}
+        run: |
+          if [ -z "$PRODUCTION_URL" ]; then
+            echo "::warning::PRODUCTION_URL isn't set; can't confirm the deploy"
+            exit 0
+          fi
+          for _ in $(seq 1 60); do
+            live=$(curl --silent --max-time 10 "$PRODUCTION_URL/health" | jq -r '.version // empty' 2>/dev/null || true)
+            if [ "$live" = "$VERSION" ]; then
+              echo "Production is running $VERSION"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "::error::Production didn't report version $VERSION within 10 minutes"
+          exit 1

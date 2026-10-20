@@ -1,0 +1,42 @@
+# Render Blueprint: staging and production web services (docs/deployment.md).
+# The databases are on Neon (branches `staging` and `main`), not on Render.
+services:
+  - type: web
+    name: applytrack-staging
+    runtime: docker
+    plan: free
+    region: frankfurt
+    branch: main
+    autoDeployTrigger: checksPass # every green commit on main
+    healthCheckPath: /ready
+    envVars:
+      - key: APPLYTRACK_ENVIRONMENT
+        value: production # production settings: JSON logs, a real JWT secret required
+      - key: APPLYTRACK_LOG_LEVEL
+        value: DEBUG # logs X-Forwarded-For entry counts, to measure the proxy hops
+      - key: APPLYTRACK_TRUSTED_PROXY_HOPS
+        value: "0" # set after measuring on staging (docs/deployment.md)
+      - key: APPLYTRACK_DATABASE_URL
+        sync: false # Neon `staging` branch, entered when the Blueprint is created
+      - key: APPLYTRACK_JWT_SECRET_KEY
+        generateValue: true
+
+  - type: web
+    name: applytrack-production
+    runtime: docker
+    plan: free
+    region: frankfurt
+    branch: main
+    autoDeployTrigger: "off" # deployed by the Release workflow when a version is tagged
+    healthCheckPath: /ready
+    envVars:
+      - key: APPLYTRACK_ENVIRONMENT
+        value: production
+      - key: APPLYTRACK_LOG_LEVEL
+        value: INFO
+      - key: APPLYTRACK_TRUSTED_PROXY_HOPS
+        value: "0" # same value as staging once measured
+      - key: APPLYTRACK_DATABASE_URL
+        sync: false # Neon `main` branch
+      - key: APPLYTRACK_JWT_SECRET_KEY
+        generateValue: true # different from staging, so staging tokens never work here
