@@ -7,6 +7,10 @@ changes, a minor version for new features, and a patch version for fixes.
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-10-21
+
+First release.
+
 ### Added
 
 - Download all your data (`GET /users/me/export`) and delete your account (`DELETE /users/me`) ([#40])
@@ -41,7 +45,8 @@ changes, a minor version for new features, and a patch version for fixes.
 - Interview times are returned in UTC on create, matching reads ([#25])
 - CI tests the Python version the Docker image ships ([#35])
 
-[Unreleased]: https://github.com/zeiado/applytrack/commits/main
+[Unreleased]: https://github.com/zeiado/applytrack/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/zeiado/applytrack/releases/tag/v0.2.0
 [#1]: https://github.com/zeiado/applytrack/pull/1
 [#20]: https://github.com/zeiado/applytrack/pull/20
 [#21]: https://github.com/zeiado/applytrack/pull/21
