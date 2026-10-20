@@ -83,6 +83,13 @@ class UnauthorizedError(AppError):
         return {"WWW-Authenticate": "Bearer"}
 
 
+class ForbiddenError(AppError):
+    """Logged in, but not allowed (e.g. the password confirming a deletion was wrong)."""
+
+    status_code = status.HTTP_403_FORBIDDEN
+    code = "forbidden"
+
+
 class TooManyRequestsError(AppError):
     status_code = status.HTTP_429_TOO_MANY_REQUESTS
     code = "too_many_requests"

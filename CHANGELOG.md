@@ -9,6 +9,7 @@ changes, a minor version for new features, and a patch version for fixes.
 
 ### Added
 
+- Download all your data (`GET /users/me/export`) and delete your account (`DELETE /users/me`) ([#40])
 - Staging and production on Render with Neon PostgreSQL; tagged releases deploy to production ([#17], [docs/deployment.md](docs/deployment.md))
 - Refresh tokens with rotation, `/auth/refresh` and `/auth/logout` ([#39])
 - Applications: create, read, update and delete, scoped to the logged-in user ([#22])
@@ -57,4 +58,5 @@ changes, a minor version for new features, and a patch version for fixes.
 [#35]: https://github.com/zeiado/applytrack/pull/35
 [#17]: https://github.com/zeiado/applytrack/issues/17
 [#39]: https://github.com/zeiado/applytrack/issues/39
+[#40]: https://github.com/zeiado/applytrack/issues/40
 [#50]: https://github.com/zeiado/applytrack/issues/50

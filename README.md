@@ -56,6 +56,7 @@ stories and priorities.
 | **Interviews** | Log interviews per application, with timezone-aware times stored in UTC |
 | **Reminders** | Applications due for a follow-up today *in your timezone*, most overdue first |
 | **Stats** | Response, interview and offer rates; results by source; average days spent in each stage |
+| **Your data** | Download everything as JSON, or delete the account and all its data (Egypt PDPL 151/2020) |
 | **Export** | Streamed CSV download, safe to open in Excel (formula-injection escaping, UTF-8 BOM for Arabic text) |
 | **Operations** | Liveness and readiness probes, request ids, structured JSON logs, one consistent error format |
 
@@ -200,6 +201,8 @@ need `Authorization: Bearer <token>`, and other users' resources return `404`.
 | `POST` | `/api/v1/auth/refresh` | Swap a refresh token for a new pair (single use) |
 | `POST` | `/api/v1/auth/logout` | Revoke a refresh token |
 | `GET` | `/api/v1/users/me` | The current user |
+| `GET` | `/api/v1/users/me/export` | Download all your data as JSON |
+| `DELETE` | `/api/v1/users/me` | Delete your account and all its data (needs your password) |
 | `GET` | `/api/v1/applications` | List: `status`, `source`, `company`, `sort`, `limit`, `offset` |
 | `POST` | `/api/v1/applications` | Create |
 | `GET` `PATCH` `DELETE` | `/api/v1/applications/{id}` | Read, partially update, delete |
