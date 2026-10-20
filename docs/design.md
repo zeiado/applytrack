@@ -265,6 +265,14 @@ returned in the `X-Request-ID` header, attached to every log line written during
 the request, and included in error bodies as `error.request_id`, so a user
 reporting a problem can quote it.
 
+**Client IP.** Behind a reverse proxy every connection comes from the proxy, so the
+client IP is read from `X-Forwarded-For`. Each proxy appends the address it received the
+request from, but keeps whatever the client sent. With `APPLYTRACK_TRUSTED_PROXY_HOPS=N`,
+the client is therefore the Nth entry from the right; entries further left may be forged
+and are ignored. A missing, short or invalid header falls back to the connection's
+address, and the default of 0 ignores the header. The middleware sets this IP on the
+request, so the login rate limiter (ADR 0005) and the access log both use it.
+
 **Logs** go to stdout (the platform collects them):
 
 - `APPLYTRACK_LOG_FORMAT=auto` (default): JSON lines in production, readable text elsewhere.

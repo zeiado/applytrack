@@ -57,7 +57,7 @@ def login(
     Repeated failures are rate limited per IP and email, and per IP.
     """
     limiter: LoginRateLimiter = request.app.state.login_limiter
-    # Behind a proxy, run uvicorn with --proxy-headers so this is the real client IP.
+    # The real client IP, also behind a proxy (APPLYTRACK_TRUSTED_PROXY_HOPS, core/client_ip.py).
     ip = request.client.host if request.client else "unknown"
     email = normalize_email(form.username)
 

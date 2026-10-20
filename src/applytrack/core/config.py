@@ -1,7 +1,7 @@
 from functools import lru_cache
 from typing import Literal, Self
 
-from pydantic import SecretStr, model_validator
+from pydantic import Field, SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # Only for local development and tests. Production refuses to start with it.
@@ -29,6 +29,10 @@ class Settings(BaseSettings):
     login_max_failures_per_account: int = 5
     login_max_failures_per_ip: int = 20
     login_window_seconds: int = 60
+
+    # Reverse proxies in front of the app that append to X-Forwarded-For (0 = none).
+    # See core/client_ip.py. Measure it for a host; never guess.
+    trusted_proxy_hops: int = Field(default=0, ge=0, le=10)
 
     @model_validator(mode="after")
     def _require_real_secret_in_production(self) -> Self:
