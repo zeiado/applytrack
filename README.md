@@ -464,7 +464,7 @@ you can read:
 
 ## Roadmap
 
-- [ ] Deploy a public demo ([#17](https://github.com/zeiado/applytrack/issues/17))
+- [x] Staging and production deployments on Render + Neon ([docs/deployment.md](docs/deployment.md))
 - [x] Refresh tokens, so sessions outlive the 30-minute access token ([ADR 0006](docs/adr/0006-rotating-refresh-tokens.md))
 - [ ] Redis-backed rate limiter for multi-instance deployments (the interface is ready; see ADR 0005)
 - [ ] Keyset pagination if lists grow large

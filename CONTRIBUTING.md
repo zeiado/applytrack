@@ -80,7 +80,9 @@ The **Release** workflow then:
 2. runs the full CI,
 3. pushes `ghcr.io/zeiado/applytrack:X.Y.Z`, `:X.Y`, `:X` and `:latest` with build
    provenance and an SBOM,
-4. creates a GitHub Release whose notes are that version's changelog section.
+4. creates a GitHub Release whose notes are that version's changelog section,
+5. deploys that commit to production and waits for it to report the new version
+   ([docs/deployment.md](docs/deployment.md)).
 
 If any step fails, nothing after it runs. Fix the problem, delete the tag
 (`git push --delete origin vX.Y.Z`), and tag again.
