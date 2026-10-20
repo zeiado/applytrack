@@ -1,5 +1,8 @@
 # Deployment
 
+- Staging: https://applytrack-staging-jxnw.onrender.com ([API docs](https://applytrack-staging-jxnw.onrender.com/docs))
+- Production: https://applytrack-production-jxnw.onrender.com ([API docs](https://applytrack-production-jxnw.onrender.com/docs))
+
 Two environments, both in Frankfurt (closest to Egypt that both providers offer):
 
 | | Staging | Production |
@@ -50,6 +53,10 @@ is measured, not guessed:
    `K - 1` entries, so set `APPLYTRACK_TRUSTED_PROXY_HOPS` to `K - 1` on both services.
 3. Check: the access log's `client` for a request without the fake header is your own
    public IP, and adding fake entries doesn't change it.
+
+**Measured 2026-10-20:** normal requests arrive with 3 entries and a request with one
+fake entry with 4, so Render adds 3 and `APPLYTRACK_TRUSTED_PROXY_HOPS=3`. Measure again
+if requests start showing a different count, or after putting a CDN in front.
 
 ## Rollback
 

@@ -37,13 +37,13 @@ class RequestContextMiddleware:
         client_ip = resolve_client_ip(peer_host, forwarded_for, self.trusted_proxy_hops)
         # Everything downstream (request.client, the login rate limiter) sees the real client.
         scope = {**scope, "client": (client_ip, peer_port)}
+        incoming = headers.get(REQUEST_ID_HEADER.encode(), b"").decode("latin-1") or None
+        request_id = accept_request_id(incoming)
+        token = request_id_var.set(request_id)
         if forwarded_for:  # at DEBUG, to measure how many proxies a host puts in front
             access_logger.debug(
                 "X-Forwarded-For has %d entries", len(forwarded_for_entries(forwarded_for))
             )
-        incoming = headers.get(REQUEST_ID_HEADER.encode(), b"").decode("latin-1") or None
-        request_id = accept_request_id(incoming)
-        token = request_id_var.set(request_id)
         start = time.perf_counter()
         response: dict[str, Any] = {"status": 500, "started": False}
 
