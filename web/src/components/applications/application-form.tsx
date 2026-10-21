@@ -122,7 +122,10 @@ export function ApplicationForm({ action, application }: { action: Action; appli
         <div className="w-full sm:w-auto sm:min-w-40">
           <SubmitButton>{application ? t("save") : t("create")}</SubmitButton>
         </div>
-        <Link href="/applications" className={buttonVariants({ variant: "ghost", className: "h-10" })}>
+        <Link
+          href={application ? `/applications/${application.id}` : "/applications"}
+          className={buttonVariants({ variant: "ghost", className: "h-10" })}
+        >
           {t("cancel")}
         </Link>
       </div>

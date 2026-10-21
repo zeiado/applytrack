@@ -128,7 +128,7 @@ function Card({
   const locale = useLocale();
   const router = useRouter();
   const followUp = app.follow_up_on ? followUpState(app.follow_up_on, today) : null;
-  const editHref = `/applications/${app.id}/edit`;
+  const href = `/applications/${app.id}`;
 
   return (
     <article
@@ -144,7 +144,7 @@ function Card({
       <div className="flex items-start gap-2">
         <div className="min-w-0 flex-1">
           <h3 className="truncate font-semibold">
-            <Link href={editHref} className="hover:underline">
+            <Link href={href} className="hover:underline">
               {app.company}
             </Link>
           </h3>
@@ -171,7 +171,7 @@ function Card({
               ))}
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => router.push(editHref)}>{t("Applications.card.edit")}</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => router.push(`${href}/edit`)}>{t("Applications.card.edit")}</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

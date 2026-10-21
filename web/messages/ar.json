@@ -230,5 +230,76 @@
       "source": "اختر أين وجدتها.",
       "status": "اختر المرحلة."
     }
+  },
+  "InterviewKind": {
+    "phone_screen": "مكالمة هاتفية",
+    "technical": "تقنية",
+    "behavioral": "سلوكية",
+    "onsite": "في مقر الشركة",
+    "other": "أخرى"
+  },
+  "Detail": {
+    "back": "كل الطلبات",
+    "edit": "تعديل البيانات",
+    "jobPost": "إعلان الوظيفة",
+    "details": "البيانات",
+    "source": "المصدر",
+    "applied": "تاريخ التقديم",
+    "salary": "الراتب",
+    "salaryRange": "{min} – {max}",
+    "salaryFrom": "من {min}",
+    "salaryUpTo": "حتى {max}",
+    "notes": "ملاحظات",
+    "none": "—",
+    "move": {
+      "title": "الخطوة التالية",
+      "to": "نقل إلى",
+      "note": "ملاحظة",
+      "notePlaceholder": "مثال: اتصل قسم الموارد البشرية لتحديد موعد مقابلة",
+      "submit": "نقل",
+      "final": "هذا الطلب مغلق ({status})."
+    },
+    "followUp": {
+      "title": "المتابعة",
+      "date": "موعد المتابعة",
+      "hint": "ستصلك رسالة تذكير صباح ذلك اليوم.",
+      "save": "حفظ الموعد",
+      "clear": "مسح",
+      "saved": "تم الحفظ.",
+      "overdue": "متأخرة",
+      "today": "اليوم"
+    },
+    "interviews": {
+      "title": "المقابلات",
+      "empty": "لا توجد مقابلات بعد.",
+      "add": "إضافة مقابلة",
+      "edit": "تعديل",
+      "delete": "حذف",
+      "deleteConfirm": "حذف هذه المقابلة؟",
+      "yes": "حذف",
+      "cancel": "إلغاء",
+      "save": "حفظ المقابلة",
+      "when": "التاريخ والوقت",
+      "whenHint": "بتوقيتك ({timeZone})",
+      "kind": "النوع",
+      "duration": "المدة (بالدقائق)",
+      "interviewer": "المُحاور",
+      "notes": "ملاحظات",
+      "minutes": "{minutes} دقيقة",
+      "upcoming": "قادمة",
+      "with": "مع {name}",
+      "invalid": {
+        "scheduled_at": "اختر التاريخ والوقت.",
+        "duration_minutes": "اكتب عدد دقائق بين 1 و1440.",
+        "kind": "اختر النوع.",
+        "interviewer": "النص طويل جدًا.",
+        "notes": "النص طويل جدًا."
+      }
+    },
+    "history": {
+      "title": "السجل",
+      "created": "أُضيف بحالة {status}",
+      "moved": "{from} ← {to}"
+    }
   }
 }

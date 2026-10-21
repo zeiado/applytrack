@@ -230,5 +230,76 @@
       "source": "Choose where you found it.",
       "status": "Choose a stage."
     }
+  },
+  "InterviewKind": {
+    "phone_screen": "Phone screen",
+    "technical": "Technical",
+    "behavioral": "Behavioral",
+    "onsite": "On-site",
+    "other": "Other"
+  },
+  "Detail": {
+    "back": "All applications",
+    "edit": "Edit details",
+    "jobPost": "Job post",
+    "details": "Details",
+    "source": "Found through",
+    "applied": "Applied",
+    "salary": "Salary",
+    "salaryRange": "{min} – {max}",
+    "salaryFrom": "From {min}",
+    "salaryUpTo": "Up to {max}",
+    "notes": "Notes",
+    "none": "—",
+    "move": {
+      "title": "Next step",
+      "to": "Move to",
+      "note": "Note",
+      "notePlaceholder": "e.g. HR called to schedule an interview",
+      "submit": "Move",
+      "final": "This application is closed ({status})."
+    },
+    "followUp": {
+      "title": "Follow-up",
+      "date": "Follow up on",
+      "hint": "You'll get a reminder email that morning.",
+      "save": "Save date",
+      "clear": "Clear",
+      "saved": "Saved.",
+      "overdue": "Overdue",
+      "today": "Today"
+    },
+    "interviews": {
+      "title": "Interviews",
+      "empty": "No interviews yet.",
+      "add": "Add interview",
+      "edit": "Edit",
+      "delete": "Delete",
+      "deleteConfirm": "Delete this interview?",
+      "yes": "Delete",
+      "cancel": "Cancel",
+      "save": "Save interview",
+      "when": "Date and time",
+      "whenHint": "In your timezone ({timeZone})",
+      "kind": "Type",
+      "duration": "Length (minutes)",
+      "interviewer": "Interviewer",
+      "notes": "Notes",
+      "minutes": "{minutes} min",
+      "upcoming": "Upcoming",
+      "with": "with {name}",
+      "invalid": {
+        "scheduled_at": "Choose a date and time.",
+        "duration_minutes": "Enter minutes between 1 and 1440.",
+        "kind": "Choose a type.",
+        "interviewer": "Too long.",
+        "notes": "Too long."
+      }
+    },
+    "history": {
+      "title": "History",
+      "created": "Added as {status}",
+      "moved": "{from} → {to}"
+    }
   }
 }

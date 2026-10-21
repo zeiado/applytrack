@@ -50,8 +50,32 @@ export async function getApplication(id: string): Promise<Application> {
   const { data, response } = await api.GET("/api/v1/applications/{application_id}", {
     params: { path: { application_id: id } },
   });
-  if (response.status === 401) return toLogin(`/applications/${id}/edit`);
+  if (response.status === 401) return toLogin(`/applications/${id}`);
   if (response.status === 404) notFound();
   if (!data) throw new Error(`Getting an application failed: HTTP ${response.status}`);
+  return data;
+}
+
+/** Every status the application has been in, oldest first. */
+export async function getHistory(id: string) {
+  const api = await visitorApi();
+  const { data, response } = await api.GET("/api/v1/applications/{application_id}/history", {
+    params: { path: { application_id: id } },
+  });
+  if (response.status === 401) return toLogin(`/applications/${id}`);
+  if (response.status === 404) notFound();
+  if (!data) throw new Error(`Getting the history failed: HTTP ${response.status}`);
+  return data;
+}
+
+/** The application's interviews, earliest first. */
+export async function getInterviews(id: string) {
+  const api = await visitorApi();
+  const { data, response } = await api.GET("/api/v1/applications/{application_id}/interviews", {
+    params: { path: { application_id: id } },
+  });
+  if (response.status === 401) return toLogin(`/applications/${id}`);
+  if (response.status === 404) notFound();
+  if (!data) throw new Error(`Getting the interviews failed: HTTP ${response.status}`);
   return data;
 }

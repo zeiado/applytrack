@@ -6,6 +6,17 @@ export type ApplicationStatus = components["schemas"]["ApplicationStatus"];
 export type ApplicationSource = components["schemas"]["ApplicationSource"];
 export type ApplicationCreate = components["schemas"]["ApplicationCreate"];
 export type ApplicationUpdate = components["schemas"]["ApplicationUpdate"];
+export type StatusChange = components["schemas"]["StatusChangeRead"];
+export type Interview = components["schemas"]["InterviewRead"];
+export type InterviewKind = components["schemas"]["InterviewKind"];
+
+export const INTERVIEW_KINDS = [
+  "phone_screen",
+  "technical",
+  "behavioral",
+  "onsite",
+  "other",
+] as const satisfies readonly InterviewKind[];
 
 // Pipeline order: one board column each, left to right (right to left in Arabic).
 export const STATUSES = [

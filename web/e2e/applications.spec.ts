@@ -77,30 +77,33 @@ test("edit an application", async ({ page }) => {
   await addApplication(page, { company: "Paymob", role: "Frontend Engineer" });
 
   await page.getByRole("link", { name: "Paymob" }).click();
+  await page.getByRole("link", { name: "Edit details" }).click();
   await expect(page.getByRole("heading", { name: "Edit application" })).toBeVisible();
   await page.getByLabel("Role").fill("Senior Frontend Engineer");
-  await page.getByLabel("From").fill("40,000");
-  await page.getByLabel("To").fill("55000");
+  await page.getByLabel("From", { exact: true }).fill("40,000");
+  await page.getByLabel("To", { exact: true }).fill("55000");
   await page.getByRole("button", { name: "Save" }).click();
 
-  await expect(page).toHaveURL(/\/en\/applications$/, AUTH_TIMEOUT);
+  // Back on the application's page, with the changes.
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Paymob", AUTH_TIMEOUT);
+  await expect(page.getByText("Senior Frontend Engineer")).toBeVisible();
+  await expect(page.getByText("40,000 – 55,000")).toBeVisible();
+  await page.getByRole("link", { name: "All applications" }).click();
   await expect(column(page, "Applied")).toContainText("Senior Frontend Engineer");
-  await page.getByRole("link", { name: "Paymob" }).click();
-  await expect(page.getByLabel("From")).toHaveValue("40000");
 });
 
 test("mistakes are pointed out and nothing typed is lost", async ({ page }) => {
   await page.getByRole("link", { name: "Add application" }).first().click();
   await page.getByLabel("Company").fill("Breadfast");
   await page.getByLabel("Role").fill("Ops Analyst");
-  await page.getByLabel("From").fill("30000");
-  await page.getByLabel("To").fill("20000");
+  await page.getByLabel("From", { exact: true }).fill("30000");
+  await page.getByLabel("To", { exact: true }).fill("20000");
   await page.getByRole("button", { name: "Add application" }).click();
 
   await expect(page.getByText("Enter a whole number at least as big as “From”.")).toBeVisible(AUTH_TIMEOUT);
-  await expect(page.getByLabel("To")).toHaveAttribute("aria-invalid", "true");
+  await expect(page.getByLabel("To", { exact: true })).toHaveAttribute("aria-invalid", "true");
   await expect(page.getByLabel("Company")).toHaveValue("Breadfast");
-  await expect(page.getByLabel("From")).toHaveValue("30000");
+  await expect(page.getByLabel("From", { exact: true })).toHaveValue("30000");
   await expect(formAlert(page).filter({ hasText: "Check the fields" })).toBeVisible();
 });
 
@@ -132,6 +135,7 @@ test("the list filters by status and company", async ({ page }) => {
 test("delete an application after confirming", async ({ page }) => {
   await addApplication(page, { company: "Halan", role: "Product Manager" });
   await page.getByRole("link", { name: "Halan" }).click();
+  await page.getByRole("link", { name: "Edit details" }).click();
 
   await page.getByRole("button", { name: "Delete application" }).click();
   await expect(page.getByText("It can't be undone.")).toBeVisible();
