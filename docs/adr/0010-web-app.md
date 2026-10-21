@@ -36,6 +36,24 @@ repository, one CI, one contract.
 - **Next.js 16 defaults are kept:** Turbopack and Cache Components (partial
   prerendering). The marketing pages are prerendered per language.
 
+### How sessions work (#64)
+
+- Login, sign-up and Google sign-in are Server Actions. They call the API and store
+  its tokens in `__Host-at` and `__Host-rt` cookies (httpOnly, Secure, SameSite=Lax:
+  Lax so links from emails still see the session). Next.js checks each Server Action's
+  Origin, which stops cross-site form posts.
+- The access cookie expires a minute before the token. When only the refresh cookie
+  is left, the proxy (`src/proxy.ts`) refreshes before the page renders and passes the
+  new cookie to both the page and the browser. Parallel requests doing this at once
+  rely on the API's 30-second reuse grace period (ADR 0006).
+- The proxy also sends logged-out visitors from member pages to the login page (with
+  `?next=`, checked to be a path on this site) and logged-in ones away from the login
+  and sign-up pages. Pages still check the session with the API.
+- The web server sends each visitor's IP to the API with a shared secret, so the API's
+  rate limits apply per visitor.
+- Not done yet: a Content Security Policy. It needs nonces for Next.js scripts and
+  exceptions for Google's sign-in script; tokens are already out of reach of scripts.
+
 ## Consequences
 
 - Two languages in one CI run: Python (API) and Node (web). The web job runs in

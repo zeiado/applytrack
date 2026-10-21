@@ -19,6 +19,7 @@ npm run dev        # http://localhost:3000 (redirects to /ar or /en)
 | `npm test` | Unit tests (Vitest) |
 | `npm run build` | Production build |
 | `npm run gen:api` | Regenerate `src/lib/api/schema.ts` from `openapi.json` |
+| `npm run e2e` | End-to-end tests in Chromium: starts the API and the built app (`make db` and `npm run build` first) |
 
 After changing the API, run `make openapi` in the repo root. It exports the API's
 OpenAPI schema to `openapi.json` and regenerates the typed client. CI fails if you forget.
@@ -32,7 +33,19 @@ OpenAPI schema to `openapi.json` and regenerates the typed client. CI fails if y
 | `src/i18n/` | Languages and routing. Use `Link` and `useRouter` from `@/i18n/navigation` |
 | `messages/` | Text in Arabic and English. Every key must exist in both |
 | `src/lib/api/` | Typed API client (server only) and the generated schema |
+| `src/lib/auth/` | Sessions: cookies, Server Actions for every sign-in form, refresh |
+| `src/proxy.ts` | Runs before each page: refreshes the session, guards pages, adds the language |
+| `e2e/` | Playwright tests |
 | `src/config/brand.ts` | The product name |
+
+## Sessions
+
+The browser never sees a token. Logging in (a Server Action) stores the API's access
+and refresh tokens in `__Host-` cookies: httpOnly, Secure, SameSite=Lax. The access
+cookie expires a minute before the token; when it's gone, `src/proxy.ts` uses the
+refresh cookie to get a new pair before the page renders. Pages that need a user read
+it with `getCurrentUser()` inside a `<Suspense>` boundary. Protected pages are listed
+in `src/lib/auth/routes.ts`.
 
 ## Rules of thumb
 

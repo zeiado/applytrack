@@ -11,6 +11,8 @@ changes, a minor version for new features, and a patch version for fixes.
 
 - A refresh token used again within 30 seconds of its rotation gets its own pair instead of signing the user out, so parallel requests from the web app don't end sessions (`APPLYTRACK_REFRESH_REUSE_GRACE_SECONDS`; [#64], [ADR 0006](docs/adr/0006-rotating-refresh-tokens.md))
 - The web app's server can tell the API each visitor's IP (`X-Client-IP`, trusted only with `APPLYTRACK_CLIENT_IP_SECRET`), so rate limits apply per visitor ([#64])
+- Sign-up, login, logout and Sign in with Google in the web app, plus the pages behind the email links (confirm email, forgot and reset password), in Arabic and English. Tokens stay in httpOnly cookies on the server, and expired sessions are refreshed before each page ([#64], [ADR 0010](docs/adr/0010-web-app.md))
+- End-to-end tests (Playwright) of the sign-in flows against the real API, in CI ([#64])
 - The web app in `web/`: Next.js, Arabic (right-to-left) and English, a home page, and a typed API client generated from the OpenAPI schema; CI lints, type checks, tests and builds it ([#63], [ADR 0010](docs/adr/0010-web-app.md))
 
 ## [0.4.0] - 2026-10-21
