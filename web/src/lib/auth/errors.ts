@@ -19,6 +19,9 @@ export const KNOWN_ERRORS = [
   "invalid_reset_token",
   "reset_token_expired",
   "validation_error",
+  "invalid_transition",
+  "invalid_salary_range",
+  "not_found",
   "network",
   "unknown",
 ] as const;

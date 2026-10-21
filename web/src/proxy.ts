@@ -19,7 +19,7 @@ const intl = createMiddleware(routing);
  * 1. If the access token has expired but there's a refresh token, gets a new pair and
  *    passes it both to this request (so the page renders logged in) and to the browser.
  * 2. Sends logged-out visitors from protected pages to the login page, and logged-in
- *    ones from the login and sign-up pages to the dashboard. These are only quick
+ *    ones from the login and sign-up pages to their applications. These are only quick
  *    checks on cookies; pages still check the session with the API.
  * 3. Adds the language to URLs without one (next-intl).
  */
@@ -37,7 +37,7 @@ export default async function proxy(request: NextRequest): Promise<NextResponse>
       return session.apply(NextResponse.redirect(login));
     }
     if (kind === "guest" && loggedIn) {
-      return session.apply(NextResponse.redirect(new URL(`/${locale}/dashboard`, request.url)));
+      return session.apply(NextResponse.redirect(new URL(`/${locale}/applications`, request.url)));
     }
   }
   return session.apply(intl(session.request));

@@ -34,6 +34,7 @@ OpenAPI schema to `openapi.json` and regenerates the typed client. CI fails if y
 | `messages/` | Text in Arabic and English. Every key must exist in both |
 | `src/lib/api/` | Typed API client (server only) and the generated schema |
 | `src/lib/auth/` | Sessions: cookies, Server Actions for every sign-in form, refresh |
+| `src/lib/applications/` | Applications: reads for pages (`data.ts`), Server Actions (`actions.ts`), URL and form parsing |
 | `src/proxy.ts` | Runs before each page: refreshes the session, guards pages, adds the language |
 | `e2e/` | Playwright tests |
 | `src/config/brand.ts` | The product name |

@@ -100,7 +100,10 @@
     "reset_token_expired": "This link has expired. Ask for a new one.",
     "validation_error": "Check the fields and try again.",
     "network": "We can't reach the server. Check your connection and try again; the first request after a while can take up to a minute.",
-    "unknown": "Something went wrong. Try again."
+    "unknown": "Something went wrong. Try again.",
+    "invalid_transition": "That move isn't allowed from its current stage.",
+    "invalid_salary_range": "The salary “From” can't be more than “To”.",
+    "not_found": "That application doesn't exist anymore."
   },
   "Dashboard": {
     "title": "Dashboard",
@@ -110,5 +113,122 @@
     "verifyBanner": "Confirm your email address: we sent a link to {email}.",
     "resend": "Send it again",
     "resent": "Sent. Check your inbox (and spam folder)."
+  },
+  "Nav": {
+    "applications": "Applications",
+    "logOut": "Log out",
+    "menu": "Main"
+  },
+  "Status": {
+    "wishlist": "Wishlist",
+    "applied": "Applied",
+    "screening": "Screening",
+    "interviewing": "Interviewing",
+    "offer": "Offer",
+    "accepted": "Accepted",
+    "rejected": "Rejected",
+    "withdrawn": "Withdrawn"
+  },
+  "Source": {
+    "job_board": "Job board",
+    "company_site": "Company website",
+    "referral": "Referral",
+    "recruiter": "Recruiter",
+    "other": "Other"
+  },
+  "Applications": {
+    "title": "Applications",
+    "add": "Add application",
+    "board": "Board",
+    "list": "List",
+    "views": "View",
+    "count": "{count, plural, =0 {No applications} one {# application} other {# applications}}",
+    "empty": {
+      "title": "No applications yet",
+      "body": "Add the jobs you've applied to (or want to) and follow each one from here."
+    },
+    "truncated": "Showing your 500 newest applications. Use the list to see the rest.",
+    "card": {
+      "moveTo": "Move to…",
+      "move": "Move {company}",
+      "noMoves": "Final status",
+      "edit": "Edit",
+      "followUp": "Follow up {date}",
+      "followUpDue": "Follow up today",
+      "followUpOverdue": "Follow-up overdue",
+      "applied": "Applied {date}",
+      "dragHint": "Drag a card to a highlighted column, or use its menu."
+    },
+    "moveFailed": "That move didn't work: {reason}",
+    "filters": {
+      "title": "Filters",
+      "company": "Company",
+      "companyPlaceholder": "Search by company",
+      "status": "Status",
+      "source": "Source",
+      "anySource": "Any source",
+      "sort": "Sort by",
+      "apply": "Apply",
+      "clear": "Clear filters"
+    },
+    "sort": {
+      "-created_at": "Newest first",
+      "created_at": "Oldest first",
+      "-applied_on": "Applied date, newest",
+      "applied_on": "Applied date, oldest",
+      "company": "Company, A–Z",
+      "-company": "Company, Z–A"
+    },
+    "table": {
+      "company": "Company",
+      "role": "Role",
+      "status": "Status",
+      "applied": "Applied",
+      "followUp": "Follow up",
+      "source": "Source"
+    },
+    "noMatches": "No applications match these filters.",
+    "page": "Page {page} of {pages}",
+    "previous": "Previous",
+    "next": "Next",
+    "pagination": "Pages"
+  },
+  "ApplicationForm": {
+    "newTitle": "Add an application",
+    "editTitle": "Edit application",
+    "company": "Company",
+    "role_title": "Role",
+    "job_url": "Job link",
+    "job_urlHint": "The job post, so you can find it again",
+    "source": "Where you found it",
+    "status": "Stage",
+    "statusApplied": "I've applied",
+    "statusWishlist": "Not yet (wishlist)",
+    "salary": "Salary range (per month)",
+    "salary_min": "From",
+    "salary_max": "To",
+    "applied_on": "Date applied",
+    "follow_up_on": "Follow up on",
+    "follow_up_onHint": "You'll get a reminder that morning",
+    "notes": "Notes",
+    "optional": "optional",
+    "save": "Save",
+    "create": "Add application",
+    "cancel": "Cancel",
+    "delete": "Delete application",
+    "deleteConfirm": "Yes, delete it",
+    "deleteWarning": "This deletes the application with its history and interviews. It can't be undone.",
+    "invalid": {
+      "company": "Enter the company name.",
+      "role_title": "Enter the role.",
+      "job_url": "Enter a full link starting with https://",
+      "salary_min": "Enter a whole number, like 15000.",
+      "salary_max": "Enter a whole number at least as big as “From”.",
+      "applied_on": "Enter a valid date.",
+      "follow_up_on": "Enter a valid date.",
+      "notes": "Notes are too long.",
+      "source": "Choose where you found it.",
+      "status": "Choose a stage."
+    }
   }
 }

@@ -53,7 +53,7 @@ export function VerifyEmail() {
   return (
     <div className="grid gap-4">
       {result.ok ? <FormSuccess>{t("done")}</FormSuccess> : <FormError error={result.error} />}
-      <Link href="/dashboard" className={buttonVariants({ className: "h-10 w-full" })}>
+      <Link href="/applications" className={buttonVariants({ className: "h-10 w-full" })}>
         {t("continue")}
       </Link>
     </div>

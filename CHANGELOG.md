@@ -7,6 +7,11 @@ changes, a minor version for new features, and a patch version for fixes.
 
 ## [Unreleased]
 
+### Added
+
+- Applications in the web app: a board with a column per status, where a card moves through its menu or by dragging, only to the stages the API allows; a list with filters (status, source, company), sorting and pages; and pages to add, edit and delete an application. Follow-ups that are due or overdue stand out. Arabic and English, phone-first ([#65])
+- Logging in now opens your applications; the old `/dashboard` address redirects there ([#65])
+
 ## [0.5.0] - 2026-10-21
 
 The web app: Arabic and English, sign-up, login and Sign in with Google.
@@ -115,4 +120,5 @@ First release.
 [#46]: https://github.com/zeiado/applytrack/issues/46
 [#63]: https://github.com/zeiado/applytrack/issues/63
 [#64]: https://github.com/zeiado/applytrack/issues/64
+[#65]: https://github.com/zeiado/applytrack/issues/65
 [#50]: https://github.com/zeiado/applytrack/issues/50
