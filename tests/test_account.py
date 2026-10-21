@@ -198,8 +198,14 @@ def test_repeated_wrong_passwords_are_rate_limited(client: TestClient, ada: dict
 
 @pytest.mark.parametrize(
     "payload",
-    [{}, {"password": ""}, {"password": "x", "extra": 1}],
-    ids=["missing", "empty", "extra-field"],
+    [
+        {},
+        {"password": ""},
+        {"password": "x", "extra": 1},
+        {"google_id_token": ""},
+        {"password": "x", "google_id_token": "y"},
+    ],
+    ids=["missing", "empty", "extra-field", "empty-google", "both"],
 )
 def test_delete_validates_input(
     client: TestClient, ada: dict[str, str], payload: dict[str, Any]

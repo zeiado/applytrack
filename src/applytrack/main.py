@@ -8,6 +8,7 @@ from applytrack.api.router import api_router
 from applytrack.api.routes import health
 from applytrack.core.config import Settings, get_settings, resolved_log_format
 from applytrack.core.errors import ErrorResponse, register_exception_handlers
+from applytrack.core.google import GoogleIdTokenVerifier
 from applytrack.core.logging import configure_logging
 from applytrack.core.middleware import RequestContextMiddleware
 from applytrack.core.rate_limit import InMemoryRateLimiter, LoginRateLimiter
@@ -61,6 +62,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     app.state.forgot_password_limiter = InMemoryRateLimiter(
         limit=settings.forgot_password_max_per_ip, window_seconds=60 * 60
+    )
+    app.state.google_verifier = GoogleIdTokenVerifier(settings.google_client_ids)
+    # Invalid Google tokens per IP, with the same limit as failed password logins.
+    app.state.google_sign_in_limiter = InMemoryRateLimiter(
+        limit=settings.login_max_failures_per_ip, window_seconds=settings.login_window_seconds
     )
 
     register_exception_handlers(app)

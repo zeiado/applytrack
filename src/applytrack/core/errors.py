@@ -99,6 +99,13 @@ class TooManyRequestsError(AppError):
         self.retry_after = retry_after
 
 
+class ServiceUnavailableError(AppError):
+    """A service we depend on can't be reached, or a feature isn't configured."""
+
+    status_code = status.HTTP_503_SERVICE_UNAVAILABLE
+    code = "service_unavailable"
+
+
 def _error_response(
     status_code: int,
     code: str,

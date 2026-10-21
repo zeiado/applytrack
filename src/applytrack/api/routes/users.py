@@ -5,8 +5,10 @@ from applytrack.core.errors import (
     ErrorResponse,
     ForbiddenError,
     TooManyRequestsError,
+    UnauthorizedError,
     ValidationFailedError,
 )
+from applytrack.core.google import GoogleIdentity, GoogleIdTokenVerifier
 from applytrack.core.rate_limit import LoginRateLimiter
 from applytrack.schemas.account import AccountExport, DeleteAccountRequest
 from applytrack.schemas.auth import UserRead, UserUpdate
@@ -51,7 +53,10 @@ def export_my_data(user: CurrentUser, db: DbSession, now: Now, response: Respons
     status_code=status.HTTP_204_NO_CONTENT,
     responses={
         status.HTTP_401_UNAUTHORIZED: {"model": ErrorResponse},
-        status.HTTP_403_FORBIDDEN: {"model": ErrorResponse, "description": "Wrong password"},
+        status.HTTP_403_FORBIDDEN: {
+            "model": ErrorResponse,
+            "description": "`invalid_password`, `invalid_google_token` or `wrong_google_account`",
+        },
         status.HTTP_429_TOO_MANY_REQUESTS: {
             "model": ErrorResponse,
             "description": "Too many wrong passwords; see the Retry-After header",
@@ -61,10 +66,12 @@ def export_my_data(user: CurrentUser, db: DbSession, now: Now, response: Respons
 def delete_my_account(
     body: DeleteAccountRequest, user: CurrentUser, db: DbSession, request: Request
 ) -> Response:
-    """Permanently delete your account and all its data. Needs your current password.
+    """Permanently delete your account and all its data.
 
-    Wrong passwords count toward the same limits as failed logins, so a stolen
-    access token can't be used to guess the password.
+    Confirm with your current password, or, for an account without one, with a new
+    Google ID token from signing in with the linked Google account. Wrong passwords
+    count toward the same limits as failed logins, so a stolen access token can't be
+    used to guess the password.
     """
     limiter: LoginRateLimiter = request.app.state.login_limiter
     ip = request.client.host if request.client else "unknown"
@@ -76,9 +83,21 @@ def delete_my_account(
             code="too_many_login_attempts",
         )
     try:
-        AccountService(db, user).delete(body.password)
+        google = None
+        if body.google_id_token is not None:
+            google = _google_identity(request, body.google_id_token)
+        AccountService(db, user).delete(password=body.password, google=google)
     except ForbiddenError:
         limiter.record_failure(ip, user.email)
         raise
     limiter.record_success(ip, user.email)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+def _google_identity(request: Request, id_token: str) -> GoogleIdentity:
+    verifier: GoogleIdTokenVerifier = request.app.state.google_verifier
+    try:
+        return verifier.verify(id_token)
+    except UnauthorizedError as exc:
+        # 403, not 401: the access token is fine; the confirmation isn't.
+        raise ForbiddenError(exc.message, code="invalid_google_token") from exc

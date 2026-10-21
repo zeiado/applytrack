@@ -14,7 +14,10 @@ class User(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     __table_args__ = (CheckConstraint("locale IN ('ar', 'en')", name="locale"),)
 
     email: Mapped[str] = mapped_column(String(320), unique=True, index=True)
-    password_hash: Mapped[str] = mapped_column(String(255))
+    # None for accounts created with Google that haven't set a password.
+    password_hash: Mapped[str | None] = mapped_column(String(255))
+    # Google's ID for the linked Google account ("sub" in its ID tokens).
+    google_subject: Mapped[str | None] = mapped_column(String(255), unique=True)
     # Language for emails: "ar" or "en" (mail/templates.py).
     locale: Mapped[str] = mapped_column(String(2), default="en", server_default="en")
     # Set when the user opens the link in the verification email.
@@ -33,3 +36,12 @@ class User(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     @property
     def email_verified(self) -> bool:
         return self.email_verified_at is not None
+
+    @property
+    def sign_in_methods(self) -> list[str]:
+        methods = []
+        if self.password_hash is not None:
+            methods.append("password")
+        if self.google_subject is not None:
+            methods.append("google")
+        return methods

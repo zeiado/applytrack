@@ -31,8 +31,10 @@ def test_register_creates_user_without_exposing_password(client: TestClient) -> 
         "locale",
         "timezone",
         "reminder_emails",
+        "sign_in_methods",
         "created_at",
     }
+    assert body["sign_in_methods"] == ["password"]
     assert (body["timezone"], body["reminder_emails"]) == ("Africa/Cairo", True)
     assert body["email_verified"] is False
     assert body["locale"] == "en"

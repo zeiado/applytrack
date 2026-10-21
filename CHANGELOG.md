@@ -12,6 +12,8 @@ changes, a minor version for new features, and a patch version for fixes.
 - Daily follow-up reminder emails: one email on mornings when follow-ups are due, at 08:00 in the user's timezone, never twice a day, only to verified emails ([#45])
 - `PATCH /users/me` to change the email language, timezone (default `Africa/Cairo`) and turn reminder emails off ([#45])
 - A scheduled workflow wakes production each morning so reminders go out on Render's free plan ([#45])
+- Sign in with Google: `POST /auth/google` takes a Google ID token and returns the usual tokens, linking to the account with the same email or creating one without a password ([#46], [ADR 0009](docs/adr/0009-sign-in-with-google.md))
+- `GET /users/me` lists `sign_in_methods`; accounts without a password confirm deletion with Google instead ([#46])
 
 ## [0.3.0] - 2026-10-21
 
@@ -92,4 +94,5 @@ First release.
 [#43]: https://github.com/zeiado/applytrack/issues/43
 [#44]: https://github.com/zeiado/applytrack/issues/44
 [#45]: https://github.com/zeiado/applytrack/issues/45
+[#46]: https://github.com/zeiado/applytrack/issues/46
 [#50]: https://github.com/zeiado/applytrack/issues/50

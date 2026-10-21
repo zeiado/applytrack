@@ -6,10 +6,12 @@ from fastapi.security import OAuth2PasswordRequestForm
 from applytrack.api.deps import AppSettings, CurrentUser, DbSession, Now
 from applytrack.core.config import Settings
 from applytrack.core.errors import ErrorResponse, TooManyRequestsError, UnauthorizedError
+from applytrack.core.google import GoogleIdTokenVerifier
 from applytrack.core.rate_limit import LoginRateLimiter, RateLimiter
 from applytrack.schemas.auth import (
     EmailTokenRequest,
     ForgotPasswordRequest,
+    GoogleSignInRequest,
     RefreshRequest,
     RegisterRequest,
     ResetPasswordRequest,
@@ -17,6 +19,7 @@ from applytrack.schemas.auth import (
     UserRead,
 )
 from applytrack.services.auth import AuthService, normalize_email
+from applytrack.services.google_sign_in import GoogleSignInService
 from applytrack.services.password_reset import PasswordResetService
 from applytrack.services.tokens import TokenPair, TokenService
 from applytrack.services.verification import EmailVerificationService
@@ -135,6 +138,61 @@ def login(
         limiter.record_failure(ip, email)
         raise
     limiter.record_success(ip, email)
+    return _token_response(TokenService(db, settings).issue(user.id, now), settings)
+
+
+@router.post(
+    "/google",
+    responses={
+        status.HTTP_401_UNAUTHORIZED: {
+            "model": ErrorResponse,
+            "description": "`invalid_google_token` or `google_token_expired`",
+        },
+        status.HTTP_403_FORBIDDEN: {
+            "model": ErrorResponse,
+            "description": "`google_email_not_verified`: Google hasn't verified the address",
+        },
+        status.HTTP_409_CONFLICT: {
+            "model": ErrorResponse,
+            "description": "`google_account_mismatch`: the account with this email is "
+            "linked to another Google account",
+        },
+        status.HTTP_429_TOO_MANY_REQUESTS: {
+            "model": ErrorResponse,
+            "description": "Too many invalid tokens from this IP address; see Retry-After",
+        },
+        status.HTTP_503_SERVICE_UNAVAILABLE: {
+            "model": ErrorResponse,
+            "description": "`google_unavailable` (couldn't fetch Google's keys) or "
+            "`google_sign_in_not_configured`",
+        },
+    },
+)
+def sign_in_with_google(
+    body: GoogleSignInRequest, request: Request, db: DbSession, settings: AppSettings, now: Now
+) -> TokenResponse:
+    """Exchange a Google ID token for the same tokens as `/auth/login`.
+
+    Get the ID token with Google's sign-in button (Google Identity Services) using this
+    server's client ID. The first sign-in links the Google account to the account with
+    the same email, or creates an account (with no password) if there is none.
+    """
+    limiter: RateLimiter = request.app.state.google_sign_in_limiter
+    ip = request.client.host if request.client else "unknown"
+    wait = limiter.retry_after(ip)
+    if wait is not None:
+        raise TooManyRequestsError(
+            f"Too many failed sign-ins. Try again in {wait} seconds.",
+            retry_after=wait,
+            code="too_many_login_attempts",
+        )
+    verifier: GoogleIdTokenVerifier = request.app.state.google_verifier
+    try:
+        identity = verifier.verify(body.id_token)
+    except UnauthorizedError:
+        limiter.hit(ip)
+        raise
+    user = GoogleSignInService(db).sign_in(identity, locale=body.locale, now=now)
     return _token_response(TokenService(db, settings).issue(user.id, now), settings)
 
 
