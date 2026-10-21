@@ -26,3 +26,10 @@ class InterviewKind(StrEnum):
     BEHAVIORAL = "behavioral"
     ONSITE = "onsite"
     OTHER = "other"
+
+
+class JobStatus(StrEnum):
+    PENDING = "pending"  # waiting for run_at
+    RUNNING = "running"  # claimed by a worker until locked_until
+    DONE = "done"
+    FAILED = "failed"  # gave up: a permanent error, or out of attempts

@@ -26,6 +26,7 @@ Other modules:
 - `core/` – settings, security (hashing, JWT), logging, error handling
 - `models/` – SQLAlchemy ORM tables
 - `schemas/` – Pydantic request/response models (the API contract)
+- `jobs/` – the background job queue and worker; `mail/` – email backends and templates (see [Background jobs and email](#background-jobs-and-email))
 
 Keeping routers thin means services can be unit tested without spinning up HTTP,
 and repositories can be swapped or mocked.
@@ -68,6 +69,17 @@ refresh_tokens
   family_id   UUID, indexed (all tokens from one login)
   token_hash  text unique (SHA-256 of the token; the token itself is never stored)
   created_at / expires_at / revoked_at timestamptz
+
+jobs                                    (background work, ADR 0007)
+  id            UUID PK
+  kind          text (e.g. send_email)
+  payload       jsonb (cleared when the job finishes)
+  status        enum(pending, running, done, failed)   index (status, run_at)
+  attempts / max_attempts  int
+  run_at        timestamptz (not before)
+  locked_until  timestamptz (a running job's lease)
+  last_error    text
+  created_at / finished_at timestamptz
 
 interviews
   id                UUID PK
@@ -317,6 +329,44 @@ It's a plain ASGI middleware rather than Starlette's `BaseHTTPMiddleware`, which
 has known problems with streaming responses and context variables. It uses only
 the standard `logging` module: a JSON formatter is about 20 lines, so a
 dependency like structlog wasn't worth adding.
+
+## Background jobs and email
+
+Work that shouldn't make a request wait, such as sending email, runs as a **job**: a row
+in `jobs`, saved in the same transaction as the change that caused it
+([ADR 0007](adr/0007-database-job-queue-and-email.md)).
+
+```
+request --> Mailer.send()  --> INSERT jobs (pending)    } one transaction:
+        --> the change itself (e.g. INSERT users)       } both or neither
+worker  --> claim the oldest due job (FOR UPDATE SKIP LOCKED), lease 5 min, commit
+        --> run it: render the template, send with the configured backend
+        --> done | pending again with backoff (30 s, 2 m, 8 m, 32 m, 1 h) | failed
+```
+
+- **Temporary vs permanent failures.** Timeouts, HTTP 429/5xx and SMTP 4xx are retried.
+  Rejected addresses, bad requests and template errors fail the job at once.
+- **At least once.** A worker that dies mid-job loses its lease after 5 minutes and the
+  job runs again, so handlers must tolerate repeats. Emails carry the job id as an
+  idempotency key, which Resend uses to drop duplicates.
+- **Where it runs.** `python -m applytrack.worker` (the Compose `worker` service), or a
+  thread in the API process with `APPLYTRACK_RUN_WORKER_IN_API=true` (Render's free plan
+  has no workers). Several workers can run at once.
+- **Housekeeping**, hourly: delete `done` jobs older than 7 days, `failed` ones older
+  than 30, and expired refresh tokens.
+- **Logs.** Each job logs under the request id `job-<id>`, with `job_kind`, `attempt` and
+  `outcome`. Recipients are masked (`a***@example.com`), except by the console backend,
+  whose job is to print the email.
+
+**Templates** live in `mail/templates/` as `<name>.<locale>.txt` (first line
+`Subject: ...`) and `<name>.<locale>.html` (extends `_layout.html`), for `ar` (right
+to left) and `en`. HTML is autoescaped, a missing variable is an error, and a test
+checks that every email exists in both languages and both formats. The app name comes
+from `APPLYTRACK_APP_NAME`, so a rebrand needs no template changes.
+
+**Backends** (`APPLYTRACK_EMAIL_BACKEND`): `console` writes to the log; `resend` uses
+Resend's HTTP API; `smtp` works with any SMTP provider. Incomplete provider settings
+stop the app at startup.
 
 ## Testing strategy
 

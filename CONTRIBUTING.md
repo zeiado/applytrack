@@ -37,6 +37,19 @@ CI applies every migration on PostgreSQL, runs `alembic check`, and downgrades t
 `tests/test_migrations.py` does the same on SQLite during `make test`, and fails if a
 table has an unnamed or duplicated CHECK constraint.
 
+## Emails
+
+Templates are in `src/applytrack/mail/templates/`. A new email needs four files:
+`<name>.ar.txt`, `<name>.ar.html`, `<name>.en.txt` and `<name>.en.html` (a test fails
+if one is missing). The `.txt` file starts with `Subject: ...`; the `.html` file
+extends `_layout.html`. Send it from a service with
+`Mailer(session, settings).send(to=..., template="<name>", locale=..., context={...})`
+before the service commits.
+
+In tests, run the queued jobs with the `worker` fixture (`worker.run_pending()`) and
+read what was sent from `mailbox.outbox`. Locally, `make worker` prints emails to the
+terminal.
+
 ## Tests
 
 - `make test` uses in-memory SQLite. To run against PostgreSQL like CI does:

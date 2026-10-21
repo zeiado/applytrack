@@ -28,5 +28,21 @@ services:
       db:
         condition: service_healthy
 
+  # Runs queued jobs, such as emails (docs/adr/0007-database-job-queue-and-email.md).
+  # With the default console backend, emails appear in this service's log.
+  worker:
+    build: .
+    command: ["python", "-m", "applytrack.worker"]
+    environment:
+      APPLYTRACK_DATABASE_URL: postgresql+psycopg://applytrack:applytrack@db:5432/applytrack
+    env_file:
+      - path: .env
+        required: false
+    healthcheck:
+      disable: true # the image's check calls the API's /health; the worker serves no HTTP
+    depends_on:
+      api:
+        condition: service_healthy # the API applies migrations when it starts
+
 volumes:
   pgdata:

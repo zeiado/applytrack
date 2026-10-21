@@ -1,10 +1,18 @@
-.PHONY: install run db migrate migration lint format typecheck test audit sast check
+.PHONY: install run worker test-email db migrate migration lint format typecheck test audit sast check
 
 install:
 	uv sync
 
 run:
 	uv run uvicorn applytrack.main:app --reload --no-access-log
+
+# Runs queued jobs, such as emails. With the console backend, emails print here.
+worker:
+	uv run python -m applytrack.worker
+
+# Usage: make test-email to=you@example.com locale=ar (checks the email provider settings)
+test-email:
+	uv run python -m applytrack.mail $(to) --locale $(or $(locale),en)
 
 db:
 	docker compose up -d db

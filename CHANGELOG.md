@@ -7,6 +7,12 @@ changes, a minor version for new features, and a patch version for fixes.
 
 ## [Unreleased]
 
+### Added
+
+- Background jobs stored in PostgreSQL, with retries and a worker (`python -m applytrack.worker`, or inside the API with `APPLYTRACK_RUN_WORKER_IN_API`) ([#42], [ADR 0007](docs/adr/0007-database-job-queue-and-email.md))
+- Email through a console, Resend or SMTP backend chosen by `APPLYTRACK_EMAIL_BACKEND`, with templates in Arabic and English ([#42])
+- Expired refresh tokens and old finished jobs are deleted hourly ([#42])
+
 ## [0.2.0] - 2026-10-21
 
 First release.
@@ -64,4 +70,5 @@ First release.
 [#17]: https://github.com/zeiado/applytrack/issues/17
 [#39]: https://github.com/zeiado/applytrack/issues/39
 [#40]: https://github.com/zeiado/applytrack/issues/40
+[#42]: https://github.com/zeiado/applytrack/issues/42
 [#50]: https://github.com/zeiado/applytrack/issues/50

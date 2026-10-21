@@ -58,6 +58,36 @@ is measured, not guessed:
 fake entry with 4, so Render adds 3 and `APPLYTRACK_TRUSTED_PROXY_HOPS=3`. Measure again
 if requests start showing a different count, or after putting a CDN in front.
 
+## Background jobs and email
+
+Free Render instances can't run a separate worker, so both services set
+`APPLYTRACK_RUN_WORKER_IN_API=true` and the API runs the job worker in a thread
+([ADR 0007](adr/0007-database-job-queue-and-email.md)). Jobs are in the database, so
+none are lost when a service sleeps or redeploys; they run when it's back.
+
+Until there's a sending domain, `APPLYTRACK_EMAIL_BACKEND=console`: emails are written to
+the service log (Render › service › Logs, search for `Email not sent`), and the API
+logs a warning at startup. Links in those emails are visible to anyone with log access,
+so switch to a provider before real users sign up.
+
+**Switching to Resend** (no code change):
+
+1. Buy the domain, add it in Resend › Domains, and add the DNS records it shows (SPF,
+   DKIM; add a DMARC record too). Wait until Resend shows it verified.
+2. Create an API key with "Sending access" for that domain only.
+3. On each Render service › Environment, set `APPLYTRACK_EMAIL_BACKEND=resend`,
+   `APPLYTRACK_RESEND_API_KEY` (paste it there, never in a chat or a file in the repo)
+   and `APPLYTRACK_EMAIL_FROM`, e.g. `Sekka <noreply@mail.example.com>`. Send from a
+   subdomain, so marketing email later can't hurt its reputation.
+4. Locally, with the same values in `.env`: `make test-email to=you@example.com locale=ar`.
+
+Any SMTP provider works the same way with `APPLYTRACK_EMAIL_BACKEND=smtp` and the
+`APPLYTRACK_SMTP_*` settings. The app refuses to start if a provider's settings are
+incomplete, so a typo shows up at deploy time, not on the first email.
+
+When a paid plan allows it, run `python -m applytrack.worker` as a Render background
+worker and turn `APPLYTRACK_RUN_WORKER_IN_API` off.
+
 ## Rollback
 
 - **Code:** Render › service › Events › pick an earlier deploy › Rollback.
