@@ -1,4 +1,4 @@
-"""Password hashing, JWT access tokens and refresh tokens.
+"""Password hashing, JWT access tokens, and random tokens (refresh tokens, email links).
 
 See docs/adr/0003-jwt-authentication.md and docs/adr/0006-rotating-refresh-tokens.md.
 """
@@ -67,11 +67,11 @@ def decode_access_token(token: str, settings: Settings) -> uuid.UUID:
         raise UnauthorizedError("Invalid token", code="invalid_token") from exc
 
 
-def new_refresh_token() -> str:
-    """A random, URL-safe refresh token with 256 bits of entropy."""
+def new_random_token() -> str:
+    """A random, URL-safe token with 256 bits of entropy (refresh tokens, email links)."""
     return secrets.token_urlsafe(32)
 
 
-def hash_refresh_token(token: str) -> str:
+def hash_token(token: str) -> str:
     """SHA-256 hex digest. A fast hash is enough here: the token is random, not a password."""
     return hashlib.sha256(token.encode()).hexdigest()

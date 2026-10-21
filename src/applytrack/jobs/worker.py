@@ -17,6 +17,7 @@ from sqlalchemy.orm import Session, sessionmaker
 
 from applytrack.core.logging import request_id_var
 from applytrack.models import Job, JobStatus
+from applytrack.repositories.email_tokens import EmailTokenRepository
 from applytrack.repositories.jobs import JobRepository
 from applytrack.repositories.refresh_tokens import RefreshTokenRepository
 
@@ -126,18 +127,24 @@ class Worker:
         self.housekeep()
 
     def housekeep(self) -> None:
-        """Delete old finished jobs and expired refresh tokens."""
+        """Delete old finished jobs, and expired refresh tokens and email links."""
         now = self.clock()
         with self.session_factory() as session:
             jobs = JobRepository(session)
             done = jobs.delete_finished(JobStatus.DONE, now - self.retention.done)
             failed = jobs.delete_finished(JobStatus.FAILED, now - self.retention.failed)
             tokens = RefreshTokenRepository(session).delete_expired(now)
+            # Kept a day past expiry: the per-hour email limit counts recent ones.
+            links = EmailTokenRepository(session).delete_expired(now - timedelta(days=1))
             session.commit()
-        if done or failed or tokens:
+        if done or failed or tokens or links:
             logger.info(
                 "Housekeeping",
-                extra={"deleted_jobs": done + failed, "deleted_refresh_tokens": tokens},
+                extra={
+                    "deleted_jobs": done + failed,
+                    "deleted_refresh_tokens": tokens,
+                    "deleted_email_tokens": links,
+                },
             )
 
     def close(self) -> None:

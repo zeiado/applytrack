@@ -3,13 +3,20 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Request, Response, status
 from fastapi.security import OAuth2PasswordRequestForm
 
-from applytrack.api.deps import AppSettings, DbSession, Now
+from applytrack.api.deps import AppSettings, CurrentUser, DbSession, Now
 from applytrack.core.config import Settings
 from applytrack.core.errors import ErrorResponse, TooManyRequestsError, UnauthorizedError
 from applytrack.core.rate_limit import LoginRateLimiter
-from applytrack.schemas.auth import RefreshRequest, RegisterRequest, TokenResponse, UserRead
+from applytrack.schemas.auth import (
+    EmailTokenRequest,
+    RefreshRequest,
+    RegisterRequest,
+    TokenResponse,
+    UserRead,
+)
 from applytrack.services.auth import AuthService, normalize_email
 from applytrack.services.tokens import TokenPair, TokenService
+from applytrack.services.verification import EmailVerificationService
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -28,10 +35,59 @@ def _token_response(pair: TokenPair, settings: Settings) -> TokenResponse:
     status_code=status.HTTP_201_CREATED,
     responses={status.HTTP_409_CONFLICT: {"model": ErrorResponse}},
 )
-def register(body: RegisterRequest, db: DbSession) -> UserRead:
-    """Create an account."""
-    user = AuthService(db).register(body.email, body.password)
+def register(body: RegisterRequest, db: DbSession, settings: AppSettings, now: Now) -> UserRead:
+    """Create an account, and email a link to verify the address."""
+    verification = EmailVerificationService(db, settings)
+    user = AuthService(db).register(
+        body.email,
+        body.password,
+        locale=body.locale,
+        on_created=lambda new_user: verification.queue_email(new_user, now),
+    )
     return UserRead.model_validate(user)
+
+
+@router.post(
+    "/verify-email",
+    status_code=status.HTTP_204_NO_CONTENT,
+    responses={
+        status.HTTP_400_BAD_REQUEST: {
+            "model": ErrorResponse,
+            "description": "`invalid_verification_token` (unknown or already used) or "
+            "`verification_token_expired`",
+        }
+    },
+)
+def verify_email(
+    body: EmailTokenRequest, db: DbSession, settings: AppSettings, now: Now
+) -> Response:
+    """Confirm an email address with the token from the verification email.
+
+    No login needed: the link may be opened on another device. Each link works once,
+    and using one also cancels the user's older verification links.
+    """
+    EmailVerificationService(db, settings).verify(body.token, now)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.post(
+    "/verify-email/resend",
+    status_code=status.HTTP_202_ACCEPTED,
+    responses={
+        status.HTTP_401_UNAUTHORIZED: {"model": ErrorResponse},
+        status.HTTP_409_CONFLICT: {"model": ErrorResponse, "description": "Already verified"},
+        status.HTTP_429_TOO_MANY_REQUESTS: {
+            "model": ErrorResponse,
+            "description": "Too many verification emails this hour; see Retry-After",
+        },
+    },
+)
+def resend_verification_email(
+    user: CurrentUser, db: DbSession, settings: AppSettings, now: Now
+) -> Response:
+    """Send a new verification link to the logged-in user (a few per hour at most)."""
+    EmailVerificationService(db, settings).resend(user, now)
+    return Response(status_code=status.HTTP_202_ACCEPTED)
 
 
 @router.post(

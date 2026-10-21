@@ -49,7 +49,7 @@ stories and priorities.
 
 | Area | What it does |
 |------|--------------|
-| **Accounts** | Register and log in. Argon2id password hashing, short-lived JWT access tokens, rotating refresh tokens with reuse detection, logout, failed-login rate limiting |
+| **Accounts** | Register, verify the email by link, and log in. Argon2id password hashing, short-lived JWT access tokens, rotating refresh tokens with reuse detection, logout, failed-login rate limiting |
 | **Applications** | Create, read, update (partial) and delete. Company, role, link, source, salary range, dates, notes |
 | **Search** | Filter by status, source and company (case-insensitive), sort on three fields, paginate with totals |
 | **Status workflow** | `wishlist → applied → screening → interviewing → offer → accepted` with validated transitions, `rejected`/`withdrawn` exits, and an append-only history |
@@ -201,7 +201,9 @@ need `Authorization: Bearer <token>`, and other users' resources return `404`.
 |--------|------|-------------|
 | `GET` | `/health` | Liveness probe and version |
 | `GET` | `/ready` | Readiness probe: checks the database, `503` if it's down |
-| `POST` | `/api/v1/auth/register` | Create an account |
+| `POST` | `/api/v1/auth/register` | Create an account and email a verification link |
+| `POST` | `/api/v1/auth/verify-email` | Confirm the email with the token from the link |
+| `POST` | `/api/v1/auth/verify-email/resend` | Send a new verification link (limited per hour) |
 | `POST` | `/api/v1/auth/login` | Get an access token and a refresh token (OAuth2 password form) |
 | `POST` | `/api/v1/auth/refresh` | Swap a refresh token for a new pair (single use) |
 | `POST` | `/api/v1/auth/logout` | Revoke a refresh token |
@@ -426,6 +428,9 @@ All settings are environment variables (or a `.env` file). See [.env.example](.e
 | `APPLYTRACK_LOG_FORMAT` | `auto` | `auto` = JSON in production, text elsewhere |
 | `APPLYTRACK_TRUSTED_PROXY_HOPS` | `0` | Proxies in front of the app that append to `X-Forwarded-For` ([docs/deployment.md](docs/deployment.md)) |
 | `APPLYTRACK_APP_NAME` | `ApplyTrack` | Product name, used in API docs and emails |
+| `APPLYTRACK_PUBLIC_APP_URL` | `http://localhost:3000` | The web app; links in emails point here |
+| `APPLYTRACK_EMAIL_VERIFICATION_EXPIRE_HOURS` | `24` | Verification link lifetime |
+| `APPLYTRACK_EMAIL_TOKEN_LIMIT_PER_HOUR` | `3` | Emails of each kind (verification, reset) per account per hour |
 | `APPLYTRACK_EMAIL_BACKEND` | `console` | `console` (log only), `resend` or `smtp` |
 | `APPLYTRACK_EMAIL_FROM` | `ApplyTrack <noreply@localhost>` | Sender; must be on your verified domain for `resend`/`smtp` |
 | `APPLYTRACK_EMAIL_REPLY_TO` | unset | Optional `Reply-To` |
@@ -493,13 +498,15 @@ you can read:
 | [0005](docs/adr/0005-in-memory-login-rate-limiting.md) | In-memory rate limiting for failed logins |
 | [0006](docs/adr/0006-rotating-refresh-tokens.md) | Rotating refresh tokens with reuse detection |
 | [0007](docs/adr/0007-database-job-queue-and-email.md) | A job queue in PostgreSQL, and pluggable email backends |
+| [0008](docs/adr/0008-one-time-email-tokens.md) | One-time tokens for email links |
 
 ## Roadmap
 
 - [x] Staging and production deployments on Render + Neon ([docs/deployment.md](docs/deployment.md))
 - [x] Refresh tokens, so sessions outlive the 30-minute access token ([ADR 0006](docs/adr/0006-rotating-refresh-tokens.md))
 - [x] Background jobs and email in Arabic and English ([ADR 0007](docs/adr/0007-database-job-queue-and-email.md))
-- [ ] Email verification, password reset and daily reminder emails
+- [x] Email verification ([ADR 0008](docs/adr/0008-one-time-email-tokens.md))
+- [ ] Password reset and daily reminder emails
 - [ ] Redis-backed rate limiter for multi-instance deployments (the interface is ready; see ADR 0005)
 - [ ] Keyset pagination if lists grow large
 - [ ] Container image scanning with a verified Trivy binary
