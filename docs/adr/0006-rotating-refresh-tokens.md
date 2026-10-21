@@ -20,6 +20,13 @@ again, and users need a way to log out.
 - **Reuse detection:** a revoked token sent again means two parties hold it (for
   example, a stolen token). The server revokes every refresh token of that user and
   returns `401 refresh_token_reused`; the user logs in again with their password.
+- **Grace period (added for the web app, #64):** a token used again within 30 seconds
+  of being rotated (`APPLYTRACK_REFRESH_REUSE_GRACE_SECONDS`, 0 turns it off) gets a
+  new pair in the same family instead of counting as reuse, as long as the session is
+  still active (not logged out or revoked). The web app's server refreshes for the
+  browser, and two page loads at the moment the access token expires would otherwise
+  sign the user out everywhere. `rotated_at` tells rotation apart from logout, which
+  gets no grace.
 - `POST /auth/logout` revokes one token and always returns `204`.
 - The token row is locked (`SELECT ... FOR UPDATE`) during a refresh, so two
   simultaneous refreshes with one token can't both succeed.
@@ -34,9 +41,11 @@ again, and users need a way to log out.
 
 ## Consequences
 
-- Clients must store the newest refresh token after every refresh. Two browser tabs
-  refreshing with the same token at once will look like reuse and sign the user out;
-  clients should share one refresh in flight.
+- Clients must store the newest refresh token after every refresh. Refreshes with the
+  same token within the grace period both succeed; after it, a second use is reuse.
+- Someone who steals a refresh token and uses it within 30 seconds of the user's own
+  refresh gets a session without triggering reuse detection. That window is short, and
+  the stolen token stops working at its next use after the user's next refresh.
 - Sending a logged-out token again also counts as reuse.
 - Expired and revoked rows build up; a periodic cleanup job can delete rows past
   `expires_at` once the background worker exists.

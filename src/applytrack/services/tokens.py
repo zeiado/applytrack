@@ -40,6 +40,18 @@ class TokenService:
         if token is None:
             raise UnauthorizedError("Invalid refresh token", code="invalid_refresh_token")
 
+        if token.revoked_at is not None and self._within_reuse_grace(token, now):
+            # Two requests from the same client refreshed with this token at the same
+            # moment (e.g. the web app's server handling two page loads). The other one
+            # already rotated it; give this one its own pair in the same session.
+            pair = self._issue(token.user_id, family_id=token.family_id, now=now)
+            self.session.commit()
+            logger.info(
+                "Rotated refresh token reused within the grace period",
+                extra={"user_id": str(token.user_id)},
+            )
+            return pair
+
         if token.revoked_at is not None:
             # A used or logged-out token came back: someone may have stolen it.
             # Sign the user out everywhere; they log in again with their password.
@@ -55,6 +67,7 @@ class TokenService:
             raise UnauthorizedError("Refresh token has expired", code="refresh_token_expired")
 
         token.revoked_at = now
+        token.rotated_at = now
         pair = self._issue(token.user_id, family_id=token.family_id, now=now)
         self.session.commit()
         return pair
@@ -65,6 +78,18 @@ class TokenService:
         if token is not None and token.revoked_at is None:
             token.revoked_at = now
             self.session.commit()
+
+    def _within_reuse_grace(self, token: RefreshToken, now: datetime) -> bool:
+        """A token rotated moments ago, in a session that's still active. Not one that
+        was logged out or revoked, and not after the session was signed out."""
+        grace = timedelta(seconds=self.settings.refresh_reuse_grace_seconds)
+        return (
+            grace > timedelta(0)
+            and token.rotated_at is not None
+            and now - token.rotated_at <= grace
+            and token.expires_at > now
+            and self.tokens.family_is_active(token.family_id, now)
+        )
 
     def _issue(self, user_id: uuid.UUID, *, family_id: uuid.UUID, now: datetime) -> TokenPair:
         raw = new_random_token()

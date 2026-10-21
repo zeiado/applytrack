@@ -25,3 +25,5 @@ class RefreshToken(UUIDPrimaryKeyMixin, Base):
     created_at: Mapped[datetime] = mapped_column(UTCDateTime, default=utcnow)
     expires_at: Mapped[datetime] = mapped_column(UTCDateTime)
     revoked_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
+    # Set when a refresh replaced this token (as opposed to logout or revoke-all).
+    rotated_at: Mapped[datetime | None] = mapped_column(UTCDateTime)

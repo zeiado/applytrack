@@ -22,6 +22,21 @@ class RefreshTokenRepository:
             select(RefreshToken).where(RefreshToken.token_hash == token_hash).with_for_update()
         )
 
+    def family_is_active(self, family_id: uuid.UUID, now: datetime) -> bool:
+        """Whether the session still has a usable token (it wasn't logged out or revoked)."""
+        return (
+            self.session.scalar(
+                select(RefreshToken.id)
+                .where(
+                    RefreshToken.family_id == family_id,
+                    RefreshToken.revoked_at.is_(None),
+                    RefreshToken.expires_at > now,
+                )
+                .limit(1)
+            )
+            is not None
+        )
+
     def revoke_all_for_user(self, user_id: uuid.UUID, now: datetime) -> None:
         self.session.execute(
             update(RefreshToken)
