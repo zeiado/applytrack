@@ -29,7 +29,9 @@ def upgrade() -> None:
 def downgrade() -> None:
     """Downgrade schema."""
     conn = op.get_bind()
-    without_password = conn.scalar(sa.text("SELECT count(*) FROM users WHERE password_hash IS NULL"))
+    without_password = conn.scalar(
+        sa.text("SELECT count(*) FROM users WHERE password_hash IS NULL")
+    )
     if without_password:
         raise RuntimeError(
             f"{without_password} users sign in only with Google. They'd be locked out; "

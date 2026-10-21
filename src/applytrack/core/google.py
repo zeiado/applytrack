@@ -80,7 +80,7 @@ class GoogleIdTokenVerifier:
                 "The Google sign-in has expired. Sign in again.", code="google_token_expired"
             ) from exc
         except jwt.PyJWTError as exc:
-            logger.info("Invalid Google ID token: %s", exc)
+            logger.info("Google sign-in rejected: %s", exc)  # the reason, never the JWT
             raise _invalid() from exc
 
         email = claims.get("email")
