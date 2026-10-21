@@ -6,6 +6,7 @@ from datetime import datetime
 from sqlalchemy.orm import Session
 
 from applytrack.core.errors import ForbiddenError
+from applytrack.core.google import GoogleIdentity
 from applytrack.core.security import verify_password
 from applytrack.models import User
 from applytrack.repositories.account import AccountRepository
@@ -37,9 +38,16 @@ class AccountService:
             exported_at=now, user=UserRead.model_validate(self.user), applications=applications
         )
 
-    def delete(self, password: str) -> None:
-        """Delete the account and everything in it. Needs the current password."""
-        if not verify_password(password, self.user.password_hash):
+    def delete(self, *, password: str | None = None, google: GoogleIdentity | None = None) -> None:
+        """Delete the account and everything in it. Needs the current password, or a
+        fresh sign-in with the Google account linked to it."""
+        if google is not None:
+            if google.subject != self.user.google_subject:
+                raise ForbiddenError(
+                    "That isn't the Google account linked to this account",
+                    code="wrong_google_account",
+                )
+        elif not verify_password(password or "", self.user.password_hash):
             raise ForbiddenError("Incorrect password", code="invalid_password")
         user_id = self.user.id
         self.repo.delete_user(self.user)

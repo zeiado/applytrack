@@ -1,9 +1,9 @@
 from email.utils import parseaddr
 from functools import lru_cache
-from typing import Literal, Self
+from typing import Annotated, Literal, Self
 
 from pydantic import Field, SecretStr, field_validator, model_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 # Only for local development and tests. Production refuses to start with it.
 DEV_JWT_SECRET = "dev-only-insecure-secret-change-me-0123456789"  # noqa: S105
@@ -45,6 +45,10 @@ class Settings(BaseSettings):
     # Emails of one kind (verification, password reset) per account per hour
     email_token_limit_per_hour: int = Field(default=3, ge=1, le=20)
 
+    # Sign in with Google (docs/adr/0009-sign-in-with-google.md): OAuth client IDs from
+    # Google Cloud, comma-separated. Empty turns it off.
+    google_client_ids: Annotated[list[str], NoDecode] = []
+
     # Email (docs/adr/0007-database-job-queue-and-email.md).
     # console writes emails to the log instead of sending them.
     email_backend: Literal["console", "resend", "smtp"] = "console"
@@ -75,6 +79,24 @@ class Settings(BaseSettings):
         if not url.startswith(("https://", "http://")):
             raise ValueError("APPLYTRACK_PUBLIC_APP_URL must start with https:// or http://")
         return url.rstrip("/")
+
+    @field_validator("google_client_ids", mode="before")
+    @classmethod
+    def _split_client_ids(cls, value: object) -> object:
+        if isinstance(value, str):
+            return [part.strip() for part in value.split(",") if part.strip()]
+        return value
+
+    @field_validator("google_client_ids")
+    @classmethod
+    def _google_client_id_format(cls, client_ids: list[str]) -> list[str]:
+        for client_id in client_ids:
+            if not client_id.endswith(".apps.googleusercontent.com"):
+                raise ValueError(
+                    f"{client_id!r} isn't a Google OAuth client ID "
+                    "(they end in .apps.googleusercontent.com)"
+                )
+        return client_ids
 
     @model_validator(mode="after")
     def _require_real_secret_in_production(self) -> Self:

@@ -86,7 +86,7 @@ def test_tokens_with_bad_claims_are_rejected(settings: Settings, claims: dict[st
 
 
 def test_unsigned_token_is_rejected(settings: Settings) -> None:
-    token = jwt.encode({"sub": str(uuid.uuid4()), "type": "access"}, key=None, algorithm="none")
+    token = jwt.encode({"sub": str(uuid.uuid4()), "type": "access"}, key="", algorithm="none")
 
     with pytest.raises(UnauthorizedError):
         decode_access_token(token, settings)

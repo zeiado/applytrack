@@ -23,6 +23,10 @@ class UserRead(BaseModel):
     locale: Locale
     timezone: str = Field(description="IANA name; reminder emails arrive in its morning")
     reminder_emails: bool = Field(description="Whether to get a morning email of due follow-ups")
+    sign_in_methods: list[Literal["password", "google"]] = Field(
+        description="How the user can sign in. Without `password`, offer to set one "
+        "(the forgot-password email sets it)"
+    )
     created_at: datetime
 
 
@@ -42,6 +46,19 @@ class EmailTokenRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     token: str = Field(min_length=1, max_length=256)
+
+
+class GoogleSignInRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    id_token: str = Field(
+        min_length=1,
+        max_length=4096,
+        description="The ID token from Google's sign-in button (its `credential`)",
+    )
+    locale: Locale = Field(
+        default="en", description="Language for emails, if this creates the account"
+    )
 
 
 class TokenResponse(BaseModel):

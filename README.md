@@ -207,12 +207,13 @@ need `Authorization: Bearer <token>`, and other users' resources return `404`.
 | `POST` | `/api/v1/auth/forgot-password` | Email a password reset link (always `202`) |
 | `POST` | `/api/v1/auth/reset-password` | Set a new password with the link's token; signs out everywhere |
 | `POST` | `/api/v1/auth/login` | Get an access token and a refresh token (OAuth2 password form) |
+| `POST` | `/api/v1/auth/google` | Sign in with a Google ID token; links or creates the account |
 | `POST` | `/api/v1/auth/refresh` | Swap a refresh token for a new pair (single use) |
 | `POST` | `/api/v1/auth/logout` | Revoke a refresh token |
 | `GET` | `/api/v1/users/me` | The current user |
 | `PATCH` | `/api/v1/users/me` | Change email language, timezone, or reminder emails on/off |
 | `GET` | `/api/v1/users/me/export` | Download all your data as JSON |
-| `DELETE` | `/api/v1/users/me` | Delete your account and all its data (needs your password) |
+| `DELETE` | `/api/v1/users/me` | Delete your account and all its data (needs your password, or Google) |
 | `GET` | `/api/v1/applications` | List: `status`, `source`, `company`, `sort`, `limit`, `offset` |
 | `POST` | `/api/v1/applications` | Create |
 | `GET` `PATCH` `DELETE` | `/api/v1/applications/{id}` | Read, partially update, delete |
@@ -510,6 +511,7 @@ you can read:
 | [0006](docs/adr/0006-rotating-refresh-tokens.md) | Rotating refresh tokens with reuse detection |
 | [0007](docs/adr/0007-database-job-queue-and-email.md) | A job queue in PostgreSQL, and pluggable email backends |
 | [0008](docs/adr/0008-one-time-email-tokens.md) | One-time tokens for email links |
+| [0009](docs/adr/0009-sign-in-with-google.md) | Sign in with Google |
 
 ## Roadmap
 
@@ -518,6 +520,7 @@ you can read:
 - [x] Background jobs and email in Arabic and English ([ADR 0007](docs/adr/0007-database-job-queue-and-email.md))
 - [x] Email verification ([ADR 0008](docs/adr/0008-one-time-email-tokens.md))
 - [x] Password reset by email ([ADR 0008](docs/adr/0008-one-time-email-tokens.md))
+- [x] Sign in with Google ([ADR 0009](docs/adr/0009-sign-in-with-google.md))
 - [x] Daily follow-up reminder emails
 - [ ] Redis-backed rate limiter for multi-instance deployments (the interface is ready; see ADR 0005)
 - [ ] Keyset pagination if lists grow large

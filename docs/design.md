@@ -37,7 +37,8 @@ and repositories can be swapped or mocked.
 users
   id            UUID  PK
   email         text  unique, not null
-  password_hash text  not null
+  password_hash text  null for accounts created with Google that haven't set a password
+  google_subject text unique, Google's ID for the linked Google account
   locale        text  'ar' | 'en' (language for emails), default 'en'
   email_verified_at timestamptz, null until the verification link is used
   password_changed_at timestamptz, set by a password reset (older access tokens are refused)
@@ -196,6 +197,25 @@ which doesn't reveal anything about accounts.
    before `password_changed_at` get `401 token_revoked`.
 4. Queues a "your password was changed" email, and answers `204`.
 
+### Sign in with Google
+
+`POST /auth/google {id_token, locale?}` takes the ID token from Google's sign-in button
+and returns the same tokens as `/auth/login` ([ADR 0009](adr/0009-sign-in-with-google.md)).
+
+1. The token is checked against Google's keys, our client IDs, Google's issuer and its
+   expiry: `401 invalid_google_token` or `401 google_token_expired`. Invalid tokens count
+   toward a per-IP limit (`429 too_many_login_attempts`). `503 google_unavailable` if
+   Google's keys can't be fetched, `503 google_sign_in_not_configured` without client IDs.
+2. Google must have verified the email: `403 google_email_not_verified`.
+3. The user is found by Google's account ID; else the account with the same email gets
+   linked (`409 google_account_mismatch` if it has a different Google account); else an
+   account is created, verified and without a password, in `locale`.
+4. Linking to an account whose email isn't verified removes its password and signs out
+   its sessions, since whoever registered it may not own the address.
+
+Accounts without a password set one with the forgot-password email. `GET /users/me` lists
+`sign_in_methods` (`password`, `google`).
+
 ### Interviews
 
 Interviews are nested under their application:
@@ -291,7 +311,9 @@ and to have it erased.
   history and interviews, as a download (`applytrack-export-YYYY-MM-DD.json`). Applications
   use the same shape as the applications API. Three queries load everything, however many
   applications there are (a test guards against N+1).
-- `DELETE /users/me` takes `{"password": "..."}`. The user row is deleted and the database
+- `DELETE /users/me` takes `{"password": "..."}`, or `{"google_id_token": "..."}` from
+  signing in again with the linked Google account (`403 wrong_google_account` for another
+  one). The user row is deleted and the database
   cascades to applications, history, interviews and refresh tokens, so existing tokens
   stop working at once and the email can sign up again.
 - A wrong password returns `403 invalid_password` and counts toward the failed-login limits

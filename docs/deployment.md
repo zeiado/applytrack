@@ -96,6 +96,23 @@ delete the workflow then.
 When a paid plan allows it, run `python -m applytrack.worker` as a Render background
 worker and turn `APPLYTRACK_RUN_WORKER_IN_API` off.
 
+## Sign in with Google
+
+Off until `APPLYTRACK_GOOGLE_CLIENT_IDS` is set ([ADR 0009](adr/0009-sign-in-with-google.md)).
+
+1. In Google Cloud Console, create a project, then Google Auth Platform › Branding: the
+   app name, support email and (once there's a domain) the home page and privacy policy.
+   Audience: External. Data access: the `openid`, `email` and `profile` scopes only, which
+   don't need Google's verification review.
+2. Clients › Create client › Web application. Add the web app's origins under
+   "Authorized JavaScript origins" (`http://localhost:3000` for development, then the
+   real domain). No redirect URI or client secret is needed.
+3. On each Render service › Environment, set `APPLYTRACK_GOOGLE_CLIENT_IDS` to the client
+   ID (`...apps.googleusercontent.com`). It isn't a secret; the web app uses it too.
+   Several IDs are comma-separated, e.g. a separate one for staging or the extension.
+4. Until the app is published in Google Auth Platform › Audience, only listed test users
+   can sign in. Publish it before launch.
+
 ## Rollback
 
 - **Code:** Render › service › Events › pick an earlier deploy › Rollback.
