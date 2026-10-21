@@ -11,8 +11,11 @@ from pydantic import SecretStr
 
 from applytrack.core import security
 from applytrack.core.config import Settings
+from applytrack.jobs.worker import Worker
+from applytrack.mail.backends import MemoryEmailBackend
 from applytrack.main import create_app
 from applytrack.models import Base
+from applytrack.worker import build_worker
 
 # CI sets this to a real PostgreSQL database; locally tests default to in-memory SQLite.
 TEST_DATABASE_URL = os.environ.get("APPLYTRACK_TEST_DATABASE_URL", "sqlite+pysqlite:///:memory:")
@@ -52,6 +55,19 @@ def app(settings: Settings) -> Iterator[FastAPI]:
 def client(app: FastAPI) -> Iterator[TestClient]:
     with TestClient(app) as c:
         yield c
+
+
+@pytest.fixture
+def mailbox() -> MemoryEmailBackend:
+    """Where the worker's emails go in tests: read ``mailbox.outbox``."""
+    return MemoryEmailBackend()
+
+
+@pytest.fixture
+def worker(app: FastAPI, settings: Settings, mailbox: MemoryEmailBackend) -> Worker:
+    """The real worker, sending to ``mailbox``. Call ``worker.run_pending()`` to run
+    the jobs a request queued."""
+    return build_worker(settings, app.state.session_factory, email_backend=mailbox)
 
 
 class AuthHelper:

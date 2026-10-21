@@ -12,16 +12,28 @@ from applytrack.core.logging import configure_logging
 from applytrack.core.middleware import RequestContextMiddleware
 from applytrack.core.rate_limit import InMemoryRateLimiter, LoginRateLimiter
 from applytrack.db.session import build_engine, build_session_factory
+from applytrack.jobs.worker import WorkerThread
+from applytrack.worker import build_worker, warn_if_emails_only_logged
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
     """Build the FastAPI app. Taking settings as an argument keeps tests isolated."""
     settings = settings or get_settings()
     engine = build_engine(settings.database_url, echo=settings.database_echo)
+    session_factory = build_session_factory(engine)
 
     @asynccontextmanager
     async def lifespan(_: FastAPI) -> AsyncIterator[None]:
+        worker_thread = None
+        if settings.run_worker_in_api:
+            warn_if_emails_only_logged(settings)
+            worker_thread = WorkerThread(
+                build_worker(settings, session_factory), settings.worker_poll_seconds
+            )
+            worker_thread.start()
         yield
+        if worker_thread is not None:
+            worker_thread.stop()
         engine.dispose()
 
     app = FastAPI(
@@ -35,7 +47,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     )
     app.state.settings = settings
     app.state.engine = engine
-    app.state.session_factory = build_session_factory(engine)
+    app.state.session_factory = session_factory
     app.state.login_limiter = LoginRateLimiter(
         per_account=InMemoryRateLimiter(
             limit=settings.login_max_failures_per_account,

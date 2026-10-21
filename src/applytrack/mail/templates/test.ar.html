@@ -1,0 +1,7 @@
+{% extends "_layout.html" %}
+{% block content %}
+<p style="margin:0 0 16px;">مرحبًا،</p>
+<p style="margin:0 0 16px;">هذه رسالة تجريبية من {{ app_name }}. إذا وصلتك، فإرسال البريد يعمل.</p>
+<p style="margin:0;color:#6b7280;">أُرسلت في <span dir="ltr">{{ sent_at }}</span>.</p>
+{% endblock %}
+{% block footer %}وصلتك هذه الرسالة لأن أحدًا يختبر إرسال البريد من {{ app_name }}.{% endblock %}

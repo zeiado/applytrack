@@ -1,0 +1,7 @@
+{% extends "_layout.html" %}
+{% block content %}
+<p style="margin:0 0 16px;">Hi,</p>
+<p style="margin:0 0 16px;">This is a test email from {{ app_name }}. If you can read it, sending email works.</p>
+<p style="margin:0;color:#6b7280;">Sent at {{ sent_at }}.</p>
+{% endblock %}
+{% block footer %}You received this because someone tested email sending for {{ app_name }}.{% endblock %}

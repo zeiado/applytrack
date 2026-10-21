@@ -58,6 +58,7 @@ stories and priorities.
 | **Stats** | Response, interview and offer rates; results by source; average days spent in each stage |
 | **Your data** | Download everything as JSON, or delete the account and all its data (Egypt PDPL 151/2020) |
 | **Export** | Streamed CSV download, safe to open in Excel (formula-injection escaping, UTF-8 BOM for Arabic text) |
+| **Email** | Background jobs in PostgreSQL with retries; Arabic and English templates; console, Resend or any SMTP provider, chosen by config |
 | **Operations** | Liveness and readiness probes, request ids, structured JSON logs, one consistent error format |
 
 ## Tech stack
@@ -69,6 +70,7 @@ stories and priorities.
 | Database | PostgreSQL 17 | Relational data with constraints ([ADR 0002](docs/adr/0002-fastapi-postgres-sqlalchemy.md)) |
 | ORM and migrations | SQLAlchemy 2.0 (typed) + Alembic | Explicit queries, versioned schema |
 | Auth | PyJWT + pwdlib (Argon2id) | Stateless tokens ([ADR 0003](docs/adr/0003-jwt-authentication.md)) |
+| Background jobs and email | A job table in PostgreSQL, Jinja2 templates, Resend or SMTP | No extra infrastructure; jobs commit with the change that caused them ([ADR 0007](docs/adr/0007-database-job-queue-and-email.md)) |
 | Tooling | uv, Ruff, mypy `--strict`, pytest, pre-commit | Fast, reproducible, strict |
 | Delivery | Docker (multi-stage, non-root), GitHub Actions, GHCR | Same image from CI to production |
 | Security | pip-audit, Semgrep, Dependabot, actionlint | Known-vulnerability and code scanning on every PR |
@@ -96,6 +98,9 @@ flowchart LR
 
     repos --> db[(PostgreSQL)]
     routers -.->|"errors (AppError)"| handlers["core/errors<br/><sub>one JSON error shape</sub>"]
+    services -.->|"Mailer.send: queue a job"| db
+    db -.->|"due jobs"| worker["worker<br/><sub>retries · housekeeping</sub>"]
+    worker --> provider([Email provider])
 ```
 
 Some of the business logic is written as **pure functions with no I/O**, so it's
@@ -292,6 +297,10 @@ link to the PR or ADR with the reasoning.
 - **Injection defences beyond SQL.** CSV formula injection is escaped. Incoming
   request ids are validated so they can't forge log lines. Login timing is the same
   for unknown emails and wrong passwords. ([#28](https://github.com/zeiado/applytrack/pull/28), [#30](https://github.com/zeiado/applytrack/pull/30), [#21](https://github.com/zeiado/applytrack/pull/21))
+- **Emails that match the data.** An email job is saved in the same transaction as the
+  change that caused it, so a rolled-back sign-up never sends one. Workers claim jobs
+  with `SKIP LOCKED`, retry temporary failures with backoff, and recover jobs from
+  workers that died. ([ADR 0007](docs/adr/0007-database-job-queue-and-email.md))
 - **Supply chain.** Actions are pinned to commit SHAs, and every locked dependency is
   audited. Released images carry provenance and an SBOM. Details are in [SECURITY.md](SECURITY.md).
 
@@ -363,6 +372,8 @@ docker compose up --build
 
 This starts PostgreSQL, applies migrations and serves the API at
 **http://localhost:8000**, with interactive docs at **http://localhost:8000/docs**.
+A `worker` service runs background jobs; with the default console backend, emails
+appear in its log (`docker compose logs -f worker`).
 
 Once a version is released, you can also pull the image:
 
@@ -380,6 +391,7 @@ cp .env.example .env
 make db                      # start PostgreSQL
 make migrate                 # apply migrations
 make run                     # API with auto-reload on :8000
+make worker                  # in another terminal: background jobs; emails print here
 ```
 
 | Command | What it does |
@@ -389,6 +401,7 @@ make run                     # API with auto-reload on :8000
 | `make audit` | Check dependencies for known vulnerabilities |
 | `make migration m="add x"` | Autogenerate a migration (then review it) |
 | `make format` | Auto-fix lint and formatting |
+| `make test-email to=you@example.com` | Send one test email with the configured provider |
 
 To run the tests against PostgreSQL like CI does:
 
@@ -411,7 +424,17 @@ All settings are environment variables (or a `.env` file). See [.env.example](.e
 | `APPLYTRACK_LOGIN_WINDOW_SECONDS` | `60` | Rate-limit window |
 | `APPLYTRACK_LOG_LEVEL` | `INFO` | |
 | `APPLYTRACK_LOG_FORMAT` | `auto` | `auto` = JSON in production, text elsewhere |
-| `FORWARDED_ALLOW_IPS` | unset | Proxy addresses uvicorn trusts for the client IP (needed behind a load balancer) |
+| `APPLYTRACK_TRUSTED_PROXY_HOPS` | `0` | Proxies in front of the app that append to `X-Forwarded-For` ([docs/deployment.md](docs/deployment.md)) |
+| `APPLYTRACK_APP_NAME` | `ApplyTrack` | Product name, used in API docs and emails |
+| `APPLYTRACK_EMAIL_BACKEND` | `console` | `console` (log only), `resend` or `smtp` |
+| `APPLYTRACK_EMAIL_FROM` | `ApplyTrack <noreply@localhost>` | Sender; must be on your verified domain for `resend`/`smtp` |
+| `APPLYTRACK_EMAIL_REPLY_TO` | unset | Optional `Reply-To` |
+| `APPLYTRACK_RESEND_API_KEY` | unset | Required for `resend` |
+| `APPLYTRACK_SMTP_HOST` / `_PORT` / `_USERNAME` / `_PASSWORD` | unset / `587` | The host is required for `smtp` |
+| `APPLYTRACK_SMTP_SECURITY` | `starttls` | `starttls`, `tls` (implicit, usually port 465) or `none` (refused in production) |
+| `APPLYTRACK_RUN_WORKER_IN_API` | `false` | Run the job worker inside the API process (for hosts without worker services) |
+| `APPLYTRACK_WORKER_POLL_SECONDS` | `2` | How often an idle worker checks for jobs |
+| `APPLYTRACK_JOB_MAX_ATTEMPTS` | `5` | Attempts before a job is marked failed |
 
 ---
 
@@ -429,7 +452,10 @@ src/applytrack/
 ├── models/            # SQLAlchemy tables and enums
 ├── core/              # settings, security, errors, logging, middleware, rate limiting
 ├── db/                # engine and per-request sessions
-└── main.py            # app factory
+├── jobs/              # job queue in PostgreSQL and the worker loop
+├── mail/              # email backends and Arabic/English templates
+├── main.py            # app factory
+└── worker.py          # worker process: python -m applytrack.worker
 migrations/            # Alembic migrations (reviewed by hand, tested in CI)
 tests/                 # ~2,900 lines of tests for ~2,400 lines of app code
 docs/
@@ -466,11 +492,14 @@ you can read:
 | [0004](docs/adr/0004-store-enums-as-strings.md) | Store enums as strings with CHECK constraints |
 | [0005](docs/adr/0005-in-memory-login-rate-limiting.md) | In-memory rate limiting for failed logins |
 | [0006](docs/adr/0006-rotating-refresh-tokens.md) | Rotating refresh tokens with reuse detection |
+| [0007](docs/adr/0007-database-job-queue-and-email.md) | A job queue in PostgreSQL, and pluggable email backends |
 
 ## Roadmap
 
 - [x] Staging and production deployments on Render + Neon ([docs/deployment.md](docs/deployment.md))
 - [x] Refresh tokens, so sessions outlive the 30-minute access token ([ADR 0006](docs/adr/0006-rotating-refresh-tokens.md))
+- [x] Background jobs and email in Arabic and English ([ADR 0007](docs/adr/0007-database-job-queue-and-email.md))
+- [ ] Email verification, password reset and daily reminder emails
 - [ ] Redis-backed rate limiter for multi-instance deployments (the interface is ready; see ADR 0005)
 - [ ] Keyset pagination if lists grow large
 - [ ] Container image scanning with a verified Trivy binary

@@ -1,3 +1,4 @@
+from email.utils import parseaddr
 from functools import lru_cache
 from typing import Literal, Self
 
@@ -34,6 +35,25 @@ class Settings(BaseSettings):
     # See core/client_ip.py. Measure it for a host; never guess.
     trusted_proxy_hops: int = Field(default=0, ge=0, le=10)
 
+    # Email (docs/adr/0007-database-job-queue-and-email.md).
+    # console writes emails to the log instead of sending them.
+    email_backend: Literal["console", "resend", "smtp"] = "console"
+    email_from: str = "ApplyTrack <noreply@localhost>"
+    email_reply_to: str | None = None
+    email_timeout_seconds: float = Field(default=10, gt=0, le=60)
+    resend_api_key: SecretStr | None = None
+    smtp_host: str | None = None
+    smtp_port: int = Field(default=587, ge=1, le=65535)
+    smtp_username: str | None = None
+    smtp_password: SecretStr | None = None
+    smtp_security: Literal["starttls", "tls", "none"] = "starttls"
+
+    # Background jobs (ADR 0007). Run the worker as its own process (python -m
+    # applytrack.worker), or inside the API process where separate workers cost extra.
+    run_worker_in_api: bool = False
+    worker_poll_seconds: float = Field(default=2, gt=0, le=60)
+    job_max_attempts: int = Field(default=5, ge=1, le=20)
+
     @model_validator(mode="after")
     def _require_real_secret_in_production(self) -> Self:
         secret = self.jwt_secret_key.get_secret_value()
@@ -41,6 +61,25 @@ class Settings(BaseSettings):
             raise ValueError(
                 "APPLYTRACK_JWT_SECRET_KEY must be set to a random 32+ character value"
             )
+        return self
+
+    @model_validator(mode="after")
+    def _require_complete_email_settings(self) -> Self:
+        """Fail at startup, not on the first email, when a provider is half configured."""
+        _, sender = parseaddr(self.email_from)
+        if "@" not in sender:
+            raise ValueError("APPLYTRACK_EMAIL_FROM must be an address like 'Name <a@b.com>'")
+        if self.email_backend == "console":
+            return self
+        if sender.endswith("@localhost"):
+            raise ValueError("Set APPLYTRACK_EMAIL_FROM to an address on your sending domain")
+        if self.email_backend == "resend" and not self.resend_api_key:
+            raise ValueError("APPLYTRACK_EMAIL_BACKEND=resend needs APPLYTRACK_RESEND_API_KEY")
+        if self.email_backend == "smtp":
+            if not self.smtp_host:
+                raise ValueError("APPLYTRACK_EMAIL_BACKEND=smtp needs APPLYTRACK_SMTP_HOST")
+            if self.environment == "production" and self.smtp_security == "none":
+                raise ValueError("APPLYTRACK_SMTP_SECURITY=none would send passwords in clear")
         return self
 
 

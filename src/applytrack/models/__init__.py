@@ -2,8 +2,14 @@
 
 from applytrack.models.application import Application
 from applytrack.models.base import Base
-from applytrack.models.enums import ApplicationSource, ApplicationStatus, InterviewKind
+from applytrack.models.enums import (
+    ApplicationSource,
+    ApplicationStatus,
+    InterviewKind,
+    JobStatus,
+)
 from applytrack.models.interview import Interview
+from applytrack.models.job import Job
 from applytrack.models.refresh_token import RefreshToken
 from applytrack.models.status_change import StatusChange
 from applytrack.models.user import User
@@ -15,6 +21,8 @@ __all__ = [
     "Base",
     "Interview",
     "InterviewKind",
+    "Job",
+    "JobStatus",
     "RefreshToken",
     "StatusChange",
     "User",

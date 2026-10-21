@@ -20,6 +20,12 @@ services:
         sync: false # Neon `staging` branch, entered when the Blueprint is created
       - key: APPLYTRACK_JWT_SECRET_KEY
         generateValue: true
+      # Free instances can't run a separate worker, so the API runs it (ADR 0007).
+      - key: APPLYTRACK_RUN_WORKER_IN_API
+        value: "true"
+      # console until there's a sending domain: emails go to the log (docs/deployment.md).
+      - key: APPLYTRACK_EMAIL_BACKEND
+        value: console
 
   - type: web
     name: applytrack-production
@@ -40,3 +46,9 @@ services:
         sync: false # Neon `main` branch
       - key: APPLYTRACK_JWT_SECRET_KEY
         generateValue: true # different from staging, so staging tokens never work here
+      # Free instances can't run a separate worker, so the API runs it (ADR 0007).
+      - key: APPLYTRACK_RUN_WORKER_IN_API
+        value: "true"
+      # console until there's a sending domain: emails go to the log (docs/deployment.md).
+      - key: APPLYTRACK_EMAIL_BACKEND
+        value: console

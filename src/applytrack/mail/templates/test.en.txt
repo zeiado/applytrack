@@ -1,0 +1,7 @@
+Subject: {{ app_name }} test email
+
+Hi,
+
+This is a test email from {{ app_name }}. If you can read it, sending email works.
+
+Sent at {{ sent_at }}.
