@@ -11,6 +11,7 @@ changes, a minor version for new features, and a patch version for fixes.
 
 - Applications in the web app: a board with a column per status, where a card moves through its menu or by dragging, only to the stages the API allows; a list with filters (status, source, company), sorting and pages; and pages to add, edit and delete an application. Follow-ups that are due or overdue stand out. Arabic and English, phone-first ([#65])
 - A page for each application: interviews (add, edit, delete; times typed and shown in your own timezone), the history of its stages with their notes, a "next step" form that moves it with a note, the follow-up date, and its details. Cards and list rows open it ([#66])
+- Settings in the web app: email language, timezone (with "use this device's timezone") and the morning reminder email; a link to set a password for accounts made with Google; download all your data; delete the account, confirmed with the password or a new Google sign-in ([#68])
 - Logging in now opens your applications; the old `/dashboard` address redirects there ([#65])
 
 ## [0.5.0] - 2026-10-21
@@ -123,4 +124,5 @@ First release.
 [#64]: https://github.com/zeiado/applytrack/issues/64
 [#65]: https://github.com/zeiado/applytrack/issues/65
 [#66]: https://github.com/zeiado/applytrack/issues/66
+[#68]: https://github.com/zeiado/applytrack/issues/68
 [#50]: https://github.com/zeiado/applytrack/issues/50

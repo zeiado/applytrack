@@ -20,7 +20,8 @@
         "title": "Learn what works",
         "body": "See which sources get you interviews and how fast companies reply."
       }
-    }
+    },
+    "deleted": "Your account and all its data have been deleted."
   },
   "LanguageSwitcher": {
     "label": "Language",
@@ -103,7 +104,9 @@
     "unknown": "Something went wrong. Try again.",
     "invalid_transition": "That move isn't allowed from its current stage.",
     "invalid_salary_range": "The salary “From” can't be more than “To”.",
-    "not_found": "That application doesn't exist anymore."
+    "not_found": "That application doesn't exist anymore.",
+    "invalid_password": "That password isn't right.",
+    "wrong_google_account": "That's a different Google account from the one linked to this account."
   },
   "Dashboard": {
     "title": "Dashboard",
@@ -117,7 +120,8 @@
   "Nav": {
     "applications": "Applications",
     "logOut": "Log out",
-    "menu": "Main"
+    "menu": "Main",
+    "settings": "Settings"
   },
   "Status": {
     "wishlist": "Wishlist",
@@ -300,6 +304,53 @@
       "title": "History",
       "created": "Added as {status}",
       "moved": "{from} → {to}"
+    }
+  },
+  "Settings": {
+    "title": "Settings",
+    "account": {
+      "title": "Account",
+      "email": "Email",
+      "verified": "Confirmed",
+      "notVerified": "Not confirmed yet",
+      "signIn": "Signs in with",
+      "password": "Password",
+      "google": "Google"
+    },
+    "preferences": {
+      "title": "Preferences",
+      "language": "Email language",
+      "languageHint": "Reminder and account emails come in this language.",
+      "timezone": "Timezone",
+      "timezoneHint": "Interview times are shown in it, and reminder emails arrive in its morning.",
+      "suggested": "Common",
+      "all": "All timezones",
+      "detect": "Use this device's timezone",
+      "reminders": "Morning reminder email",
+      "remindersHint": "On days when a follow-up is due, one email at 8:00.",
+      "save": "Save preferences",
+      "saved": "Saved."
+    },
+    "password": {
+      "title": "Password",
+      "googleOnly": "You sign in with Google. To also sign in with your email and a password, we'll email you a link to set one.",
+      "send": "Email me a link",
+      "sent": "Check your inbox: the link to set a password works for 30 minutes.",
+      "change": "To change your password, log out and use “Forgot your password?”."
+    },
+    "data": {
+      "title": "Your data",
+      "body": "Download everything we store about you: your profile, applications, their history and interviews (JSON).",
+      "download": "Download my data"
+    },
+    "delete": {
+      "title": "Delete account",
+      "body": "This deletes your account and all your applications, history and interviews right away. It can't be undone.",
+      "start": "Delete my account",
+      "passwordLabel": "Enter your password to confirm",
+      "confirm": "Delete my account forever",
+      "googleConfirm": "Confirm by signing in with Google again:",
+      "cancel": "Cancel"
     }
   }
 }

@@ -1,3 +1,4 @@
+import { KanbanSquare, Settings } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { SiteHeader } from "@/components/site-header";
@@ -11,13 +12,20 @@ export default async function AppLayout({ children, params }: LayoutProps<"/[loc
   const { locale } = await params;
   setRequestLocale(locale as Locale);
   const t = await getTranslations("Nav");
+  const item = "text-muted-foreground hover:text-foreground flex items-center gap-1.5 text-sm font-medium";
 
   return (
     <>
       <SiteHeader>
-        <nav aria-label={t("menu")} className="hidden sm:block">
-          <Link href="/applications" className="text-sm font-medium hover:underline">
-            {t("applications")}
+        <nav aria-label={t("menu")} className="flex items-center gap-4">
+          {/* Icons only on phones (with the label for screen readers), words on wider screens. */}
+          <Link href="/applications" className={item}>
+            <KanbanSquare aria-hidden className="size-4" />
+            <span className="sr-only sm:not-sr-only">{t("applications")}</span>
+          </Link>
+          <Link href="/settings" className={item}>
+            <Settings aria-hidden className="size-4" />
+            <span className="sr-only sm:not-sr-only">{t("settings")}</span>
           </Link>
         </nav>
         <form action={logOut}>
