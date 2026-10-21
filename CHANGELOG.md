@@ -7,6 +7,12 @@ changes, a minor version for new features, and a patch version for fixes.
 
 ## [Unreleased]
 
+### Added
+
+- Daily follow-up reminder emails: one email on mornings when follow-ups are due, at 08:00 in the user's timezone, never twice a day, only to verified emails ([#45])
+- `PATCH /users/me` to change the email language, timezone (default `Africa/Cairo`) and turn reminder emails off ([#45])
+- A scheduled workflow wakes production each morning so reminders go out on Render's free plan ([#45])
+
 ## [0.3.0] - 2026-10-21
 
 Email: background jobs, email verification and password reset.
@@ -85,4 +91,5 @@ First release.
 [#42]: https://github.com/zeiado/applytrack/issues/42
 [#43]: https://github.com/zeiado/applytrack/issues/43
 [#44]: https://github.com/zeiado/applytrack/issues/44
+[#45]: https://github.com/zeiado/applytrack/issues/45
 [#50]: https://github.com/zeiado/applytrack/issues/50

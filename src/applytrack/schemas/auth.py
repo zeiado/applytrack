@@ -5,6 +5,7 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 from applytrack.mail.templates import Locale
+from applytrack.schemas.timezones import Timezone
 
 
 class RegisterRequest(BaseModel):
@@ -20,7 +21,19 @@ class UserRead(BaseModel):
     email: EmailStr
     email_verified: bool = Field(description="Whether the user opened the verification link")
     locale: Locale
+    timezone: str = Field(description="IANA name; reminder emails arrive in its morning")
+    reminder_emails: bool = Field(description="Whether to get a morning email of due follow-ups")
     created_at: datetime
+
+
+class UserUpdate(BaseModel):
+    """Fields you can change. Leave a field out to keep it."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    locale: Locale | None = None
+    timezone: Timezone | None = None
+    reminder_emails: bool | None = None
 
 
 class EmailTokenRequest(BaseModel):

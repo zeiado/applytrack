@@ -1,0 +1,16 @@
+Subject: لديك {{ total }} {{ "متابعة" if total == 1 else "متابعات" }} اليوم في {{ app_name }}
+
+صباح الخير،
+
+حان وقت متابعة {{ "هذا الطلب" if total == 1 else "هذه الطلبات" }}:
+
+{% for item in items %}
+- {{ item.company }}: {{ item.role_title }} ({% if item.days_overdue == 0 %}مستحقة اليوم{% else %}متأخرة {{ item.days_overdue }} يوم{% endif %})
+{% endfor %}
+{% if more %}
+...و{{ more }} غيرها.
+{% endif %}
+
+اطّلع عليها كلها: {{ link }}
+
+تصلك هذه الرسالة في الصباح عندما تكون هناك متابعة مستحقة. يمكنك إيقافها من الإعدادات: {{ settings_link }}

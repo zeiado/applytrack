@@ -1,0 +1,19 @@
+{% extends "_layout.html" %}
+{% from "_macros.html" import button %}
+{% block content %}
+<p style="margin:0 0 16px;">صباح الخير،</p>
+<p style="margin:0 0 16px;">حان وقت متابعة {{ "هذا الطلب" if total == 1 else "هذه الطلبات" }}:</p>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" dir="rtl" style="margin:0 0 8px;">
+{% for item in items %}
+<tr>
+<td style="padding:8px 0;border-bottom:1px solid #e5e7eb;text-align:right;"><strong>{{ item.company }}</strong><br><span style="color:#4b5563;">{{ item.role_title }}</span></td>
+<td align="left" style="padding:8px 0;border-bottom:1px solid #e5e7eb;font-size:14px;color:{{ '#b91c1c' if item.days_overdue > 0 else '#4b5563' }};white-space:nowrap;">{% if item.days_overdue == 0 %}مستحقة اليوم{% else %}متأخرة {{ item.days_overdue }} يوم{% endif %}</td>
+</tr>
+{% endfor %}
+</table>
+{% if more %}
+<p style="margin:0 0 8px;color:#4b5563;">…و{{ more }} غيرها.</p>
+{% endif %}
+{{ button(link, "عرض كل المتابعات") }}
+{% endblock %}
+{% block footer %}تصلك هذه الرسالة في الصباح عندما تكون هناك متابعة مستحقة. <a href="{{ settings_link }}" style="color:#6b7280;">يمكنك إيقافها من الإعدادات</a>.{% endblock %}

@@ -8,7 +8,7 @@ leaves a claim that expires after ``lease``, and the job runs again.
 import logging
 import threading
 import uuid
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 from typing import Any, Protocol
@@ -65,6 +65,16 @@ def _utcnow() -> datetime:
     return datetime.now(UTC)
 
 
+@dataclass(frozen=True)
+class PeriodicTask:
+    """Something the worker runs every ``every``, such as checking for reminder emails.
+    Each worker runs it, so it must be safe to run on several workers at once."""
+
+    name: str
+    every: timedelta
+    run: Callable[[datetime], object]
+
+
 @dataclass
 class _Claimed:
     context: JobContext
@@ -81,7 +91,9 @@ class Worker:
     retry: RetryPolicy = field(default_factory=RetryPolicy)
     retention: Retention = field(default_factory=Retention)
     housekeeping_every: timedelta = timedelta(hours=1)
+    periodic: Sequence[PeriodicTask] = ()
     _last_housekeeping: datetime | None = field(default=None, init=False)
+    _last_periodic: dict[str, datetime] = field(default_factory=dict, init=False)
 
     def run_once(self) -> bool:
         """Run the next due job, if any. Returns whether there was one."""
@@ -110,6 +122,7 @@ class Worker:
         while not stop.is_set():
             try:
                 self.maybe_housekeep()
+                self.run_periodic()
                 busy = self.run_once()
             except Exception:  # e.g. the database is unreachable; keep the loop alive
                 logger.exception("Worker loop error; retrying shortly")
@@ -125,6 +138,20 @@ class Worker:
             return
         self._last_housekeeping = now
         self.housekeep()
+
+    def run_periodic(self) -> None:
+        """Run each periodic task that is due. A failing task is logged and retried at
+        its next interval; it doesn't stop the jobs."""
+        now = self.clock()
+        for task in self.periodic:
+            last = self._last_periodic.get(task.name)
+            if last is not None and now - last < task.every:
+                continue
+            self._last_periodic[task.name] = now
+            try:
+                task.run(now)
+            except Exception:
+                logger.exception("Periodic task failed", extra={"task": task.name})
 
     def housekeep(self) -> None:
         """Delete old finished jobs, and expired refresh tokens and email links."""

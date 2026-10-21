@@ -1,10 +1,15 @@
 from fastapi import APIRouter, Request, Response, status
 
 from applytrack.api.deps import CurrentUser, DbSession, Now
-from applytrack.core.errors import ErrorResponse, ForbiddenError, TooManyRequestsError
+from applytrack.core.errors import (
+    ErrorResponse,
+    ForbiddenError,
+    TooManyRequestsError,
+    ValidationFailedError,
+)
 from applytrack.core.rate_limit import LoginRateLimiter
 from applytrack.schemas.account import AccountExport, DeleteAccountRequest
-from applytrack.schemas.auth import UserRead
+from applytrack.schemas.auth import UserRead, UserUpdate
 from applytrack.services.account import AccountService
 
 router = APIRouter(prefix="/users", tags=["users"])
@@ -13,6 +18,23 @@ router = APIRouter(prefix="/users", tags=["users"])
 @router.get("/me", responses={status.HTTP_401_UNAUTHORIZED: {"model": ErrorResponse}})
 def read_me(user: CurrentUser) -> UserRead:
     """The logged-in user."""
+    return UserRead.model_validate(user)
+
+
+@router.patch(
+    "/me",
+    responses={
+        status.HTTP_401_UNAUTHORIZED: {"model": ErrorResponse},
+        status.HTTP_422_UNPROCESSABLE_CONTENT: {"model": ErrorResponse},
+    },
+)
+def update_me(body: UserUpdate, user: CurrentUser, db: DbSession) -> UserRead:
+    """Change your email language, timezone, or turn reminder emails on or off."""
+    for field, value in body.model_dump(exclude_unset=True).items():
+        if value is None:
+            raise ValidationFailedError(f"{field} can't be null", code="validation_error")
+        setattr(user, field, value)
+    db.commit()
     return UserRead.model_validate(user)
 
 

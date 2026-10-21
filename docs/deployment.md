@@ -85,6 +85,14 @@ Any SMTP provider works the same way with `APPLYTRACK_EMAIL_BACKEND=smtp` and th
 `APPLYTRACK_SMTP_*` settings. The app refuses to start if a provider's settings are
 incomplete, so a typo shows up at deploy time, not on the first email.
 
+**Reminder emails on the free plan.** The morning reminder check only runs while the
+service is awake, and free services sleep after 15 minutes without traffic. The
+**Wake production** workflow (`.github/workflows/wake-production.yml`) requests `/health`
+at 05:05 and 06:05 UTC, which is just after 08:00 in Cairo in summer and in winter, so
+the worker starts and sends that morning's emails. Users in other timezones get theirs
+the next time the service is awake after their morning. A paid instance doesn't sleep;
+delete the workflow then.
+
 When a paid plan allows it, run `python -m applytrack.worker` as a Render background
 worker and turn `APPLYTRACK_RUN_WORKER_IN_API` off.
 

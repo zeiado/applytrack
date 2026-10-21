@@ -54,7 +54,7 @@ stories and priorities.
 | **Search** | Filter by status, source and company (case-insensitive), sort on three fields, paginate with totals |
 | **Status workflow** | `wishlist → applied → screening → interviewing → offer → accepted` with validated transitions, `rejected`/`withdrawn` exits, and an append-only history |
 | **Interviews** | Log interviews per application, with timezone-aware times stored in UTC |
-| **Reminders** | Applications due for a follow-up today *in your timezone*, most overdue first |
+| **Reminders** | Applications due for a follow-up today *in your timezone*, most overdue first, and a morning email listing them (Arabic or English) |
 | **Stats** | Response, interview and offer rates; results by source; average days spent in each stage |
 | **Your data** | Download everything as JSON, or delete the account and all its data (Egypt PDPL 151/2020) |
 | **Export** | Streamed CSV download, safe to open in Excel (formula-injection escaping, UTF-8 BOM for Arabic text) |
@@ -210,6 +210,7 @@ need `Authorization: Bearer <token>`, and other users' resources return `404`.
 | `POST` | `/api/v1/auth/refresh` | Swap a refresh token for a new pair (single use) |
 | `POST` | `/api/v1/auth/logout` | Revoke a refresh token |
 | `GET` | `/api/v1/users/me` | The current user |
+| `PATCH` | `/api/v1/users/me` | Change email language, timezone, or reminder emails on/off |
 | `GET` | `/api/v1/users/me/export` | Download all your data as JSON |
 | `DELETE` | `/api/v1/users/me` | Delete your account and all its data (needs your password) |
 | `GET` | `/api/v1/applications` | List: `status`, `source`, `company`, `sort`, `limit`, `offset` |
@@ -438,6 +439,8 @@ All settings are environment variables (or a `.env` file). See [.env.example](.e
 | `APPLYTRACK_EMAIL_VERIFICATION_EXPIRE_HOURS` | `24` | Verification link lifetime |
 | `APPLYTRACK_PASSWORD_RESET_EXPIRE_MINUTES` | `30` | Password reset link lifetime |
 | `APPLYTRACK_FORGOT_PASSWORD_MAX_PER_IP` | `10` | Password reset requests per IP per hour |
+| `APPLYTRACK_REMINDER_HOUR` | `8` | Local hour (in each user's timezone) from which reminder emails go out |
+| `APPLYTRACK_REMINDER_CHECK_MINUTES` | `5` | How often the worker checks for users whose morning has come |
 | `APPLYTRACK_EMAIL_TOKEN_LIMIT_PER_HOUR` | `3` | Emails of each kind (verification, reset) per account per hour |
 | `APPLYTRACK_EMAIL_BACKEND` | `console` | `console` (log only), `resend` or `smtp` |
 | `APPLYTRACK_EMAIL_FROM` | `ApplyTrack <noreply@localhost>` | Sender; must be on your verified domain for `resend`/`smtp` |
@@ -515,7 +518,7 @@ you can read:
 - [x] Background jobs and email in Arabic and English ([ADR 0007](docs/adr/0007-database-job-queue-and-email.md))
 - [x] Email verification ([ADR 0008](docs/adr/0008-one-time-email-tokens.md))
 - [x] Password reset by email ([ADR 0008](docs/adr/0008-one-time-email-tokens.md))
-- [ ] Daily follow-up reminder emails
+- [x] Daily follow-up reminder emails
 - [ ] Redis-backed rate limiter for multi-instance deployments (the interface is ready; see ADR 0005)
 - [ ] Keyset pagination if lists grow large
 - [ ] Container image scanning with a verified Trivy binary

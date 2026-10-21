@@ -1,9 +1,12 @@
-from datetime import datetime
+from datetime import date, datetime
 
-from sqlalchemy import CheckConstraint, String
+from sqlalchemy import Boolean, CheckConstraint, Date, String, true
 from sqlalchemy.orm import Mapped, mapped_column
 
 from applytrack.models.base import Base, TimestampMixin, UTCDateTime, UUIDPrimaryKeyMixin
+
+# Most users are in Egypt; anyone else sets theirs with PATCH /users/me.
+DEFAULT_TIMEZONE = "Africa/Cairo"
 
 
 class User(UUIDPrimaryKeyMixin, TimestampMixin, Base):
@@ -18,6 +21,14 @@ class User(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     email_verified_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
     # Set by a password reset. Access tokens issued before it are refused.
     password_changed_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
+    # IANA name. Decides when "the morning" is for reminder emails.
+    timezone: Mapped[str] = mapped_column(
+        String(64), default=DEFAULT_TIMEZONE, server_default=DEFAULT_TIMEZONE
+    )
+    reminder_emails: Mapped[bool] = mapped_column(Boolean, default=True, server_default=true())
+    # The user's local date when reminders were last checked (an email was sent, or
+    # nothing was due), so there is never more than one check a day.
+    reminders_checked_on: Mapped[date | None] = mapped_column(Date)
 
     @property
     def email_verified(self) -> bool:
