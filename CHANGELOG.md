@@ -7,6 +7,10 @@ changes, a minor version for new features, and a patch version for fixes.
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-21
+
+Email: background jobs, email verification and password reset.
+
 ### Added
 
 - Background jobs stored in PostgreSQL, with retries and a worker (`python -m applytrack.worker`, or inside the API with `APPLYTRACK_RUN_WORKER_IN_API`) ([#42], [ADR 0007](docs/adr/0007-database-job-queue-and-email.md))
@@ -58,7 +62,8 @@ First release.
 - Interview times are returned in UTC on create, matching reads ([#25])
 - CI tests the Python version the Docker image ships ([#35])
 
-[Unreleased]: https://github.com/zeiado/applytrack/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/zeiado/applytrack/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/zeiado/applytrack/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/zeiado/applytrack/releases/tag/v0.2.0
 [#1]: https://github.com/zeiado/applytrack/pull/1
 [#20]: https://github.com/zeiado/applytrack/pull/20

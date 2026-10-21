@@ -1,6 +1,6 @@
 [project]
 name = "applytrack"
-version = "0.2.0"
+version = "0.3.0"
 description = "REST API for tracking job applications, interviews and follow-ups"
 readme = "README.md"
 license = "MIT"
