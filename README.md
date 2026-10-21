@@ -49,7 +49,7 @@ stories and priorities.
 
 | Area | What it does |
 |------|--------------|
-| **Accounts** | Register, verify the email by link, and log in. Argon2id password hashing, short-lived JWT access tokens, rotating refresh tokens with reuse detection, logout, failed-login rate limiting |
+| **Accounts** | Register, verify the email by link, log in, and reset a forgotten password by email. Argon2id password hashing, short-lived JWT access tokens, rotating refresh tokens with reuse detection, logout, failed-login rate limiting |
 | **Applications** | Create, read, update (partial) and delete. Company, role, link, source, salary range, dates, notes |
 | **Search** | Filter by status, source and company (case-insensitive), sort on three fields, paginate with totals |
 | **Status workflow** | `wishlist → applied → screening → interviewing → offer → accepted` with validated transitions, `rejected`/`withdrawn` exits, and an append-only history |
@@ -204,6 +204,8 @@ need `Authorization: Bearer <token>`, and other users' resources return `404`.
 | `POST` | `/api/v1/auth/register` | Create an account and email a verification link |
 | `POST` | `/api/v1/auth/verify-email` | Confirm the email with the token from the link |
 | `POST` | `/api/v1/auth/verify-email/resend` | Send a new verification link (limited per hour) |
+| `POST` | `/api/v1/auth/forgot-password` | Email a password reset link (always `202`) |
+| `POST` | `/api/v1/auth/reset-password` | Set a new password with the link's token; signs out everywhere |
 | `POST` | `/api/v1/auth/login` | Get an access token and a refresh token (OAuth2 password form) |
 | `POST` | `/api/v1/auth/refresh` | Swap a refresh token for a new pair (single use) |
 | `POST` | `/api/v1/auth/logout` | Revoke a refresh token |
@@ -303,6 +305,10 @@ link to the PR or ADR with the reasoning.
   change that caused it, so a rolled-back sign-up never sends one. Workers claim jobs
   with `SKIP LOCKED`, retry temporary failures with backoff, and recover jobs from
   workers that died. ([ADR 0007](docs/adr/0007-database-job-queue-and-email.md))
+- **Password reset that can't find or hijack accounts.** `forgot-password` answers the
+  same for every email; links are one-time, hashed, expire in 30 minutes and travel in
+  the URL fragment. A reset revokes refresh tokens and every access token issued before
+  it. ([ADR 0008](docs/adr/0008-one-time-email-tokens.md))
 - **Supply chain.** Actions are pinned to commit SHAs, and every locked dependency is
   audited. Released images carry provenance and an SBOM. Details are in [SECURITY.md](SECURITY.md).
 
@@ -430,6 +436,8 @@ All settings are environment variables (or a `.env` file). See [.env.example](.e
 | `APPLYTRACK_APP_NAME` | `ApplyTrack` | Product name, used in API docs and emails |
 | `APPLYTRACK_PUBLIC_APP_URL` | `http://localhost:3000` | The web app; links in emails point here |
 | `APPLYTRACK_EMAIL_VERIFICATION_EXPIRE_HOURS` | `24` | Verification link lifetime |
+| `APPLYTRACK_PASSWORD_RESET_EXPIRE_MINUTES` | `30` | Password reset link lifetime |
+| `APPLYTRACK_FORGOT_PASSWORD_MAX_PER_IP` | `10` | Password reset requests per IP per hour |
 | `APPLYTRACK_EMAIL_TOKEN_LIMIT_PER_HOUR` | `3` | Emails of each kind (verification, reset) per account per hour |
 | `APPLYTRACK_EMAIL_BACKEND` | `console` | `console` (log only), `resend` or `smtp` |
 | `APPLYTRACK_EMAIL_FROM` | `ApplyTrack <noreply@localhost>` | Sender; must be on your verified domain for `resend`/`smtp` |
@@ -506,7 +514,8 @@ you can read:
 - [x] Refresh tokens, so sessions outlive the 30-minute access token ([ADR 0006](docs/adr/0006-rotating-refresh-tokens.md))
 - [x] Background jobs and email in Arabic and English ([ADR 0007](docs/adr/0007-database-job-queue-and-email.md))
 - [x] Email verification ([ADR 0008](docs/adr/0008-one-time-email-tokens.md))
-- [ ] Password reset and daily reminder emails
+- [x] Password reset by email ([ADR 0008](docs/adr/0008-one-time-email-tokens.md))
+- [ ] Daily follow-up reminder emails
 - [ ] Redis-backed rate limiter for multi-instance deployments (the interface is ready; see ADR 0005)
 - [ ] Keyset pagination if lists grow large
 - [ ] Container image scanning with a verified Trivy binary

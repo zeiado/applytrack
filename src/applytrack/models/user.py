@@ -16,6 +16,8 @@ class User(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     locale: Mapped[str] = mapped_column(String(2), default="en", server_default="en")
     # Set when the user opens the link in the verification email.
     email_verified_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
+    # Set by a password reset. Access tokens issued before it are refused.
+    password_changed_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
 
     @property
     def email_verified(self) -> bool:

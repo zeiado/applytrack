@@ -6,15 +6,18 @@ from fastapi.security import OAuth2PasswordRequestForm
 from applytrack.api.deps import AppSettings, CurrentUser, DbSession, Now
 from applytrack.core.config import Settings
 from applytrack.core.errors import ErrorResponse, TooManyRequestsError, UnauthorizedError
-from applytrack.core.rate_limit import LoginRateLimiter
+from applytrack.core.rate_limit import LoginRateLimiter, RateLimiter
 from applytrack.schemas.auth import (
     EmailTokenRequest,
+    ForgotPasswordRequest,
     RefreshRequest,
     RegisterRequest,
+    ResetPasswordRequest,
     TokenResponse,
     UserRead,
 )
 from applytrack.services.auth import AuthService, normalize_email
+from applytrack.services.password_reset import PasswordResetService
 from applytrack.services.tokens import TokenPair, TokenService
 from applytrack.services.verification import EmailVerificationService
 
@@ -149,4 +152,59 @@ def refresh(body: RefreshRequest, db: DbSession, settings: AppSettings, now: Now
 def logout(body: RefreshRequest, db: DbSession, settings: AppSettings, now: Now) -> Response:
     """Revoke a refresh token. Always succeeds, so it can't be used to test tokens."""
     TokenService(db, settings).logout(body.refresh_token, now)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.post(
+    "/forgot-password",
+    status_code=status.HTTP_202_ACCEPTED,
+    responses={
+        status.HTTP_429_TOO_MANY_REQUESTS: {
+            "model": ErrorResponse,
+            "description": "Too many requests from this IP address; see Retry-After",
+        }
+    },
+)
+def forgot_password(
+    body: ForgotPasswordRequest, request: Request, db: DbSession, settings: AppSettings, now: Now
+) -> Response:
+    """Email a password reset link, valid for 30 minutes.
+
+    Always answers `202`, whether or not the email has an account, so this can't be
+    used to find accounts. Each account gets a few reset emails per hour at most.
+    """
+    limiter: RateLimiter = request.app.state.forgot_password_limiter
+    ip = request.client.host if request.client else "unknown"
+    wait = limiter.retry_after(ip)
+    if wait is not None:
+        raise TooManyRequestsError(
+            f"Too many password reset requests. Try again in {wait} seconds.",
+            retry_after=wait,
+            code="too_many_reset_requests",
+        )
+    limiter.hit(ip)
+    PasswordResetService(db, settings).request(body.email, now)
+    return Response(status_code=status.HTTP_202_ACCEPTED)
+
+
+@router.post(
+    "/reset-password",
+    status_code=status.HTTP_204_NO_CONTENT,
+    responses={
+        status.HTTP_400_BAD_REQUEST: {
+            "model": ErrorResponse,
+            "description": "`invalid_reset_token` (unknown or already used) or "
+            "`reset_token_expired`",
+        }
+    },
+)
+def reset_password(
+    body: ResetPasswordRequest, db: DbSession, settings: AppSettings, now: Now
+) -> Response:
+    """Set a new password with the token from the reset email.
+
+    Signs the user out everywhere: refresh tokens are revoked and access tokens issued
+    before the reset stop working. The user is emailed that the password changed.
+    """
+    PasswordResetService(db, settings).reset(body.token, body.new_password, now)
     return Response(status_code=status.HTTP_204_NO_CONTENT)

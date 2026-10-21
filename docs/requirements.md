@@ -33,6 +33,7 @@ Priority uses MoSCoW: **M**ust, **S**hould, **C**ould, **W**on't (for v1).
 | US-11 | share a board with a mentor | they can give feedback | W |
 | US-12 | download all my data and delete my account | I control my personal data (Egypt PDPL 151/2020) | M |
 | US-13 | confirm my email address | reminders and password resets reach me | M |
+| US-14 | reset a forgotten password by email | I don't lose my data | M |
 
 ## Functional requirements
 

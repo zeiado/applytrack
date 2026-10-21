@@ -14,6 +14,11 @@ changes, a minor version for new features, and a patch version for fixes.
 - Expired refresh tokens and old finished jobs are deleted hourly ([#42])
 - Email verification: registering emails a one-time link (`POST /auth/verify-email`), which can be resent a few times per hour (`POST /auth/verify-email/resend`); `GET /users/me` shows `email_verified` ([#43], [ADR 0008](docs/adr/0008-one-time-email-tokens.md))
 - `locale` (`ar` or `en`) at registration picks the language of emails ([#43])
+- Password reset by email: `POST /auth/forgot-password` (always `202`, limited per account and per IP) and `POST /auth/reset-password`, which signs the user out everywhere and emails a security notice ([#44])
+
+### Changed
+
+- Access tokens carry a fractional `iat`, and tokens issued before a password reset are refused with `401 token_revoked` ([#44])
 
 ## [0.2.0] - 2026-10-21
 
@@ -74,4 +79,5 @@ First release.
 [#40]: https://github.com/zeiado/applytrack/issues/40
 [#42]: https://github.com/zeiado/applytrack/issues/42
 [#43]: https://github.com/zeiado/applytrack/issues/43
+[#44]: https://github.com/zeiado/applytrack/issues/44
 [#50]: https://github.com/zeiado/applytrack/issues/50

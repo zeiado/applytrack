@@ -6,6 +6,7 @@ See docs/adr/0003-jwt-authentication.md and docs/adr/0006-rotating-refresh-token
 import hashlib
 import secrets
 import uuid
+from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 
 import jwt
@@ -38,15 +39,23 @@ def create_access_token(
     issued_at = now or datetime.now(UTC)
     payload = {
         "sub": str(user_id),
-        "iat": issued_at,
+        # Fractional seconds (allowed by RFC 7519), so a token issued just before a
+        # password reset can be told apart from one issued just after it.
+        "iat": issued_at.timestamp(),
         "exp": issued_at + timedelta(minutes=settings.access_token_expire_minutes),
         "type": "access",
     }
     return jwt.encode(payload, settings.jwt_secret_key.get_secret_value(), settings.jwt_algorithm)
 
 
-def decode_access_token(token: str, settings: Settings) -> uuid.UUID:
-    """Return the user id in a valid token, or raise UnauthorizedError."""
+@dataclass(frozen=True)
+class AccessTokenClaims:
+    user_id: uuid.UUID
+    issued_at: datetime
+
+
+def decode_access_token(token: str, settings: Settings) -> AccessTokenClaims:
+    """Return the claims of a valid token, or raise UnauthorizedError."""
     try:
         payload = jwt.decode(
             token,
@@ -62,8 +71,11 @@ def decode_access_token(token: str, settings: Settings) -> uuid.UUID:
     if payload.get("type") != "access":
         raise UnauthorizedError("Invalid token", code="invalid_token")
     try:
-        return uuid.UUID(payload["sub"])
-    except ValueError as exc:
+        return AccessTokenClaims(
+            user_id=uuid.UUID(payload["sub"]),
+            issued_at=datetime.fromtimestamp(float(payload["iat"]), UTC),
+        )
+    except (ValueError, TypeError) as exc:
         raise UnauthorizedError("Invalid token", code="invalid_token") from exc
 
 
