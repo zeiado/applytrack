@@ -59,6 +59,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         ),
     )
 
+    app.state.forgot_password_limiter = InMemoryRateLimiter(
+        limit=settings.forgot_password_max_per_ip, window_seconds=60 * 60
+    )
+
     register_exception_handlers(app)
     app.add_middleware(RequestContextMiddleware, trusted_proxy_hops=settings.trusted_proxy_hops)
     app.include_router(health.router)

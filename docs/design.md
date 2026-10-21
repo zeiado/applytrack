@@ -40,6 +40,7 @@ users
   password_hash text  not null
   locale        text  'ar' | 'en' (language for emails), default 'en'
   email_verified_at timestamptz, null until the verification link is used
+  password_changed_at timestamptz, set by a password reset (older access tokens are refused)
   created_at    timestamptz
 
 applications
@@ -138,6 +139,8 @@ All routes are under `/api/v1`. Data routes require `Authorization: Bearer <toke
 | POST | `/auth/register` | Create account; emails a verification link |
 | POST | `/auth/verify-email` | Verify the email with the link's token (no login needed) |
 | POST | `/auth/verify-email/resend` | Send a new verification link |
+| POST | `/auth/forgot-password` | Email a password reset link (always `202`) |
+| POST | `/auth/reset-password` | Set a new password with the link's token |
 | POST | `/auth/login` | Get access and refresh tokens |
 | POST | `/auth/refresh` | Rotate a refresh token for a new pair ([ADR 0006](adr/0006-rotating-refresh-tokens.md)) |
 | POST | `/auth/logout` | Revoke a refresh token |
@@ -172,6 +175,22 @@ single use, 24 hours.
 | Older than 24 hours | `400 verification_token_expired` |
 | Resend when already verified | `409 email_already_verified` |
 | A 4th email within an hour (the sign-up email counts) | `429 too_many_emails` with `Retry-After` |
+
+### Password reset
+
+`POST /auth/forgot-password {email}` always answers `202` with an empty body. If the
+account exists and has had fewer than 3 reset emails this hour, it queues an email with
+`<APPLYTRACK_PUBLIC_APP_URL>/reset-password#token=<token>`, valid for 30 minutes. The
+endpoint is also limited to 10 requests per IP per hour (`429 too_many_reset_requests`),
+which doesn't reveal anything about accounts.
+
+`POST /auth/reset-password {token, new_password}`:
+
+1. Checks the token (ADR 0008): `400 invalid_reset_token` or `400 reset_token_expired`.
+2. Sets the new password and `password_changed_at`, and marks the email verified.
+3. Revokes every refresh token. Access tokens carry a fractional `iat`; any issued
+   before `password_changed_at` get `401 token_revoked`.
+4. Queues a "your password was changed" email, and answers `204`.
 
 ### Interviews
 
@@ -302,12 +321,14 @@ Validation errors add a `details` list:
 
 | Status | `code` | Raised by |
 |--------|--------|-----------|
-| 401 | `unauthorized` | `UnauthorizedError` (adds `WWW-Authenticate: Bearer`) |
+| 400 | `bad_request` or a specific code | `AppError` (e.g. `invalid_reset_token`, `verification_token_expired` for email links) |
+| 401 | `unauthorized` or a specific code | `UnauthorizedError` (adds `WWW-Authenticate: Bearer`; e.g. `token_expired`, `token_revoked` after a password reset) |
 | 404 | `not_found` | `NotFoundError`, unknown routes |
 | 403 | `forbidden` or a specific code | `ForbiddenError` (e.g. `invalid_password` when deleting an account) |
 | 405 | `method_not_allowed` | wrong HTTP method |
 | 409 | `conflict` or a specific code | `ConflictError` |
 | 429 | `too_many_login_attempts` | failed-login limit reached (adds `Retry-After`; see ADR 0005) |
+| 429 | `too_many_emails`, `too_many_reset_requests` | email limits per account or per IP (adds `Retry-After`; see ADR 0008) |
 | 422 | `validation_error` | invalid request body, query or path |
 | 500 | `internal_error` | anything unexpected; logged with a stack trace, details never sent to the client |
 

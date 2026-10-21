@@ -39,6 +39,9 @@ class Settings(BaseSettings):
     public_app_url: str = "http://localhost:3000"
     # One-time email links (docs/adr/0008-one-time-email-tokens.md)
     email_verification_expire_hours: int = Field(default=24, ge=1, le=168)
+    password_reset_expire_minutes: int = Field(default=30, ge=5, le=240)
+    # Password reset requests per IP per hour, whatever the email (ADR 0008)
+    forgot_password_max_per_ip: int = Field(default=10, ge=1, le=1000)
     # Emails of one kind (verification, password reset) per account per hour
     email_token_limit_per_hour: int = Field(default=3, ge=1, le=20)
 

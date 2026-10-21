@@ -33,9 +33,13 @@ def get_current_user(
 ) -> User:
     if token is None:
         raise UnauthorizedError("Not authenticated", code="not_authenticated")
-    user = UserRepository(db).get(decode_access_token(token, settings))
+    claims = decode_access_token(token, settings)
+    user = UserRepository(db).get(claims.user_id)
     if user is None:
         raise UnauthorizedError("Invalid token", code="invalid_token")
+    # Tokens issued before a password reset stop working (ADR 0008).
+    if user.password_changed_at is not None and claims.issued_at < user.password_changed_at:
+        raise UnauthorizedError("Token was revoked; log in again", code="token_revoked")
     return user
 
 

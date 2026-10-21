@@ -31,7 +31,22 @@ def test_verify_password_without_a_hash_is_false() -> None:
 def test_token_round_trip(settings: Settings) -> None:
     user_id = uuid.uuid4()
 
-    assert decode_access_token(create_access_token(user_id, settings), settings) == user_id
+    issued = (datetime.now(UTC) - timedelta(seconds=5)).replace(microsecond=750_000)
+    token = create_access_token(user_id, settings, now=issued)
+
+    claims = decode_access_token(token, settings)
+    assert claims.user_id == user_id
+    assert abs(claims.issued_at - issued) < timedelta(milliseconds=1)  # sub-second precision
+
+
+def test_tokens_with_whole_second_iat_still_work(settings: Settings) -> None:
+    """Tokens issued before iat became fractional stay valid until they expire."""
+    user_id = uuid.uuid4()
+    now = int(datetime.now(UTC).timestamp())
+    payload = {"sub": str(user_id), "iat": now, "exp": now + 60, "type": "access"}
+    token = jwt.encode(payload, settings.jwt_secret_key.get_secret_value(), "HS256")
+
+    assert decode_access_token(token, settings).issued_at == datetime.fromtimestamp(now, UTC)
 
 
 def test_expired_token_is_rejected(settings: Settings) -> None:
