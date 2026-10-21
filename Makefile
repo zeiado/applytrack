@@ -1,4 +1,4 @@
-.PHONY: install run worker test-email db migrate migration lint format typecheck test audit sast check
+.PHONY: install run worker test-email db migrate migration lint format typecheck test audit sast check openapi web
 
 install:
 	uv sync
@@ -47,6 +47,15 @@ audit:
 
 # Static security analysis. Free Semgrep registry rules, no account needed; fails on any finding.
 sast:
-	uvx semgrep==1.181.0 scan --metrics=off --error 		--config p/python --config p/secrets --config p/dockerfile --config p/github-actions
+	uvx semgrep==1.181.0 scan --metrics=off --error 		--config p/python --config p/secrets --config p/dockerfile --config p/github-actions --config p/typescript --config p/react --config p/nextjs
 
 check: lint typecheck test
+
+# Regenerate the web app's typed API client after changing the API.
+openapi:
+	uv run python scripts/export_openapi.py web/openapi.json
+	cd web && npm run gen:api
+
+# The web app on http://localhost:3000, talking to the API on :8000 (make run).
+web:
+	cd web && npm run dev

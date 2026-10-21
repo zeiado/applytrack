@@ -73,6 +73,7 @@ stories and priorities.
 | Background jobs and email | A job table in PostgreSQL, Jinja2 templates, Resend or SMTP | No extra infrastructure; jobs commit with the change that caused them ([ADR 0007](docs/adr/0007-database-job-queue-and-email.md)) |
 | Tooling | uv, Ruff, mypy `--strict`, pytest, pre-commit | Fast, reproducible, strict |
 | Delivery | Docker (multi-stage, non-root), GitHub Actions, GHCR | Same image from CI to production |
+| Web app | Next.js, TypeScript, Tailwind CSS, shadcn/ui, next-intl | Arabic and English with RTL; typed client generated from the OpenAPI schema ([ADR 0010](docs/adr/0010-web-app.md)) |
 | Security | pip-audit, Semgrep, Dependabot, actionlint | Known-vulnerability and code scanning on every PR |
 
 ---
@@ -413,6 +414,10 @@ make worker                  # in another terminal: background jobs; emails prin
 | `make format` | Auto-fix lint and formatting |
 | `make test-email to=you@example.com` | Send one test email with the configured provider |
 
+The web app is in [`web/`](web/README.md): `cd web && npm install && npm run dev`
+(or `make web`) serves it on http://localhost:3000. After changing the API, run
+`make openapi` to regenerate its typed client.
+
 To run the tests against PostgreSQL like CI does:
 
 ```bash
@@ -512,6 +517,7 @@ you can read:
 | [0007](docs/adr/0007-database-job-queue-and-email.md) | A job queue in PostgreSQL, and pluggable email backends |
 | [0008](docs/adr/0008-one-time-email-tokens.md) | One-time tokens for email links |
 | [0009](docs/adr/0009-sign-in-with-google.md) | Sign in with Google |
+| [0010](docs/adr/0010-web-app.md) | The web app: Next.js in this repo, tokens kept on the server |
 
 ## Roadmap
 
@@ -522,6 +528,8 @@ you can read:
 - [x] Password reset by email ([ADR 0008](docs/adr/0008-one-time-email-tokens.md))
 - [x] Sign in with Google ([ADR 0009](docs/adr/0009-sign-in-with-google.md))
 - [x] Daily follow-up reminder emails
+- [ ] Web app in Arabic and English ([milestone v1.2](https://github.com/zeiado/applytrack/milestone/6)): scaffold done ([ADR 0010](docs/adr/0010-web-app.md))
+- [ ] Chrome extension to save jobs from LinkedIn, Wuzzuf, Bayt and Forasna
 - [ ] Redis-backed rate limiter for multi-instance deployments (the interface is ready; see ADR 0005)
 - [ ] Keyset pagination if lists grow large
 - [ ] Container image scanning with a verified Trivy binary

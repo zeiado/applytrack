@@ -1,0 +1,35 @@
+{
+  "Metadata": {
+    "description": "Track every job application, interview and follow-up in one place."
+  },
+  "Home": {
+    "tagline": "Your job search, on track.",
+    "intro": "Save every application, see where each one stands, and get a reminder when it's time to follow up.",
+    "getStarted": "Get started free",
+    "logIn": "Log in",
+    "features": {
+      "board": {
+        "title": "Every application on one board",
+        "body": "From applied to offer, see your whole search at a glance."
+      },
+      "reminders": {
+        "title": "Never forget a follow-up",
+        "body": "A morning email tells you who to follow up with today."
+      },
+      "insights": {
+        "title": "Learn what works",
+        "body": "See which sources get you interviews and how fast companies reply."
+      }
+    }
+  },
+  "LanguageSwitcher": {
+    "label": "Language",
+    "ar": "العربية",
+    "en": "English"
+  },
+  "NotFound": {
+    "title": "Page not found",
+    "body": "The page you're looking for doesn't exist.",
+    "home": "Go to the home page"
+  }
+}

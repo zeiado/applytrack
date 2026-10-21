@@ -7,6 +7,10 @@ changes, a minor version for new features, and a patch version for fixes.
 
 ## [Unreleased]
 
+### Added
+
+- The web app in `web/`: Next.js, Arabic (right-to-left) and English, a home page, and a typed API client generated from the OpenAPI schema; CI lints, type checks, tests and builds it ([#63], [ADR 0010](docs/adr/0010-web-app.md))
+
 ## [0.4.0] - 2026-10-21
 
 Daily reminder emails and sign in with Google.
@@ -100,4 +104,5 @@ First release.
 [#44]: https://github.com/zeiado/applytrack/issues/44
 [#45]: https://github.com/zeiado/applytrack/issues/45
 [#46]: https://github.com/zeiado/applytrack/issues/46
+[#63]: https://github.com/zeiado/applytrack/issues/63
 [#50]: https://github.com/zeiado/applytrack/issues/50

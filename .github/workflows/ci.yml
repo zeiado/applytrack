@@ -61,6 +61,40 @@ jobs:
       - name: Test (PostgreSQL)
         run: uv run pytest --cov-report=xml
 
+  web:
+    name: Web app (lint, type check, test, build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+        with:
+          enable-cache: true
+      - name: Install dependencies
+        run: npm ci
+      - name: API client matches the API (run `make openapi` if this fails)
+        run: |
+          (cd .. && uv run --frozen python scripts/export_openapi.py web/openapi.json)
+          npm run gen:api
+          git diff --exit-code -- openapi.json src/lib/api/schema.ts
+      - name: Lint
+        run: npm run lint
+      - name: Type check
+        run: npm run typecheck
+      - name: Test
+        run: npm test
+      - name: Build
+        run: npm run build
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
+
   dependency-audit:
     name: Dependency vulnerability audit
     runs-on: ubuntu-latest
