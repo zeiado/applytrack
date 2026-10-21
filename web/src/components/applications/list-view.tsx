@@ -37,7 +37,7 @@ export async function ListView({ query, page, today }: { query: ListQuery; page:
             {page.items.map((app) => (
               <li key={app.id}>
                 <Link
-                  href={`/applications/${app.id}/edit`}
+                  href={`/applications/${app.id}`}
                   className="bg-card hover:bg-muted/50 grid gap-1 rounded-lg border p-3"
                 >
                   <span className="flex items-center justify-between gap-2">
@@ -170,7 +170,7 @@ async function Table({ items, today, locale }: { items: Application[]; today: st
           {items.map((app) => (
             <tr key={app.id} className="hover:bg-muted/30 border-t">
               <td className="px-3 py-2 font-medium">
-                <Link href={`/applications/${app.id}/edit`} className="hover:underline">
+                <Link href={`/applications/${app.id}`} className="hover:underline">
                   {app.company}
                 </Link>
               </td>
