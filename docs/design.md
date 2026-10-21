@@ -38,6 +38,8 @@ users
   id            UUID  PK
   email         text  unique, not null
   password_hash text  not null
+  locale        text  'ar' | 'en' (language for emails), default 'en'
+  email_verified_at timestamptz, null until the verification link is used
   created_at    timestamptz
 
 applications
@@ -69,6 +71,13 @@ refresh_tokens
   family_id   UUID, indexed (all tokens from one login)
   token_hash  text unique (SHA-256 of the token; the token itself is never stored)
   created_at / expires_at / revoked_at timestamptz
+
+email_tokens                            (links sent by email, ADR 0008)
+  id          UUID PK
+  user_id     UUID FK → users.id (on delete cascade)
+  purpose     enum(verify_email, reset_password)  index (user_id, purpose, created_at)
+  token_hash  text unique (SHA-256; the token itself is only in the email)
+  created_at / expires_at / used_at timestamptz
 
 jobs                                    (background work, ADR 0007)
   id            UUID PK
@@ -126,7 +135,9 @@ All routes are under `/api/v1`. Data routes require `Authorization: Bearer <toke
 
 | Method | Path | Description |
 |--------|------|-------------|
-| POST | `/auth/register` | Create account |
+| POST | `/auth/register` | Create account; emails a verification link |
+| POST | `/auth/verify-email` | Verify the email with the link's token (no login needed) |
+| POST | `/auth/verify-email/resend` | Send a new verification link |
 | POST | `/auth/login` | Get access and refresh tokens |
 | POST | `/auth/refresh` | Rotate a refresh token for a new pair ([ADR 0006](adr/0006-rotating-refresh-tokens.md)) |
 | POST | `/auth/logout` | Revoke a refresh token |
@@ -145,6 +156,22 @@ All routes are under `/api/v1`. Data routes require `Authorization: Bearer <toke
 | GET | `/stats` | Aggregate stats |
 | GET | `/health` | Liveness (no auth) |
 | GET | `/ready` | Readiness: checks the database (no auth) |
+
+### Email verification
+
+Registering (optional `locale`: `ar` or `en`) queues an email with a link to
+`<APPLYTRACK_PUBLIC_APP_URL>/verify-email#token=<token>`. The web app sends that token to
+`POST /auth/verify-email`, and `GET /users/me` then shows `email_verified: true`.
+Tokens follow [ADR 0008](adr/0008-one-time-email-tokens.md): 256-bit, stored hashed,
+single use, 24 hours.
+
+| Situation | Response |
+|---|---|
+| Valid link | `204` |
+| Used, unknown, or a newer link was used | `400 invalid_verification_token` |
+| Older than 24 hours | `400 verification_token_expired` |
+| Resend when already verified | `409 email_already_verified` |
+| A 4th email within an hour (the sign-up email counts) | `429 too_many_emails` with `Retry-After` |
 
 ### Interviews
 

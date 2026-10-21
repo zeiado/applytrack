@@ -11,7 +11,7 @@ from sqlalchemy import select
 from applytrack.api.deps import get_now
 from applytrack.core.config import Settings
 from applytrack.core.errors import UnauthorizedError
-from applytrack.core.security import hash_refresh_token
+from applytrack.core.security import hash_token
 from applytrack.models import RefreshToken
 from applytrack.services.tokens import TokenService
 from tests.conftest import TEST_DATABASE_URL, AuthHelper
@@ -167,7 +167,7 @@ def test_only_a_hash_of_the_refresh_token_is_stored(
     with app.state.session_factory() as session:
         stored = session.scalars(select(RefreshToken)).all()
 
-    assert [t.token_hash for t in stored] == [hash_refresh_token(body["refresh_token"])]
+    assert [t.token_hash for t in stored] == [hash_token(body["refresh_token"])]
     assert body["refresh_token"] not in stored[0].token_hash
     assert stored[0].expires_at == clock.now + timedelta(days=30)
     assert stored[0].revoked_at is None

@@ -2,9 +2,11 @@
 
 from applytrack.models.application import Application
 from applytrack.models.base import Base
+from applytrack.models.email_token import EmailToken
 from applytrack.models.enums import (
     ApplicationSource,
     ApplicationStatus,
+    EmailTokenPurpose,
     InterviewKind,
     JobStatus,
 )
@@ -19,6 +21,8 @@ __all__ = [
     "ApplicationSource",
     "ApplicationStatus",
     "Base",
+    "EmailToken",
+    "EmailTokenPurpose",
     "Interview",
     "InterviewKind",
     "Job",

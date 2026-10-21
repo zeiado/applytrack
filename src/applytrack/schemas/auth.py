@@ -4,10 +4,13 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
+from applytrack.mail.templates import Locale
+
 
 class RegisterRequest(BaseModel):
     email: EmailStr
     password: str = Field(min_length=8, max_length=128)
+    locale: Locale = Field(default="en", description="Language for emails: ar or en")
 
 
 class UserRead(BaseModel):
@@ -15,7 +18,17 @@ class UserRead(BaseModel):
 
     id: uuid.UUID
     email: EmailStr
+    email_verified: bool = Field(description="Whether the user opened the verification link")
+    locale: Locale
     created_at: datetime
+
+
+class EmailTokenRequest(BaseModel):
+    """A token from a link in an email (the part after ``#token=``)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    token: str = Field(min_length=1, max_length=256)
 
 
 class TokenResponse(BaseModel):

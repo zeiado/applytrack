@@ -28,6 +28,11 @@ class InterviewKind(StrEnum):
     OTHER = "other"
 
 
+class EmailTokenPurpose(StrEnum):
+    VERIFY_EMAIL = "verify_email"
+    RESET_PASSWORD = "reset_password"  # noqa: S105 (a purpose, not a password)
+
+
 class JobStatus(StrEnum):
     PENDING = "pending"  # waiting for run_at
     RUNNING = "running"  # claimed by a worker until locked_until

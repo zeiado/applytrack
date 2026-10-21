@@ -24,7 +24,9 @@ def test_register_creates_user_without_exposing_password(client: TestClient) -> 
     assert response.status_code == 201
     body = response.json()
     assert body["email"] == "ada@example.com"  # normalized
-    assert set(body) == {"id", "email", "created_at"}
+    assert set(body) == {"id", "email", "email_verified", "locale", "created_at"}
+    assert body["email_verified"] is False
+    assert body["locale"] == "en"
 
 
 def test_register_duplicate_email_is_conflict_ignoring_case(

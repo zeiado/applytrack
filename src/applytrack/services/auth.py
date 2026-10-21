@@ -1,3 +1,5 @@
+from collections.abc import Callable
+
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -16,14 +18,25 @@ class AuthService:
         self.session = session
         self.users = UserRepository(session)
 
-    def register(self, email: str, password: str) -> User:
+    def register(
+        self,
+        email: str,
+        password: str,
+        *,
+        locale: str = "en",
+        on_created: Callable[[User], None] | None = None,
+    ) -> User:
+        """Create an account. ``on_created`` runs in the same transaction, before the
+        commit (it queues the verification email), so both happen or neither does."""
         email = normalize_email(email)
         if self.users.get_by_email(email) is not None:
             raise ConflictError("An account with this email already exists", code="email_taken")
 
-        user = User(email=email, password_hash=hash_password(password))
+        user = User(email=email, password_hash=hash_password(password), locale=locale)
         try:
             self.users.add(user)
+            if on_created is not None:
+                on_created(user)
             self.session.commit()
         except IntegrityError as exc:  # two sign-ups with the same email at the same moment
             self.session.rollback()

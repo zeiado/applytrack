@@ -1,0 +1,10 @@
+Subject: Confirm your email for {{ app_name }}
+
+Hi,
+
+Please confirm your email address so {{ app_name }} can send you reminders and help you reset your password.
+
+Open this link to confirm:
+{{ link }}
+
+The link works once and expires in {{ hours }} hours. If you didn't create an account, you can ignore this email.

@@ -2,7 +2,7 @@ from email.utils import parseaddr
 from functools import lru_cache
 from typing import Literal, Self
 
-from pydantic import Field, SecretStr, model_validator
+from pydantic import Field, SecretStr, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # Only for local development and tests. Production refuses to start with it.
@@ -35,6 +35,13 @@ class Settings(BaseSettings):
     # See core/client_ip.py. Measure it for a host; never guess.
     trusted_proxy_hops: int = Field(default=0, ge=0, le=10)
 
+    # The web app. Links in emails point here (e.g. <url>/verify-email#token=...).
+    public_app_url: str = "http://localhost:3000"
+    # One-time email links (docs/adr/0008-one-time-email-tokens.md)
+    email_verification_expire_hours: int = Field(default=24, ge=1, le=168)
+    # Emails of one kind (verification, password reset) per account per hour
+    email_token_limit_per_hour: int = Field(default=3, ge=1, le=20)
+
     # Email (docs/adr/0007-database-job-queue-and-email.md).
     # console writes emails to the log instead of sending them.
     email_backend: Literal["console", "resend", "smtp"] = "console"
@@ -53,6 +60,13 @@ class Settings(BaseSettings):
     run_worker_in_api: bool = False
     worker_poll_seconds: float = Field(default=2, gt=0, le=60)
     job_max_attempts: int = Field(default=5, ge=1, le=20)
+
+    @field_validator("public_app_url")
+    @classmethod
+    def _http_url_without_trailing_slash(cls, url: str) -> str:
+        if not url.startswith(("https://", "http://")):
+            raise ValueError("APPLYTRACK_PUBLIC_APP_URL must start with https:// or http://")
+        return url.rstrip("/")
 
     @model_validator(mode="after")
     def _require_real_secret_in_production(self) -> Self:

@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 
 from applytrack.core.config import Settings
 from applytrack.core.errors import UnauthorizedError
-from applytrack.core.security import create_access_token, hash_refresh_token, new_refresh_token
+from applytrack.core.security import create_access_token, hash_token, new_random_token
 from applytrack.models import RefreshToken
 from applytrack.repositories.refresh_tokens import RefreshTokenRepository
 
@@ -36,7 +36,7 @@ class TokenService:
 
     def refresh(self, raw_token: str, now: datetime) -> TokenPair:
         """Exchange a refresh token for a new pair. The used token stops working."""
-        token = self.tokens.get_by_hash_for_update(hash_refresh_token(raw_token))
+        token = self.tokens.get_by_hash_for_update(hash_token(raw_token))
         if token is None:
             raise UnauthorizedError("Invalid refresh token", code="invalid_refresh_token")
 
@@ -61,18 +61,18 @@ class TokenService:
 
     def logout(self, raw_token: str, now: datetime) -> None:
         """Revoke one refresh token. Unknown or already revoked tokens are ignored."""
-        token = self.tokens.get_by_hash_for_update(hash_refresh_token(raw_token))
+        token = self.tokens.get_by_hash_for_update(hash_token(raw_token))
         if token is not None and token.revoked_at is None:
             token.revoked_at = now
             self.session.commit()
 
     def _issue(self, user_id: uuid.UUID, *, family_id: uuid.UUID, now: datetime) -> TokenPair:
-        raw = new_refresh_token()
+        raw = new_random_token()
         self.tokens.add(
             RefreshToken(
                 user_id=user_id,
                 family_id=family_id,
-                token_hash=hash_refresh_token(raw),
+                token_hash=hash_token(raw),
                 created_at=now,
                 expires_at=now + timedelta(days=self.settings.refresh_token_expire_days),
             )

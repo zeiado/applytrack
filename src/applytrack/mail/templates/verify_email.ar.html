@@ -1,0 +1,10 @@
+{% extends "_layout.html" %}
+{% from "_macros.html" import button %}
+{% block content %}
+<p style="margin:0 0 16px;">مرحبًا،</p>
+<p style="margin:0 0 16px;">من فضلك أكّد بريدك الإلكتروني حتى يرسل لك {{ app_name }} التذكيرات ويساعدك في استعادة كلمة المرور.</p>
+{{ button(link, "تأكيد بريدي الإلكتروني") }}
+<p style="margin:0 0 16px;font-size:14px;color:#6b7280;">أو انسخ هذا الرابط في المتصفح:<br><a href="{{ link }}" dir="ltr" style="color:#2563eb;word-break:break-all;">{{ link }}</a></p>
+<p style="margin:0;font-size:14px;color:#6b7280;">الرابط يعمل مرة واحدة وتنتهي صلاحيته خلال {{ hours }} ساعة.</p>
+{% endblock %}
+{% block footer %}إذا لم تنشئ حسابًا في {{ app_name }}، تجاهل هذه الرسالة.{% endblock %}
