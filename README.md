@@ -528,7 +528,7 @@ you can read:
 - [x] Password reset by email ([ADR 0008](docs/adr/0008-one-time-email-tokens.md))
 - [x] Sign in with Google ([ADR 0009](docs/adr/0009-sign-in-with-google.md))
 - [x] Daily follow-up reminder emails
-- [ ] Web app in Arabic and English ([milestone v1.2](https://github.com/zeiado/applytrack/milestone/6)): sign-in, the applications board and application pages are done ([ADR 0010](docs/adr/0010-web-app.md))
+- [ ] Web app in Arabic and English ([milestone v1.2](https://github.com/zeiado/applytrack/milestone/6)): sign-in, the applications board, application pages and settings are done ([ADR 0010](docs/adr/0010-web-app.md))
 - [ ] Chrome extension to save jobs from LinkedIn, Wuzzuf, Bayt and Forasna
 - [ ] Redis-backed rate limiter for multi-instance deployments (the interface is ready; see ADR 0005)
 - [ ] Keyset pagination if lists grow large

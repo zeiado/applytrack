@@ -22,6 +22,8 @@ export const KNOWN_ERRORS = [
   "invalid_transition",
   "invalid_salary_range",
   "not_found",
+  "invalid_password",
+  "wrong_google_account",
   "network",
   "unknown",
 ] as const;
