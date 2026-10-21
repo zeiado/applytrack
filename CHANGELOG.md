@@ -7,6 +7,10 @@ changes, a minor version for new features, and a patch version for fixes.
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-10-21
+
+The web app: Arabic and English, sign-up, login and Sign in with Google.
+
 ### Added
 
 - A refresh token used again within 30 seconds of its rotation gets its own pair instead of signing the user out, so parallel requests from the web app don't end sessions (`APPLYTRACK_REFRESH_REUSE_GRACE_SECONDS`; [#64], [ADR 0006](docs/adr/0006-rotating-refresh-tokens.md))
@@ -82,7 +86,8 @@ First release.
 - Interview times are returned in UTC on create, matching reads ([#25])
 - CI tests the Python version the Docker image ships ([#35])
 
-[Unreleased]: https://github.com/zeiado/applytrack/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/zeiado/applytrack/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/zeiado/applytrack/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/zeiado/applytrack/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/zeiado/applytrack/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/zeiado/applytrack/releases/tag/v0.2.0
