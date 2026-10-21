@@ -21,6 +21,16 @@ const nextConfig: NextConfig = {
       },
     },
   },
+  async redirects() {
+    // The first logged-in page was /dashboard; applications replaced it (#65).
+    return [
+      {
+        source: "/:locale(ar|en)/dashboard",
+        destination: "/:locale/applications",
+        permanent: false,
+      },
+    ];
+  },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },

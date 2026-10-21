@@ -1,14 +1,14 @@
 "use server";
 
-import { cookies, headers } from "next/headers";
+import { cookies } from "next/headers";
 import { getLocale } from "next-intl/server";
 
 import { redirect } from "@/i18n/navigation";
-import { clientIpFrom, type TokenResponse } from "@/lib/api/client";
+import type { TokenResponse } from "@/lib/api/client";
 
-import { ACCESS_COOKIE, clearSessionCookies, REFRESH_COOKIE, setSessionCookies } from "./cookies";
+import { clearSessionCookies, REFRESH_COOKIE, setSessionCookies } from "./cookies";
 import { type ActionState, safeNextPath, toActionError } from "./errors";
-import { refreshTokens } from "./refresh";
+import { ensureFreshSession } from "./fresh-session";
 import { visitorApi } from "./session";
 
 // Each action runs on this server: the browser posts the form here, never to the API.
@@ -23,7 +23,7 @@ function networkError(error: unknown): ActionState {
   console.error("API request failed", error);
   return NETWORK_ERROR;
 }
-const HOME_AFTER_LOGIN = "/dashboard";
+const HOME_AFTER_LOGIN = "/applications";
 
 function text(form: FormData, name: string): string {
   const value = form.get(name);
@@ -33,17 +33,6 @@ function text(form: FormData, name: string): string {
 async function startSession(tokens: TokenResponse, next: unknown): Promise<never> {
   setSessionCookies(await cookies(), tokens);
   return redirect({ href: safeNextPath(next) ?? HOME_AFTER_LOGIN, locale: await getLocale() });
-}
-
-/** For actions that need the user: the proxy only refreshes on page loads, so a form
- * sent long after the page loaded may find the access token expired. */
-async function ensureFreshSession(): Promise<void> {
-  const cookieStore = await cookies();
-  const refreshToken = cookieStore.get(REFRESH_COOKIE)?.value;
-  if (cookieStore.has(ACCESS_COOKIE) || !refreshToken) return;
-  const result = await refreshTokens(refreshToken, clientIpFrom(await headers()));
-  if (result.status === "refreshed") setSessionCookies(cookieStore, result.tokens);
-  else if (result.status === "invalid") clearSessionCookies(cookieStore);
 }
 
 async function requestTokens(email: string, password: string) {

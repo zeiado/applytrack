@@ -1,6 +1,6 @@
 // Loads each page once before the tests, so the first tests don't pay for the
 // servers' cold start (loading route code, the first database connection).
-const PAGES = ["/en/register", "/en/login", "/ar/login", "/en/dashboard", "/en/forgot-password"];
+const PAGES = ["/en/register", "/en/login", "/ar/login", "/en/applications", "/en/applications/new", "/en/forgot-password"];
 
 export default async function warmUp(): Promise<void> {
   for (const path of PAGES) {

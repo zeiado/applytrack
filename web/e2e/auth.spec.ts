@@ -1,59 +1,40 @@
-import { expect, type Page, test } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
-const PASSWORD = "correct-horse-battery";
-// Signing up or in hashes a password with Argon2 on purpose slowly; with several
-// tests at once on one API process, that can take a few seconds.
-const AUTH_TIMEOUT = { timeout: 30_000 };
-
-/** Our form messages (Next.js has its own hidden role="alert" route announcer). */
-function formAlert(page: Page) {
-  return page.locator('[data-slot="alert"]');
-}
-
-function newEmail(): string {
-  return `e2e-${Date.now()}-${Math.random().toString(36).slice(2, 8)}@example.com`;
-}
-
-/** The dashboard's greeting. The email is wrapped in Unicode direction marks, so it
- * displays correctly inside Arabic text. */
-function welcome(page: Page, email: string) {
-  return page.getByRole("heading", { name: `Welcome, ⁨${email}⁩` });
-}
-
-async function register(page: Page, email: string) {
-  await page.goto("/en/register");
-  await page.getByLabel("Email").fill(email);
-  await page.getByLabel("Password").fill(PASSWORD);
-  await page.getByRole("button", { name: "Create account" }).click();
-  await expect(page).toHaveURL(/\/en\/dashboard$/, AUTH_TIMEOUT);
-}
+import { AUTH_TIMEOUT, formAlert, newEmail, PASSWORD, register, signedInAs } from "./helpers";
 
 test("sign up, log out, and log in again", async ({ page }) => {
-  const email = newEmail();
-
-  await register(page, email);
-  await expect(welcome(page, email)).toBeVisible();
-  await expect(page.locator('[data-slot="alert"]')).toContainText(`we sent a link to ⁨${email}⁩`);
+  const email = await register(page);
+  await expect(signedInAs(page, email)).toContainText("we sent a link to");
 
   await page.getByRole("button", { name: "Log out" }).click();
   await expect(page).toHaveURL(/\/en$/);
 
-  // The dashboard now asks for a login, and returns there after it.
-  await page.goto("/en/dashboard");
-  await expect(page).toHaveURL(/\/en\/login\?next=%2Fdashboard$/);
+  // Applications now ask for a login, and return there after it.
+  await page.goto("/en/applications");
+  await expect(page).toHaveURL(/\/en\/login\?next=%2Fapplications$/);
   await page.getByLabel("Email").fill(email);
   await page.getByLabel("Password").fill("wrong-password");
   await page.getByRole("button", { name: "Log in" }).click();
   await expect(formAlert(page)).toHaveText("That email and password don't match.", AUTH_TIMEOUT);
 
+  // The email is still filled in; only the password needs typing again.
+  await expect(page.getByLabel("Email")).toHaveValue(email);
   await page.getByLabel("Password").fill(PASSWORD);
   await page.getByRole("button", { name: "Log in" }).click();
-  await expect(page).toHaveURL(/\/en\/dashboard$/, AUTH_TIMEOUT);
-  await expect(welcome(page, email)).toBeVisible();
+  await expect(page).toHaveURL(/\/en\/applications$/, AUTH_TIMEOUT);
+  await expect(signedInAs(page, email)).toBeVisible();
+});
+
+test("the old dashboard address goes to applications", async ({ page }) => {
+  await register(page);
+
+  await page.goto("/en/dashboard");
+
+  await expect(page).toHaveURL(/\/en\/applications$/);
 });
 
 test("tokens stay out of reach of page scripts", async ({ page, context }) => {
-  await register(page, newEmail());
+  await register(page);
 
   const cookies = await context.cookies();
   for (const name of ["__Host-at", "__Host-rt"]) {
@@ -68,31 +49,29 @@ test("tokens stay out of reach of page scripts", async ({ page, context }) => {
 });
 
 test("an expired access token is replaced without logging out", async ({ page, context }) => {
-  const email = newEmail();
-  await register(page, email);
+  const email = await register(page);
   const before = (await context.cookies()).find((c) => c.name === "__Host-rt")?.value;
 
   // The access cookie expires before the refresh cookie; simulate that.
   await context.clearCookies({ name: "__Host-at" });
   await page.reload();
 
-  await expect(welcome(page, email)).toBeVisible();
+  await expect(signedInAs(page, email)).toBeVisible();
   const after = await context.cookies();
   expect(after.find((c) => c.name === "__Host-at")).toBeDefined();
   expect(after.find((c) => c.name === "__Host-rt")?.value).not.toBe(before);
 });
 
 test("logged-in visitors skip the login page", async ({ page }) => {
-  await register(page, newEmail());
+  await register(page);
 
   await page.goto("/en/login");
 
-  await expect(page).toHaveURL(/\/en\/dashboard$/, AUTH_TIMEOUT);
+  await expect(page).toHaveURL(/\/en\/applications$/);
 });
 
 test("signing up with an email that's taken explains what to do", async ({ page, browser }) => {
-  const email = newEmail();
-  await register(page, email);
+  const email = await register(page);
 
   const visitor = await browser.newPage();
   await visitor.goto("/en/register");
