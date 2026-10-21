@@ -31,5 +31,84 @@
     "title": "Page not found",
     "body": "The page you're looking for doesn't exist.",
     "home": "Go to the home page"
+  },
+  "Auth": {
+    "email": "Email",
+    "password": "Password",
+    "newPassword": "New password",
+    "passwordHint": "At least 8 characters",
+    "or": "or",
+    "working": "Please wait…",
+    "login": {
+      "title": "Log in",
+      "description": "Welcome back.",
+      "submit": "Log in",
+      "forgot": "Forgot your password?",
+      "noAccount": "Don't have an account?",
+      "register": "Sign up"
+    },
+    "register": {
+      "title": "Create your account",
+      "description": "Free. Start tracking your applications in a minute.",
+      "submit": "Create account",
+      "haveAccount": "Already have an account?",
+      "login": "Log in"
+    },
+    "forgot": {
+      "title": "Reset your password",
+      "description": "Enter your email and we'll send you a link to set a new password.",
+      "submit": "Send the link",
+      "sent": "If an account uses that email, a link to reset the password is on its way. It works for 30 minutes.",
+      "back": "Back to log in"
+    },
+    "reset": {
+      "title": "Set a new password",
+      "description": "Choose a new password for your account.",
+      "submit": "Save password",
+      "done": "Your password is changed. Log in with the new one.",
+      "login": "Log in",
+      "noToken": "This link is incomplete. Open the link from the email again, or ask for a new one.",
+      "newLink": "Ask for a new link"
+    },
+    "verify": {
+      "title": "Confirm your email",
+      "checking": "Confirming your email…",
+      "done": "Your email is confirmed. Thank you!",
+      "continue": "Continue",
+      "noToken": "This link is incomplete. Open the link from the email again."
+    },
+    "google": {
+      "unavailable": "Google sign-in couldn't load. Use your email and password instead, or try again later."
+    }
+  },
+  "Errors": {
+    "invalid_credentials": "That email and password don't match.",
+    "email_taken": "An account with this email already exists. Log in instead.",
+    "too_many_login_attempts": "Too many attempts. Try again in {seconds} seconds.",
+    "too_many_reset_requests": "Too many requests. Try again in {seconds} seconds.",
+    "too_many_emails": "We've sent several emails already. Try again in {seconds} seconds.",
+    "email_already_verified": "Your email is already confirmed.",
+    "invalid_google_token": "Google sign-in didn't work. Try again.",
+    "google_token_expired": "The Google sign-in took too long. Try again.",
+    "google_email_not_verified": "Google hasn't confirmed this account's email address, so we can't use it.",
+    "google_account_mismatch": "This email's account is linked to a different Google account.",
+    "google_unavailable": "We couldn't reach Google. Try again in a moment.",
+    "google_sign_in_not_configured": "Google sign-in isn't available right now. Use your email and password.",
+    "invalid_verification_token": "This link has already been used or isn't valid. Log in and ask for a new one.",
+    "verification_token_expired": "This link has expired. Log in and ask for a new one.",
+    "invalid_reset_token": "This link has already been used or isn't valid. Ask for a new one.",
+    "reset_token_expired": "This link has expired. Ask for a new one.",
+    "validation_error": "Check the fields and try again.",
+    "network": "We can't reach the server. Check your connection and try again; the first request after a while can take up to a minute.",
+    "unknown": "Something went wrong. Try again."
+  },
+  "Dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome, {email}",
+    "comingSoon": "Your applications board is coming next. You'll be able to add and track applications here.",
+    "logOut": "Log out",
+    "verifyBanner": "Confirm your email address: we sent a link to {email}.",
+    "resend": "Send it again",
+    "resent": "Sent. Check your inbox (and spam folder)."
   }
 }

@@ -108,7 +108,10 @@ The web app (`web/`, [ADR 0010](adr/0010-web-app.md)) deploys to Vercel. One-tim
    `https://applytrack-staging-jxnw.onrender.com` for Preview), and optionally
    `NEXT_PUBLIC_APP_NAME`.
 4. Settings › Functions › Region: Frankfurt (`fra1`), next to the API.
-5. Deploy. Every push to `main` deploys production; every PR gets a preview URL.
+5. For Sign in with Google: `NEXT_PUBLIC_GOOGLE_CLIENT_ID` = the same client ID as the
+   API's `APPLYTRACK_GOOGLE_CLIENT_IDS`. Without it, the Google button is hidden.
+6. Deploy. Every push to `main` deploys production; every PR gets a preview URL.
+   `NEXT_PUBLIC_*` values are built into the app, so redeploy after changing one.
 
 **Visitor IPs.** The web app's server calls the API for its visitors, so without help
 the API would see every request coming from Vercel and the per-IP rate limits would
