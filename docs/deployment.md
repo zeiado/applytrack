@@ -96,6 +96,24 @@ delete the workflow then.
 When a paid plan allows it, run `python -m applytrack.worker` as a Render background
 worker and turn `APPLYTRACK_RUN_WORKER_IN_API` off.
 
+## Web app on Vercel
+
+The web app (`web/`, [ADR 0010](adr/0010-web-app.md)) deploys to Vercel. One-time setup:
+
+1. Sign in to vercel.com with GitHub, then Add New › Project › import `zeiado/applytrack`
+   (give Vercel access to this private repo when GitHub asks).
+2. **Root Directory: `web`**. Vercel detects Next.js; keep the default build settings.
+3. Environment variables: `API_URL` = the API's URL
+   (`https://applytrack-production-jxnw.onrender.com` for Production,
+   `https://applytrack-staging-jxnw.onrender.com` for Preview), and optionally
+   `NEXT_PUBLIC_APP_NAME`.
+4. Settings › Functions › Region: Frankfurt (`fra1`), next to the API.
+5. Deploy. Every push to `main` deploys production; every PR gets a preview URL.
+
+Then add the Vercel URL (and later the real domain) to the Google OAuth client's
+"Authorized JavaScript origins", and set `APPLYTRACK_PUBLIC_APP_URL` on the API to it,
+so links in emails open the web app.
+
 ## Sign in with Google
 
 Off until `APPLYTRACK_GOOGLE_CLIENT_IDS` is set ([ADR 0009](adr/0009-sign-in-with-google.md)).

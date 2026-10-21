@@ -7,4 +7,5 @@
 .coverage
 tests
 docs
+web
 .env
