@@ -18,6 +18,9 @@ logger = logging.getLogger("applytrack.mail")
 
 SEND_EMAIL = "send_email"
 
+# Template variables: plain values, or a list of rows (e.g. applications in a reminder).
+ContextValue = str | int | list[dict[str, str | int]]
+
 
 class SendEmailPayload(BaseModel):
     model_config = ConfigDict(extra="forbid")
@@ -25,7 +28,7 @@ class SendEmailPayload(BaseModel):
     to: EmailStr
     template: str
     locale: Locale
-    context: dict[str, str | int]
+    context: dict[str, ContextValue]
 
 
 class Mailer:
@@ -46,7 +49,7 @@ class Mailer:
         to: str,
         template: str,
         locale: Locale,
-        context: Mapping[str, str | int] | None = None,
+        context: Mapping[str, ContextValue] | None = None,
     ) -> Job:
         payload = SendEmailPayload(
             to=to, template=template, locale=locale, context=dict(context or {})

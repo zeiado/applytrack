@@ -41,6 +41,9 @@ users
   locale        text  'ar' | 'en' (language for emails), default 'en'
   email_verified_at timestamptz, null until the verification link is used
   password_changed_at timestamptz, set by a password reset (older access tokens are refused)
+  timezone      text  IANA name, default 'Africa/Cairo'
+  reminder_emails bool, default true
+  reminders_checked_on date, the user's local date of the last daily reminder check
   created_at    timestamptz
 
 applications
@@ -145,6 +148,7 @@ All routes are under `/api/v1`. Data routes require `Authorization: Bearer <toke
 | POST | `/auth/refresh` | Rotate a refresh token for a new pair ([ADR 0006](adr/0006-rotating-refresh-tokens.md)) |
 | POST | `/auth/logout` | Revoke a refresh token |
 | GET | `/users/me` | Current user |
+| PATCH | `/users/me` | Change `locale`, `timezone`, `reminder_emails` |
 | GET | `/users/me/export` | All the user's data as one JSON file |
 | DELETE | `/users/me` | Delete the account and all its data (body: current password) |
 | GET | `/applications` | List (filters: `status`, `company`, `source`; `limit`, `offset`, `sort`) |
@@ -219,6 +223,23 @@ earlier, most overdue first, with `days_overdue` on each item.
   calling `datetime.now()` themselves, so tests freeze the clock with
   `app.dependency_overrides` instead of mocking.
 - Served by an index on `(user_id, follow_up_on)`.
+
+### Reminder emails
+
+The worker runs a periodic task every `APPLYTRACK_REMINDER_CHECK_MINUTES` (5). It looks at
+users with a verified email and `reminder_emails` on, and for each one whose local time
+is past `APPLYTRACK_REMINDER_HOUR` (08:00) and who hasn't been checked on their local
+date yet:
+
+- it lists their due follow-ups with the same query as `GET /reminders/due` (open
+  applications, follow-up date on or before today, most overdue first);
+- if there are any, it queues one email with up to 10 of them and "…and N more";
+- either way it sets `reminders_checked_on` to their local date, in the same transaction.
+
+The user's row is locked with `FOR UPDATE SKIP LOCKED` while it's checked, so several
+workers never send the same email, and a user gets at most one email a day. Nothing
+is sent on days with nothing due. A follow-up added after the morning check waits for
+the next morning.
 
 ### Stats
 

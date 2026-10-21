@@ -7,16 +7,18 @@ exits. See docs/adr/0007-database-job-queue-and-email.md.
 import logging
 import signal
 import threading
+from datetime import timedelta
 
 from sqlalchemy.orm import Session, sessionmaker
 
 from applytrack.core.config import Settings, get_settings, resolved_log_format
 from applytrack.core.logging import configure_logging
 from applytrack.db.session import build_engine, build_session_factory
-from applytrack.jobs.worker import JobHandler, Worker
+from applytrack.jobs.worker import JobHandler, PeriodicTask, Worker
 from applytrack.mail.backends import EmailBackend, build_email_backend
 from applytrack.mail.mailer import SEND_EMAIL, SendEmailHandler
 from applytrack.mail.templates import get_renderer
+from applytrack.services.reminder_emails import ReminderEmailScheduler
 
 logger = logging.getLogger("applytrack.jobs")
 
@@ -35,7 +37,15 @@ def build_worker(
             settings,
         ),
     }
-    return Worker(session_factory, handlers)
+    reminders = ReminderEmailScheduler(session_factory, settings)
+    periodic = [
+        PeriodicTask(
+            "follow_up_reminders",
+            timedelta(minutes=settings.reminder_check_minutes),
+            reminders.run,
+        )
+    ]
+    return Worker(session_factory, handlers, periodic=periodic)
 
 
 def warn_if_emails_only_logged(settings: Settings) -> None:

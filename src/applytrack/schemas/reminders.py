@@ -1,23 +1,12 @@
 import uuid
 from datetime import date, datetime
-from typing import Annotated
-from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
+from zoneinfo import ZoneInfo
 
-from pydantic import AfterValidator, BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from applytrack.models import ApplicationStatus
 from applytrack.schemas.pagination import MAX_PAGE_SIZE, Page
-
-
-def _valid_timezone(name: str) -> str:
-    try:
-        ZoneInfo(name)
-    except (ZoneInfoNotFoundError, ValueError) as exc:
-        raise ValueError(f"Unknown timezone {name!r}; use an IANA name like Africa/Cairo") from exc
-    return name
-
-
-Timezone = Annotated[str, Field(max_length=64), AfterValidator(_valid_timezone)]
+from applytrack.schemas.timezones import Timezone
 
 
 class DueRemindersParams(BaseModel):

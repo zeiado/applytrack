@@ -1,0 +1,34 @@
+name: Wake production
+
+# Render's free plan stops the service after 15 minutes without traffic, and the
+# reminder-email check (#45) only runs while it's up. This wakes it shortly after
+# 08:00 Cairo time: 05:05 UTC in summer (UTC+3) and 06:05 UTC in winter (UTC+2).
+# Delete this workflow once production is on a paid instance that doesn't sleep.
+on:
+  schedule:
+    - cron: "5 5,6 * * *"
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  wake:
+    name: Request /health until the service answers
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: vars.PRODUCTION_URL != ''
+    steps:
+      - name: Wake
+        env:
+          PRODUCTION_URL: ${{ vars.PRODUCTION_URL }}
+        run: |
+          for attempt in $(seq 1 10); do
+            if curl -fsS --max-time 60 "$PRODUCTION_URL/health"; then
+              echo
+              echo "Production is up (attempt $attempt)"
+              exit 0
+            fi
+            sleep 15
+          done
+          echo "::error::Production did not answer /health"
+          exit 1

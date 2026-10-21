@@ -58,6 +58,11 @@ class Settings(BaseSettings):
     smtp_password: SecretStr | None = None
     smtp_security: Literal["starttls", "tls", "none"] = "starttls"
 
+    # Daily follow-up reminder emails (#45): sent from this local hour in each user's
+    # timezone, checked every reminder_check_minutes by the worker.
+    reminder_hour: int = Field(default=8, ge=0, le=23)
+    reminder_check_minutes: int = Field(default=5, ge=1, le=60)
+
     # Background jobs (ADR 0007). Run the worker as its own process (python -m
     # applytrack.worker), or inside the API process where separate workers cost extra.
     run_worker_in_api: bool = False

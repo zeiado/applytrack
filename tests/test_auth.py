@@ -24,7 +24,16 @@ def test_register_creates_user_without_exposing_password(client: TestClient) -> 
     assert response.status_code == 201
     body = response.json()
     assert body["email"] == "ada@example.com"  # normalized
-    assert set(body) == {"id", "email", "email_verified", "locale", "created_at"}
+    assert set(body) == {
+        "id",
+        "email",
+        "email_verified",
+        "locale",
+        "timezone",
+        "reminder_emails",
+        "created_at",
+    }
+    assert (body["timezone"], body["reminder_emails"]) == ("Africa/Cairo", True)
     assert body["email_verified"] is False
     assert body["locale"] == "en"
 
