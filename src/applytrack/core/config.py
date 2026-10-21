@@ -25,6 +25,9 @@ class Settings(BaseSettings):
     jwt_algorithm: Literal["HS256"] = "HS256"
     access_token_expire_minutes: int = 30
     refresh_token_expire_days: int = 30
+    # A refresh token used again this soon after it was rotated gets a new pair instead
+    # of signing the user out (ADR 0006): parallel requests from one client. 0 = off.
+    refresh_reuse_grace_seconds: int = Field(default=30, ge=0, le=300)
 
     # Failed-login limits (see ADR 0005)
     login_max_failures_per_account: int = 5
@@ -34,6 +37,10 @@ class Settings(BaseSettings):
     # Reverse proxies in front of the app that append to X-Forwarded-For (0 = none).
     # See core/client_ip.py. Measure it for a host; never guess.
     trusted_proxy_hops: int = Field(default=0, ge=0, le=10)
+    # Shared with the web app's server, which calls the API for its visitors. Requests
+    # with this secret in X-Proxy-Secret may name the visitor's IP in X-Client-IP, so
+    # rate limits apply per visitor, not to the web server as a whole. Unset = ignored.
+    client_ip_secret: SecretStr | None = Field(default=None, min_length=32)
 
     # The web app. Links in emails point here (e.g. <url>/verify-email#token=...).
     public_app_url: str = "http://localhost:3000"

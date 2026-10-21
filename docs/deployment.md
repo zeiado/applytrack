@@ -110,6 +110,14 @@ The web app (`web/`, [ADR 0010](adr/0010-web-app.md)) deploys to Vercel. One-tim
 4. Settings › Functions › Region: Frankfurt (`fra1`), next to the API.
 5. Deploy. Every push to `main` deploys production; every PR gets a preview URL.
 
+**Visitor IPs.** The web app's server calls the API for its visitors, so without help
+the API would see every request coming from Vercel and the per-IP rate limits would
+apply to all users together. Set the same random value (32+ characters; Render's
+"Generate" button makes one) as `APPLYTRACK_CLIENT_IP_SECRET` on each Render service
+and as `API_PROXY_SECRET` in Vercel (Production for the production API, Preview for
+staging). The web server then sends each visitor's IP in `X-Client-IP` with the secret
+in `X-Proxy-Secret`; the API ignores `X-Client-IP` from anyone without the secret.
+
 Then add the Vercel URL (and later the real domain) to the Google OAuth client's
 "Authorized JavaScript origins", and set `APPLYTRACK_PUBLIC_APP_URL` on the API to it,
 so links in emails open the web app.

@@ -70,7 +70,13 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     )
 
     register_exception_handlers(app)
-    app.add_middleware(RequestContextMiddleware, trusted_proxy_hops=settings.trusted_proxy_hops)
+    app.add_middleware(
+        RequestContextMiddleware,
+        trusted_proxy_hops=settings.trusted_proxy_hops,
+        client_ip_secret=(
+            settings.client_ip_secret.get_secret_value() if settings.client_ip_secret else None
+        ),
+    )
     app.include_router(health.router)
     app.include_router(api_router)
     return app

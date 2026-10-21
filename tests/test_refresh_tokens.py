@@ -1,3 +1,4 @@
+import logging
 import threading
 from collections.abc import Iterator
 from datetime import UTC, datetime, timedelta
@@ -96,6 +97,7 @@ def test_reusing_a_rotated_token_signs_the_user_out_everywhere(
         LOGIN, data={"username": "ada@example.com", "password": "correct-horse"}
     ).json()
     rotated = refresh(client, stolen["refresh_token"]).json()
+    clock.advance(seconds=31)  # past the grace period for parallel requests
 
     response = refresh(client, stolen["refresh_token"])
 
@@ -105,6 +107,55 @@ def test_reusing_a_rotated_token_signs_the_user_out_everywhere(
     # Both the attacker's and the user's newer tokens are dead, on every device.
     for token in (rotated["refresh_token"], other_device["refresh_token"]):
         assert refresh(client, token).json()["error"]["code"] == "refresh_token_reused"
+
+
+def test_reuse_moments_after_rotation_gets_its_own_pair(
+    client: TestClient, auth: AuthHelper, clock: Clock, caplog: pytest.LogCaptureFixture
+) -> None:
+    """Two page loads refreshed with the same token at once: the slower one isn't
+    treated as theft."""
+    token = login(client, auth)["refresh_token"]
+    first = refresh(client, token).json()
+    clock.advance(seconds=30)
+
+    with caplog.at_level(logging.INFO, logger="applytrack.auth"):
+        second = refresh(client, token)
+
+    assert second.status_code == 200
+    assert "within the grace period" in caplog.text
+    # Both new tokens work, and they're different.
+    assert second.json()["refresh_token"] != first["refresh_token"]
+    assert refresh(client, first["refresh_token"]).status_code == 200
+    assert refresh(client, second.json()["refresh_token"]).status_code == 200
+
+
+def test_reuse_after_logout_is_still_reuse(
+    client: TestClient, auth: AuthHelper, clock: Clock
+) -> None:
+    token = login(client, auth)["refresh_token"]
+    newer = refresh(client, token).json()["refresh_token"]
+    client.post(LOGOUT, json={"refresh_token": newer})
+
+    response = refresh(client, token)
+
+    assert response.json()["error"]["code"] == "refresh_token_reused"
+
+
+def test_logged_out_token_gets_no_grace(client: TestClient, auth: AuthHelper, clock: Clock) -> None:
+    token = login(client, auth)["refresh_token"]
+    client.post(LOGOUT, json={"refresh_token": token})
+
+    assert refresh(client, token).json()["error"]["code"] == "refresh_token_reused"
+
+
+def test_grace_period_can_be_turned_off(
+    app: FastAPI, client: TestClient, auth: AuthHelper, clock: Clock, settings: Settings
+) -> None:
+    app.state.settings = settings.model_copy(update={"refresh_reuse_grace_seconds": 0})
+    token = login(client, auth)["refresh_token"]
+    refresh(client, token)
+
+    assert refresh(client, token).json()["error"]["code"] == "refresh_token_reused"
 
 
 def test_expired_refresh_token_is_rejected(
@@ -196,7 +247,8 @@ def test_concurrent_refreshes_with_one_token_cannot_both_succeed(
     app: FastAPI, client: TestClient, auth: AuthHelper, settings: Settings
 ) -> None:
     """Two refreshes with the same token at the same moment. The row lock makes the
-    second one see the first one's rotation, so it counts as reuse."""
+    second one see the first one's rotation, and the grace period gives it its own
+    pair; without the lock both could rotate the same row."""
     token = login(client, auth)["refresh_token"]
     now = datetime.now(UTC)
     barrier = threading.Barrier(2)
@@ -217,7 +269,7 @@ def test_concurrent_refreshes_with_one_token_cannot_both_succeed(
     for t in threads:
         t.join(timeout=10)
 
-    assert sorted(outcomes) == ["ok", "refresh_token_reused"]
+    assert outcomes == ["ok", "ok"]
     with app.state.session_factory() as session:
-        live = session.scalars(select(RefreshToken).where(RefreshToken.revoked_at.is_(None)))
-        assert list(live) == []
+        tokens = session.scalars(select(RefreshToken)).all()
+        assert sorted(t.rotated_at is not None for t in tokens) == [False, False, True]
