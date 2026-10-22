@@ -3,7 +3,7 @@ name = "applytrack"
 version = "0.6.0"
 description = "REST API for tracking job applications, interviews and follow-ups"
 readme = "README.md"
-license = "MIT"
+license = "LicenseRef-Proprietary"
 authors = [
     { name = "Zeyad Gamal", email = "zeyadgamal2003@gmail.com" }
 ]
