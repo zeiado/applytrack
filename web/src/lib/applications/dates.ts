@@ -28,3 +28,10 @@ export function followUpState(followUpOn: string, today: string): FollowUp {
   if (followUpOn < today) return "overdue";
   return followUpOn === today ? "due" : "upcoming";
 }
+
+/** The calendar date `days` days after `date` (both YYYY-MM-DD). */
+export function addDays(date: string, days: number): string {
+  const [year, month, day] = date.split("-").map(Number);
+  const value = new Date(Date.UTC(year ?? 1970, (month ?? 1) - 1, (day ?? 1) + days));
+  return value.toISOString().slice(0, 10);
+}

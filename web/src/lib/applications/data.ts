@@ -79,3 +79,24 @@ export async function getInterviews(id: string) {
   if (!data) throw new Error(`Getting the interviews failed: HTTP ${response.status}`);
   return data;
 }
+
+/** Follow-ups due today or earlier, and those coming up in the next `withinDays` days,
+ * most overdue first. "Today" is in the user's timezone. */
+export async function getDueReminders(timeZone: string, withinDays: number) {
+  const api = await visitorApi();
+  const { data, response } = await api.GET("/api/v1/reminders/due", {
+    params: { query: { tz: timeZone, within_days: withinDays, limit: MAX_PAGE_SIZE } },
+  });
+  if (response.status === 401) return toLogin("/follow-ups");
+  if (!data) throw new Error(`Getting the follow-ups failed: HTTP ${response.status}`);
+  return data;
+}
+
+/** The funnel, rates, results per source and time in each stage. */
+export async function getStats() {
+  const api = await visitorApi();
+  const { data, response } = await api.GET("/api/v1/stats");
+  if (response.status === 401) return toLogin("/stats");
+  if (!data) throw new Error(`Getting the stats failed: HTTP ${response.status}`);
+  return data;
+}

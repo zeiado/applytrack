@@ -9,6 +9,8 @@ export type ApplicationUpdate = components["schemas"]["ApplicationUpdate"];
 export type StatusChange = components["schemas"]["StatusChangeRead"];
 export type Interview = components["schemas"]["InterviewRead"];
 export type InterviewKind = components["schemas"]["InterviewKind"];
+export type DueReminder = components["schemas"]["DueReminder"];
+export type Stats = components["schemas"]["StatsRead"];
 
 export const INTERVIEW_KINDS = [
   "phone_screen",

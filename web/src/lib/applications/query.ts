@@ -67,3 +67,24 @@ export function toSearch(query: ListQuery, changes: Partial<ListQuery> = {}): st
 export function hasFilters(query: ListQuery): boolean {
   return query.statuses.length > 0 || query.source !== null || query.company !== "";
 }
+
+/** The CSV export's API query: the list's filters and sort, every page. Excel needs the
+ * byte order mark (the API's default) to show Arabic. */
+export function toExportSearch(query: ListQuery): string {
+  const params = new URLSearchParams();
+  for (const status of query.statuses) params.append("status", status);
+  if (query.source) params.set("source", query.source);
+  if (query.company) params.set("company", query.company);
+  params.set("sort", query.sort);
+  return `?${params}`;
+}
+
+/** URLSearchParams as the plain object `parseListQuery` reads (repeated keys → arrays). */
+export function searchParamsObject(params: URLSearchParams): Record<string, string | string[]> {
+  const result: Record<string, string | string[]> = {};
+  for (const key of new Set(params.keys())) {
+    const values = params.getAll(key);
+    result[key] = values.length === 1 ? (values[0] as string) : values;
+  }
+  return result;
+}

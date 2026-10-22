@@ -1,3 +1,4 @@
+import { Download } from "lucide-react";
 import Form from "next/form";
 import { getLocale, getTranslations } from "next-intl/server";
 
@@ -25,9 +26,21 @@ export async function ListView({ query, page, today }: { query: ListQuery; page:
   return (
     <div className="grid gap-4">
       <Filters query={query} />
-      <p className="text-muted-foreground text-sm" role="status">
-        {t("count", { count: page.total })}
-      </p>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="text-muted-foreground text-sm" role="status">
+          {t("count", { count: page.total })}
+        </p>
+        {page.total > 0 && (
+          // A plain link: it's a file from a route handler, not a page.
+          <a
+            href={`/api/applications/export${toSearch(query, { page: 1 })}`}
+            className={buttonVariants({ variant: "outline", size: "sm", className: "gap-1.5" })}
+          >
+            <Download aria-hidden />
+            {t("exportCsv")}
+          </a>
+        )}
+      </div>
       {page.items.length === 0 ? (
         <p className="text-muted-foreground rounded-xl border border-dashed p-8 text-center">{t("noMatches")}</p>
       ) : (
