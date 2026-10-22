@@ -7,6 +7,10 @@ changes, a minor version for new features, and a patch version for fixes.
 
 ## [Unreleased]
 
+### Changed
+
+- The project is no longer open source: all rights are reserved from this version on. Earlier versions stay under the MIT License
+
 ### Added
 
 - Install the web app on a phone's home screen (Android and iPhone): app icons, a manifest, and an offline page when there's no connection. Settings shows how to install it on each device ([#72])

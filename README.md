@@ -5,7 +5,7 @@
 ![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)
 ![Python](https://img.shields.io/badge/python-3.12%20%7C%203.14-blue)
 ![mypy](https://img.shields.io/badge/mypy-strict-blue)
-![License](https://img.shields.io/badge/license-MIT-green)
+![License](https://img.shields.io/badge/license-all%20rights%20reserved-lightgrey)
 
 **A production-style REST API for tracking a job search:** every application, the stage it's
 in, its full status history, interviews, follow-up reminders and stats on what's working.
@@ -536,4 +536,4 @@ you can read:
 
 ## License
 
-[MIT](LICENSE) © Zeyad Gamal
+© 2026 Zeyad Gamal. All rights reserved. The code is public to read, not to reuse: see [LICENSE](LICENSE). Versions published before this change remain under the MIT License.
