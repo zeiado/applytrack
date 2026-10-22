@@ -22,6 +22,7 @@ import { type Application, type ApplicationStatus, STATUSES } from "@/lib/applic
 import type { ActionError } from "@/lib/auth/errors";
 import { cn } from "@/lib/utils";
 
+import { CompanyInitial } from "./company-initial";
 import { StatusDot } from "./status-badge";
 
 type Move = { id: string; status: ApplicationStatus };
@@ -144,12 +145,7 @@ function Card({
       className="bg-card grid gap-2 rounded-xl border p-3.5"
     >
       <div className="flex items-center gap-2.5">
-        <span
-          aria-hidden
-          className="bg-primary/10 text-primary flex size-[34px] shrink-0 items-center justify-center rounded-lg font-semibold"
-        >
-          {initial(app.company, locale)}
-        </span>
+        <CompanyInitial company={app.company} locale={locale} />
         <div className="min-w-0 flex-1">
           <h3 className="truncate font-semibold">
             <Link href={href} className="hover:underline">
@@ -209,9 +205,4 @@ function Card({
       )}
     </article>
   );
-}
-
-/** The company's first letter, for the tile on its card. */
-function initial(company: string, locale: string): string {
-  return (Array.from(company.trim())[0] ?? "?").toLocaleUpperCase(locale);
 }
