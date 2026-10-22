@@ -1,6 +1,10 @@
 import { setRequestLocale } from "next-intl/server";
+import { Suspense } from "react";
 
+import { Logo } from "@/components/brand/logo";
+import { LanguageSwitcher } from "@/components/language-switcher";
 import { SiteHeader } from "@/components/site-header";
+import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 
 export default async function AuthLayout({ children, params }: LayoutProps<"/[locale]">) {
@@ -11,10 +15,21 @@ export default async function AuthLayout({ children, params }: LayoutProps<"/[lo
 
   return (
     <>
-      <SiteHeader />
-      <main className="flex flex-1 items-start justify-center px-4 pt-6 pb-16 sm:pt-12">
-        {children}
-      </main>
+      {/* Phones: just the logo, centred, with the language switch in the corner. */}
+      <div className="relative flex justify-center px-4 pt-12 pb-2 sm:hidden">
+        <Link href="/">
+          <Logo className="h-9" />
+        </Link>
+        <div className="absolute end-4 top-4 text-sm">
+          <Suspense>
+            <LanguageSwitcher />
+          </Suspense>
+        </div>
+      </div>
+      <div className="hidden sm:block">
+        <SiteHeader />
+      </div>
+      <main className="flex flex-1 items-start justify-center px-6 pt-6 pb-16 sm:px-4 sm:pt-12">{children}</main>
     </>
   );
 }
