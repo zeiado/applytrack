@@ -19,6 +19,22 @@ if not config.get_main_option("sqlalchemy.url"):
 
 target_metadata = Base.metadata
 
+# On PostgreSQL, a migration that can't connect, waits for a lock or loses its connection
+# fails within minutes instead of hanging: a hung `alembic upgrade` at startup keeps the
+# API from ever listening, and the host gives up on the deploy only after ~15 minutes.
+POSTGRES_CONNECT_ARGS = {
+    "connect_timeout": 15,
+    "options": "-c lock_timeout=60s -c statement_timeout=10min",
+    "keepalives": 1,
+    "keepalives_idle": 30,
+    "keepalives_interval": 10,
+    "keepalives_count": 3,
+}
+
+
+def connect_args(url: str) -> dict[str, Any]:
+    return POSTGRES_CONNECT_ARGS if url.startswith("postgresql") else {}
+
 
 def render_item(type_: str, obj: Any, autogen_context: Any) -> str | bool:
     """Write our UTCDateTime as a plain timezone-aware DateTime, so migrations don't import app code."""
@@ -46,6 +62,7 @@ def run_migrations_online() -> None:
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
+        connect_args=connect_args(config.get_main_option("sqlalchemy.url") or ""),
     )
     with connectable.connect() as connection:
         context.configure(
