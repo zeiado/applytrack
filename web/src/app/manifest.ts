@@ -9,7 +9,7 @@ export default function manifest(): MetadataRoute.Manifest {
     id: "/",
     name: APP_NAME,
     short_name: APP_NAME,
-    description: "Track your job applications, follow-ups and interviews. تابع طلبات التوظيف والمقابلات.",
+    description: "Track your job applications, follow-ups and interviews. تابع تقديماتك على الشغل ومقابلاتك.",
     start_url: "/applications",
     scope: "/",
     display: "standalone",

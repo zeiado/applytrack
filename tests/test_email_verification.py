@@ -81,7 +81,7 @@ def test_registering_sends_a_verification_email(
 
     [email] = delivered(worker, mailbox)
     assert email.to == "ada@example.com"
-    assert email.subject == "Confirm your email for ApplyTrack"
+    assert email.subject == "Confirm your email for Sekka"
     assert "expires in 24 hours" in email.text
     link = f"{settings.public_app_url}/verify-email#token={token_in(email)}"
     assert link in email.text
@@ -94,7 +94,7 @@ def test_the_email_is_in_the_language_chosen_at_sign_up(
     register(client, locale="ar")
 
     [email] = delivered(worker, mailbox)
-    assert email.subject == "أكّد بريدك الإلكتروني في ApplyTrack"
+    assert email.subject == "أكّد إيميلك على Sekka"
     assert 'dir="rtl"' in email.html
     assert client.post(VERIFY, json={"token": token_in(email)}).status_code == 204
 

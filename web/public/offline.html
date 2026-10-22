@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#00695a" />
-    <title>غير متصل · Offline</title>
+    <title>مفيش نت · Offline</title>
     <!-- Shown by the service worker (sw.js) when a page can't load offline. It has to
          work with nothing else loaded, so styles are inline and it speaks both languages. -->
     <style>
@@ -82,14 +82,14 @@
         </g>
       </svg>
       <section>
-        <h1>أنت غير متصل بالإنترنت</h1>
-        <p>هذه الصفحة تحتاج إلى اتصال. ستفتح تلقائيًا عند عودة الاتصال.</p>
+        <h1>إنت مش متوصل بالنت</h1>
+        <p>الصفحة دي محتاجة نت. هتفتح لوحدها أول ما النت يرجع.</p>
       </section>
       <section lang="en" dir="ltr">
         <h1>You're offline</h1>
         <p>This page needs a connection. It opens by itself when you're back online.</p>
       </section>
-      <button type="button" id="retry">حاول مرة أخرى · Try again</button>
+      <button type="button" id="retry">جرّب تاني · Try again</button>
     </main>
     <script>
       document.getElementById("retry").addEventListener("click", () => location.reload());

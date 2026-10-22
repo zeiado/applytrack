@@ -23,7 +23,7 @@ def main(argv: list[str] | None = None) -> int:
 
     settings = get_settings()
     configure_logging(level="INFO", log_format="text")
-    rendered = get_renderer(settings.app_name).render(
+    rendered = get_renderer(settings.app_name, settings.public_app_url).render(
         "test", args.locale, {"sent_at": datetime.now(UTC).strftime("%Y-%m-%d %H:%M UTC")}
     )
     backend = build_email_backend(settings)

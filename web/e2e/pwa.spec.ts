@@ -34,7 +34,7 @@ test("offline, pages show the offline page", async ({ page, context }) => {
   await context.setOffline(true);
   await page.goto("/en/login").catch(() => {});
   await expect(page.getByRole("heading", { name: "You're offline" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "أنت غير متصل بالإنترنت" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "إنت مش متوصل بالنت" })).toBeVisible();
 
   // Back online, the page opens by itself.
   await context.setOffline(false);

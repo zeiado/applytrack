@@ -14,7 +14,7 @@ class Settings(BaseSettings):
 
     model_config = SettingsConfigDict(env_prefix="APPLYTRACK_", env_file=".env", extra="ignore")
 
-    app_name: str = "ApplyTrack"
+    app_name: str = "Sekka"
     environment: Literal["local", "test", "production"] = "local"
     log_level: str = "INFO"
     log_format: Literal["auto", "json", "text"] = "auto"  # auto: json in production, else text
@@ -59,7 +59,7 @@ class Settings(BaseSettings):
     # Email (docs/adr/0007-database-job-queue-and-email.md).
     # console writes emails to the log instead of sending them.
     email_backend: Literal["console", "resend", "smtp"] = "console"
-    email_from: str = "ApplyTrack <noreply@localhost>"
+    email_from: str = "Sekka <noreply@localhost>"
     email_reply_to: str | None = None
     email_timeout_seconds: float = Field(default=10, gt=0, le=60)
     resend_api_key: SecretStr | None = None

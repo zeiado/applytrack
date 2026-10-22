@@ -20,6 +20,8 @@ changes, a minor version for new features, and a patch version for fixes.
 - Sign-up, log-in and password pages in the Sekka style: on phones just the logo and the form (no header), the road above each title, and larger, rounder fields and buttons
 - A new home page: "Stay on track." ("خليك على السكة") with one "Start free" button, a winding road through the stages of a job search that ends in a "Yes!", and "Log in" in the header
 - Follow-ups in the same style as the board: each one shows the company's initial, and a late follow-up gets a calm teal label instead of red
+- Emails in the Sekka style: the Sekka logo (Arabic or English lettering), a teal button and links, and a teal "Time to follow up" band on the reminder, where late follow-ups are teal instead of red. The API's default name (`APPLYTRACK_APP_NAME`) is now Sekka
+- The app's Arabic text and the Arabic emails are now in Egyptian dialect ("تابع النهارده", "قدّمت", "عايز أقدّم") instead of Modern Standard Arabic
 
 ### Fixed
 

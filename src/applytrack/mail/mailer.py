@@ -56,7 +56,9 @@ class Mailer:
         )
         # Render once now, so a missing template or variable fails in the request that
         # caused it (and its test), not later in the worker.
-        get_renderer(self.settings.app_name).render(template, locale, payload.context)
+        get_renderer(self.settings.app_name, self.settings.public_app_url).render(
+            template, locale, payload.context
+        )
         return enqueue(
             self.session,
             SEND_EMAIL,

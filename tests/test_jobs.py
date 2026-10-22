@@ -116,7 +116,7 @@ def test_queued_email_is_sent_by_the_worker(
 
     [email] = mailbox.outbox
     assert email.to == "ada@example.com"
-    assert email.subject == "ApplyTrack test email"
+    assert email.subject == "Sekka test email"
     assert email.sender == settings.email_from
     assert "sending email works" in email.text
     assert email.idempotency_key == f"applytrack-job-{job_id}"

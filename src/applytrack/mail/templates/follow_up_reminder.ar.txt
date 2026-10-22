@@ -1,16 +1,16 @@
-Subject: لديك {{ total }} {{ "متابعة" if total == 1 else "متابعات" }} اليوم في {{ app_name }}
+Subject: عندك {{ total }} {{ "متابعة" if total == 1 else "متابعات" }} النهارده على {{ app_name }}
 
 صباح الخير،
 
-حان وقت متابعة {{ "هذا الطلب" if total == 1 else "هذه الطلبات" }}:
+النهارده وقت تتابع {{ "التقديم ده" if total == 1 else "التقديمات دي" }}:
 
 {% for item in items %}
-- {{ item.company }}: {{ item.role_title }} ({% if item.days_overdue == 0 %}مستحقة اليوم{% else %}متأخرة {{ item.days_overdue }} يوم{% endif %})
+- {{ item.company }}: {{ item.role_title }} ({% if item.days_overdue == 0 %}تابع النهارده{% else %}متأخرة {{ item.days_overdue }} يوم{% endif %})
 {% endfor %}
 {% if more %}
-...و{{ more }} غيرها.
+...و{{ more }} كمان.
 {% endif %}
 
-اطّلع عليها كلها: {{ link }}
+شوفهم كلهم: {{ link }}
 
-تصلك هذه الرسالة في الصباح عندما تكون هناك متابعة مستحقة. يمكنك إيقافها من الإعدادات: {{ settings_link }}
+الإيميل ده بيوصلك الصبح في الأيام اللي فيها متابعة. تقدر توقفه من الإعدادات: {{ settings_link }}
