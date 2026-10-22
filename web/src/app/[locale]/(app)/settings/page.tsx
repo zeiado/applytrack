@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Suspense } from "react";
 
+import { InstallApp } from "@/components/pwa/install-app";
 import { DeleteAccount, PreferencesForm, SetPassword } from "@/components/settings/settings-forms";
 import { buttonVariants } from "@/components/ui/button";
 import { redirect } from "@/i18n/navigation";
@@ -76,6 +77,10 @@ async function Sections({ locale }: { locale: Locale }) {
         ) : (
           <SetPassword />
         )}
+      </Section>
+
+      <Section title={t("app.title")}>
+        <InstallApp />
       </Section>
 
       <Section title={t("data.title")}>

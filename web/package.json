@@ -10,6 +10,7 @@
     "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run",
     "gen:api": "openapi-typescript openapi.json -o src/lib/api/schema.ts",
+    "icons": "node scripts/icons.mjs",
     "check": "npm run lint && npm run typecheck && npm run test",
     "e2e": "playwright test"
   },

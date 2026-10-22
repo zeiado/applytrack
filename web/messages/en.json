@@ -354,6 +354,14 @@
       "confirm": "Delete my account forever",
       "googleConfirm": "Confirm by signing in with Google again:",
       "cancel": "Cancel"
+    },
+    "app": {
+      "title": "App",
+      "body": "Add {app} to your home screen. It opens full screen, like an app.",
+      "install": "Install the app",
+      "ios": "In Safari, tap Share, then “Add to Home Screen”.",
+      "manual": "In your browser's menu, choose “Install app” or “Add to Home screen”.",
+      "installed": "You're using the installed app."
     }
   },
   "FollowUps": {

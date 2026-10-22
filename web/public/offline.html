@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#00695a" />
+    <title>غير متصل · Offline</title>
+    <!-- Shown by the service worker (sw.js) when a page can't load offline. It has to
+         work with nothing else loaded, so styles are inline and it speaks both languages. -->
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #ffffff;
+        --fg: #1a1a1a;
+        --muted: #6b6b6b;
+        --primary: #00695a;
+        --on-primary: #ffffff;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #141414;
+          --fg: #f2f2f2;
+          --muted: #a3a3a3;
+          --primary: #2a9d8a;
+          --on-primary: #0b0b0b;
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 24px 16px;
+        background: var(--bg);
+        color: var(--fg);
+        font-family: system-ui, -apple-system, "Segoe UI", Tahoma, sans-serif;
+        line-height: 1.6;
+        text-align: center;
+      }
+      main {
+        display: grid;
+        gap: 28px;
+        justify-items: center;
+        max-width: 26rem;
+      }
+      section {
+        display: grid;
+        gap: 4px;
+      }
+      h1 {
+        margin: 0;
+        font-size: 1.35rem;
+      }
+      p {
+        margin: 0;
+        color: var(--muted);
+      }
+      button {
+        font: inherit;
+        font-weight: 600;
+        border: 0;
+        border-radius: 8px;
+        padding: 10px 24px;
+        min-height: 44px;
+        background: var(--primary);
+        color: var(--on-primary);
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <svg width="72" height="72" viewBox="0 0 512 512" aria-hidden="true">
+        <rect width="512" height="512" rx="112" fill="#00695a" />
+        <g fill="none" stroke="#fff" stroke-linecap="round">
+          <path d="M140 372 C268 372 244 140 372 140" stroke-width="40" />
+          <circle cx="140" cy="372" r="34" fill="#00695a" stroke-width="28" />
+          <circle cx="372" cy="140" r="46" fill="#fff" stroke="none" />
+        </g>
+      </svg>
+      <section>
+        <h1>أنت غير متصل بالإنترنت</h1>
+        <p>هذه الصفحة تحتاج إلى اتصال. ستفتح تلقائيًا عند عودة الاتصال.</p>
+      </section>
+      <section lang="en" dir="ltr">
+        <h1>You're offline</h1>
+        <p>This page needs a connection. It opens by itself when you're back online.</p>
+      </section>
+      <button type="button" id="retry">حاول مرة أخرى · Try again</button>
+    </main>
+    <script>
+      document.getElementById("retry").addEventListener("click", () => location.reload());
+      window.addEventListener("online", () => location.reload());
+    </script>
+  </body>
+</html>
