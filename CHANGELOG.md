@@ -11,6 +11,10 @@ changes, a minor version for new features, and a patch version for fixes.
 
 - Install the web app on a phone's home screen (Android and iPhone): app icons, a manifest, and an offline page when there's no connection. Settings shows how to install it on each device ([#72])
 
+### Changed
+
+- The web app is now called Sekka: new colours (a warm off-white background, the Sekka teal, and amber for good news), brand colours for each status, new app icons and favicon, and a dark-mode palette ready for use. The brand guide and the redesign plan live in `web/brand/`
+
 ## [0.6.0] - 2026-10-22
 
 The web app's core: applications board and list, details, follow-ups, stats, CSV export and settings.
