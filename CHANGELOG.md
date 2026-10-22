@@ -7,18 +7,19 @@ changes, a minor version for new features, and a patch version for fixes.
 
 ## [Unreleased]
 
-### Changed
-
-- The project is no longer open source: all rights are reserved from this version on. Earlier versions stay under the MIT License
-
 ### Added
 
 - Install the web app on a phone's home screen (Android and iPhone): app icons, a manifest, and an offline page when there's no connection. Settings shows how to install it on each device ([#72])
 
 ### Changed
 
+- The project is no longer open source: all rights are reserved from this version on. Earlier versions stay under the MIT License
 - The web app is now called Sekka: new colours (a warm off-white background, the Sekka teal, and amber for good news), brand colours for each status, new app icons and favicon, and a dark-mode palette ready for use. The brand guide and the redesign plan live in `web/brand/`
 - The Sekka logo in the header, in Arabic or English lettering to match the page. On phones the app's sections (applications, follow-ups, stats, settings) move to a tab bar at the bottom, and the current section is marked
+
+### Fixed
+
+- A deploy no longer hangs when the database stalls during startup: migrations give up after a time limit and are retried twice, instead of waiting until the host cancels the deploy 15 minutes later
 
 ## [0.6.0] - 2026-10-22
 
