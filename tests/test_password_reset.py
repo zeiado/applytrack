@@ -92,7 +92,7 @@ def test_forgot_password_emails_a_reset_link(
     assert response.content == b""
     [email] = sent(worker, mailbox)
     assert email.to == "ada@example.com"
-    assert email.subject == "Reset your ApplyTrack password"
+    assert email.subject == "Reset your Sekka password"
     assert "expires in 30 minutes" in email.text
     link = f"{settings.public_app_url}/reset-password#token={reset_token(email)}"
     assert f'href="{link}"' in email.html
@@ -105,7 +105,7 @@ def test_the_reset_email_uses_the_account_language(
     forgot(client)
 
     _, email = sent(worker, mailbox)
-    assert email.subject == "إعادة تعيين كلمة المرور في ApplyTrack"
+    assert email.subject == "غيّر كلمة السر على Sekka"
     assert 'dir="rtl"' in email.html
 
 
@@ -212,7 +212,7 @@ def test_reset_emails_a_security_notice(
 
     _, notice = sent(worker, mailbox)
     assert notice.to == "ada@example.com"
-    assert notice.subject == "Your ApplyTrack password was changed"
+    assert notice.subject == "Your Sekka password was changed"
     assert f"{settings.public_app_url}/forgot-password" in notice.text
     assert "#token=" not in notice.text
 

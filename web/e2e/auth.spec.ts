@@ -104,5 +104,5 @@ test("the Arabic login page reads right to left", async ({ page }) => {
   await page.goto("/ar/login");
 
   await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
-  await expect(page.getByRole("heading", { name: "تسجيل الدخول" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "سجّل دخول" })).toBeVisible();
 });

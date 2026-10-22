@@ -157,6 +157,6 @@ test("the board in Arabic reads right to left", async ({ page }) => {
   await page.goto("/ar/applications");
 
   await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("الطلبات");
-  await expect(column(page, "تم التقديم").getByRole("heading", { name: "Instabug" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("تقديماتي");
+  await expect(column(page, "قدّمت").getByRole("heading", { name: "Instabug" })).toBeVisible();
 });

@@ -322,7 +322,7 @@ def test_send_test_email_command(
 
     [email] = backend.outbox
     assert email.to == "ada@example.com"
-    assert email.subject == "رسالة تجريبية من ApplyTrack"
+    assert email.subject == "إيميل تجريبي من Sekka"
     assert "Sent with the console backend (id: memory-1)" in capsys.readouterr().out
 
 

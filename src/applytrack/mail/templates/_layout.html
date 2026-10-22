@@ -1,5 +1,8 @@
-{# Shared HTML layout. Tables and inline styles because many email apps ignore <style>. #}
+{# Shared HTML layout. Tables and inline styles because many email apps ignore <style>.
+   Email apps don't show SVG, so the logo is a PNG at an absolute URL (logo_url). #}
 {% set align = "right" if dir == "rtl" else "left" %}
+{% set font = "font-family:Tahoma,'Segoe UI',Arial,sans-serif;" %}
+{% set header %}{% block header %}{% endblock %}{% endset %}
 <!doctype html>
 <html lang="{{ locale }}" dir="{{ dir }}">
 <head>
@@ -8,19 +11,32 @@
 <meta name="color-scheme" content="light">
 <title>{{ app_name }}</title>
 </head>
-<body style="margin:0;padding:0;background-color:#f4f5f7;">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f4f5f7;">
+<body style="margin:0;padding:0;background-color:#F1EEE8;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#F1EEE8;">
 <tr>
 <td align="center" style="padding:24px 12px;">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;background-color:#ffffff;border-radius:8px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;">
 <tr>
-<td dir="{{ dir }}" style="padding:32px;font-family:Tahoma,'Segoe UI',Arial,sans-serif;font-size:16px;line-height:1.7;color:#1f2933;text-align:{{ align }};">
-<p style="margin:0 0 24px;font-size:20px;font-weight:bold;color:#111827;">{{ app_name }}</p>
+<td dir="{{ dir }}" align="{{ align }}" style="padding:0 8px 20px;text-align:{{ align }};">
+<img src="{{ logo_url }}" width="{{ logo_width }}" height="{{ logo_height }}" alt="{{ app_name }}" style="display:block;border:0;width:{{ logo_width }}px;height:auto;{{ font }}font-size:20px;font-weight:bold;color:#1B1F1E;">
+</td>
+</tr>
+</table>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;background-color:#FFFFFF;border-radius:20px;">
+{% if header | trim %}
+<tr>
+<td dir="{{ dir }}" style="padding:28px 32px;background-color:#00695A;border-radius:20px 20px 0 0;{{ font }}font-size:26px;line-height:1.4;font-weight:bold;color:#FFFFFF;text-align:{{ align }};">
+{{ header | trim }}
+</td>
+</tr>
+{% endif %}
+<tr>
+<td dir="{{ dir }}" style="padding:32px;{{ font }}font-size:16px;line-height:1.7;color:#1B1F1E;text-align:{{ align }};">
 {% block content %}{% endblock %}
 </td>
 </tr>
 </table>
-<p dir="{{ dir }}" style="margin:16px 0 0;font-family:Tahoma,'Segoe UI',Arial,sans-serif;font-size:12px;line-height:1.6;color:#6b7280;">
+<p dir="{{ dir }}" style="margin:16px 0 0;{{ font }}font-size:12px;line-height:1.6;color:#5C6461;">
 {% block footer %}{% endblock %}
 </p>
 </td>

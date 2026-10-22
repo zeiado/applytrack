@@ -105,7 +105,7 @@ def test_one_email_on_the_morning_a_follow_up_is_due(
 
     [email] = sent()
     assert email.to == "ada@example.com"
-    assert email.subject == "1 follow-up due today on ApplyTrack"
+    assert email.subject == "1 follow-up due today on Sekka"
     assert "- Valeo: Backend Engineer (due today)" in email.text
     assert users.checked_on() == TODAY
 
@@ -224,7 +224,7 @@ def test_long_lists_are_cut_short(
     scheduler.run(at(8))
 
     [email] = sent()
-    assert email.subject == "12 follow-ups due today on ApplyTrack"
+    assert email.subject == "12 follow-ups due today on Sekka"
     assert email.text.count("\n- ") == 10
     assert "- Company 11: Backend Engineer (11 days overdue)" in email.text  # most overdue first
     assert "Company 01" not in email.text and "Company 00" not in email.text
@@ -241,9 +241,9 @@ def test_arabic_reminder(users: Users, scheduler: ReminderEmailScheduler, sent: 
     scheduler.run(at(8))
 
     [email] = sent()
-    assert email.subject == "لديك 2 متابعات اليوم في ApplyTrack"
+    assert email.subject == "عندك 2 متابعات النهارده على Sekka"
     assert "- فاليو: Backend Engineer (متأخرة 2 يوم)" in email.text
-    assert "(مستحقة اليوم)" in email.text
+    assert "(تابع النهارده)" in email.text
     assert 'dir="rtl"' in email.html
 
 

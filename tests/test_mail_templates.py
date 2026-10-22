@@ -15,9 +15,13 @@ from applytrack.mail.templates import (
     get_renderer,
 )
 
+APP_URL = "https://app.example.com/"
+
 
 def test_english_test_email() -> None:
-    email = EmailRenderer("ApplyTrack").render("test", "en", {"sent_at": "2026-10-21 09:00 UTC"})
+    email = EmailRenderer("ApplyTrack", APP_URL).render(
+        "test", "en", {"sent_at": "2026-10-21 09:00 UTC"}
+    )
 
     assert email.subject == "ApplyTrack test email"
     assert email.text.startswith("Hi,\n")
@@ -28,10 +32,10 @@ def test_english_test_email() -> None:
 
 
 def test_arabic_test_email_is_right_to_left() -> None:
-    email = EmailRenderer("ApplyTrack").render("test", "ar", {"sent_at": "2026-10-21"})
+    email = EmailRenderer("ApplyTrack", APP_URL).render("test", "ar", {"sent_at": "2026-10-21"})
 
-    assert email.subject == "رسالة تجريبية من ApplyTrack"
-    assert email.text.startswith("مرحبًا،\n")
+    assert email.subject == "إيميل تجريبي من ApplyTrack"
+    assert email.text.startswith("أهلًا،\n")
     assert '<html lang="ar" dir="rtl">' in email.html
     assert "text-align:right" in email.html
     assert '<span dir="ltr">2026-10-21</span>' in email.html
@@ -39,9 +43,43 @@ def test_arabic_test_email_is_right_to_left() -> None:
 
 def test_app_name_comes_from_settings() -> None:
     """The brand isn't final, so templates never hard-code it."""
-    email = get_renderer("Sekka").render("test", "en", {"sent_at": "now"})
+    email = get_renderer("Sekka", APP_URL).render("test", "en", {"sent_at": "now"})
     assert email.subject == "Sekka test email"
     assert "ApplyTrack" not in email.text + email.html
+
+
+@pytest.mark.parametrize(
+    ("locale", "logo", "width"),
+    [("en", "sekka-email-latin.png", 140), ("ar", "sekka-email-arabic.png", 105)],
+)
+def test_logo_is_a_png_from_the_web_app_in_the_right_script(
+    locale: str, logo: str, width: int
+) -> None:
+    """Email apps don't show SVG, and relative URLs don't work in email."""
+    email = EmailRenderer("Sekka", APP_URL).render("test", locale, {"sent_at": "now"})
+    assert f'src="https://app.example.com/brand/email/{logo}"' in email.html
+    assert f'width="{width}"' in email.html
+    assert 'alt="Sekka"' in email.html
+    assert (Path(__file__).parents[1] / "web/public/brand/email" / logo).is_file()
+
+
+def test_header_band_only_when_the_email_has_a_title() -> None:
+    renderer = EmailRenderer("Sekka", APP_URL)
+    reminder = renderer.render(
+        "follow_up_reminder",
+        "ar",
+        {
+            "items": [{"company": "Vodafone", "role_title": "Intern", "days_overdue": 2}],
+            "total": 1,
+            "more": 0,
+            "link": "https://app.example.com/follow-ups",
+            "settings_link": "https://app.example.com/settings",
+        },
+    )
+    assert "background-color:#00695A;border-radius:20px 20px 0 0" in reminder.html
+    assert "#b91c1c" not in reminder.html  # overdue is calm teal, not alarm red
+    plain = renderer.render("test", "en", {"sent_at": "now"})
+    assert "border-radius:20px 20px 0 0" not in plain.html
 
 
 def test_every_email_exists_in_every_language_and_format() -> None:
@@ -58,7 +96,7 @@ def custom(tmp_path: Path) -> EmailRenderer:
     (tmp_path / "nosubject.en.txt").write_text("Hello\n", "utf-8")
     (tmp_path / "nosubject.en.html").write_text("<p>Hello</p>", "utf-8")
     (tmp_path / "broken.en.txt").write_text("Subject: {% if %}\n", "utf-8")
-    return EmailRenderer("ApplyTrack", template_dir=tmp_path)
+    return EmailRenderer("ApplyTrack", APP_URL, template_dir=tmp_path)
 
 
 def test_html_is_escaped_and_text_is_not(custom: EmailRenderer) -> None:

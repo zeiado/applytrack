@@ -440,7 +440,7 @@ All settings are environment variables (or a `.env` file). See [.env.example](.e
 | `APPLYTRACK_LOG_LEVEL` | `INFO` | |
 | `APPLYTRACK_LOG_FORMAT` | `auto` | `auto` = JSON in production, text elsewhere |
 | `APPLYTRACK_TRUSTED_PROXY_HOPS` | `0` | Proxies in front of the app that append to `X-Forwarded-For` ([docs/deployment.md](docs/deployment.md)) |
-| `APPLYTRACK_APP_NAME` | `ApplyTrack` | Product name, used in API docs and emails |
+| `APPLYTRACK_APP_NAME` | `Sekka` | Product name, used in API docs and emails |
 | `APPLYTRACK_PUBLIC_APP_URL` | `http://localhost:3000` | The web app; links in emails point here |
 | `APPLYTRACK_EMAIL_VERIFICATION_EXPIRE_HOURS` | `24` | Verification link lifetime |
 | `APPLYTRACK_PASSWORD_RESET_EXPIRE_MINUTES` | `30` | Password reset link lifetime |
@@ -449,7 +449,7 @@ All settings are environment variables (or a `.env` file). See [.env.example](.e
 | `APPLYTRACK_REMINDER_CHECK_MINUTES` | `5` | How often the worker checks for users whose morning has come |
 | `APPLYTRACK_EMAIL_TOKEN_LIMIT_PER_HOUR` | `3` | Emails of each kind (verification, reset) per account per hour |
 | `APPLYTRACK_EMAIL_BACKEND` | `console` | `console` (log only), `resend` or `smtp` |
-| `APPLYTRACK_EMAIL_FROM` | `ApplyTrack <noreply@localhost>` | Sender; must be on your verified domain for `resend`/`smtp` |
+| `APPLYTRACK_EMAIL_FROM` | `Sekka <noreply@localhost>` | Sender; must be on your verified domain for `resend`/`smtp` |
 | `APPLYTRACK_EMAIL_REPLY_TO` | unset | Optional `Reply-To` |
 | `APPLYTRACK_RESEND_API_KEY` | unset | Required for `resend` |
 | `APPLYTRACK_SMTP_HOST` / `_PORT` / `_USERNAME` / `_PASSWORD` | unset / `587` | The host is required for `smtp` |

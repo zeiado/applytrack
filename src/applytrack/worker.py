@@ -33,7 +33,7 @@ def build_worker(
     handlers: dict[str, JobHandler] = {
         SEND_EMAIL: SendEmailHandler(
             email_backend or build_email_backend(settings),
-            get_renderer(settings.app_name),
+            get_renderer(settings.app_name, settings.public_app_url),
             settings,
         ),
     }
