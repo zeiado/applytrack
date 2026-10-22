@@ -3,10 +3,14 @@
     "description": "Track every job application, interview and follow-up in one place."
   },
   "Home": {
-    "tagline": "Your job search, on track.",
-    "intro": "Save every application, see where each one stands, and get a reminder when it's time to follow up.",
-    "getStarted": "Get started free",
+    "tagline": "Stay on track.",
+    "intro": "Sekka keeps every job application in one place and tells you when to follow up, until someone says yes.",
+    "getStarted": "Start free",
     "logIn": "Log in",
+    "road": {
+      "yes": "Yes!",
+      "label": "A road through the stages of a job search: wishlist, applied, screening, interviewing, offer, and finally a yes"
+    },
     "features": {
       "board": {
         "title": "Every application on one board",
