@@ -7,6 +7,10 @@ changes, a minor version for new features, and a patch version for fixes.
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-10-22
+
+The web app's core: applications board and list, details, follow-ups, stats, CSV export and settings.
+
 ### Added
 
 - Applications in the web app: a board with a column per status, where a card moves through its menu or by dragging, only to the stages the API allows; a list with filters (status, source, company), sorting and pages; and pages to add, edit and delete an application. Follow-ups that are due or overdue stand out. Arabic and English, phone-first ([#65])
@@ -96,7 +100,8 @@ First release.
 - Interview times are returned in UTC on create, matching reads ([#25])
 - CI tests the Python version the Docker image ships ([#35])
 
-[Unreleased]: https://github.com/zeiado/applytrack/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/zeiado/applytrack/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/zeiado/applytrack/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/zeiado/applytrack/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/zeiado/applytrack/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/zeiado/applytrack/compare/v0.2.0...v0.3.0
