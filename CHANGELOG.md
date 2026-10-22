@@ -14,6 +14,7 @@ changes, a minor version for new features, and a patch version for fixes.
 ### Changed
 
 - The web app is now called Sekka: new colours (a warm off-white background, the Sekka teal, and amber for good news), brand colours for each status, new app icons and favicon, and a dark-mode palette ready for use. The brand guide and the redesign plan live in `web/brand/`
+- The Sekka logo in the header, in Arabic or English lettering to match the page. On phones the app's sections (applications, follow-ups, stats, settings) move to a tab bar at the bottom, and the current section is marked
 
 ## [0.6.0] - 2026-10-22
 
