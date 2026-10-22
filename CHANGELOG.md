@@ -7,6 +7,10 @@ changes, a minor version for new features, and a patch version for fixes.
 
 ## [Unreleased]
 
+### Added
+
+- Install the web app on a phone's home screen (Android and iPhone): app icons, a manifest, and an offline page when there's no connection. Settings shows how to install it on each device ([#72])
+
 ## [0.6.0] - 2026-10-22
 
 The web app's core: applications board and list, details, follow-ups, stats, CSV export and settings.
@@ -134,4 +138,5 @@ First release.
 [#66]: https://github.com/zeiado/applytrack/issues/66
 [#67]: https://github.com/zeiado/applytrack/issues/67
 [#68]: https://github.com/zeiado/applytrack/issues/68
+[#72]: https://github.com/zeiado/applytrack/issues/72
 [#50]: https://github.com/zeiado/applytrack/issues/50

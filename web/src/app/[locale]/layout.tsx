@@ -1,9 +1,10 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Sans_Arabic } from "next/font/google";
 import { notFound } from "next/navigation";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
+import { ServiceWorker } from "@/components/pwa/service-worker";
 import { DirectionProvider } from "@/components/ui/direction";
 import { APP_NAME } from "@/config/brand";
 import { direction, routing } from "@/i18n/routing";
@@ -21,6 +22,11 @@ export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
 
+// The browser bar and the installed app's title bar take the brand teal.
+export const viewport: Viewport = {
+  themeColor: "#00695a",
+};
+
 export async function generateMetadata({ params }: LayoutProps<"/[locale]">): Promise<Metadata> {
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) return {};
@@ -28,6 +34,8 @@ export async function generateMetadata({ params }: LayoutProps<"/[locale]">): Pr
   return {
     title: { default: APP_NAME, template: `%s · ${APP_NAME}` },
     description: t("description"),
+    // iPhone and iPad: "Add to Home Screen" opens it full screen, under this name.
+    appleWebApp: { capable: true, title: APP_NAME, statusBarStyle: "default" },
   };
 }
 
@@ -42,6 +50,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
       <body className="flex min-h-full flex-col">
         <DirectionProvider direction={dir}>
           <NextIntlClientProvider>{children}</NextIntlClientProvider>
+        <ServiceWorker />
         </DirectionProvider>
       </body>
     </html>
