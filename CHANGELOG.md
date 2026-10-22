@@ -18,6 +18,7 @@ changes, a minor version for new features, and a patch version for fixes.
 - The Sekka logo in the header, in Arabic or English lettering to match the page. On phones the app's sections (applications, follow-ups, stats, settings) move to a tab bar at the bottom, and the current section is marked
 - A new look for the applications board: when an offer arrives, a banner at the top links to it; on phones a row of stages with their counts jumps to each column; cards show the company's initial, the date applied and a calm follow-up label (no more red for a late follow-up)
 - Sign-up, log-in and password pages in the Sekka style: on phones just the logo and the form (no header), the road above each title, and larger, rounder fields and buttons
+- A new home page: "Stay on track." ("خليك على السكة") with one "Start free" button, a winding road through the stages of a job search that ends in a "Yes!", and "Log in" in the header
 
 ### Fixed
 

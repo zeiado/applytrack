@@ -1,12 +1,11 @@
 import { BellRing, ChartNoAxesColumn, KanbanSquare } from "lucide-react";
 import { useTranslations } from "next-intl";
 
+import { RoadIllustration } from "@/components/brand/road";
 import { buttonVariants } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
+import { STATUSES } from "@/lib/applications/model";
 import { cn } from "@/lib/utils";
-
-// Big enough to tap comfortably on a phone.
-const CTA = "h-11 px-6 text-base";
 
 const FEATURES = [
   { key: "board", Icon: KanbanSquare },
@@ -14,31 +13,38 @@ const FEATURES = [
   { key: "insights", Icon: ChartNoAxesColumn },
 ] as const;
 
+/** The road's five stops: wishlist through offer. */
+const STOPS = STATUSES.slice(0, STATUSES.indexOf("offer") + 1);
+
 export function HomeHero() {
-  const t = useTranslations("Home");
+  const t = useTranslations();
 
   return (
     <>
-      <section className="mx-auto flex max-w-2xl flex-col items-center gap-6 px-4 py-16 text-center sm:py-24">
-        <h1 className="text-4xl font-bold tracking-tight text-balance sm:text-5xl">
-          {t("tagline")}
-        </h1>
-        <p className="text-muted-foreground text-lg text-pretty">{t("intro")}</p>
-        <div className="flex flex-wrap justify-center gap-3">
-          <Link href="/register" className={cn(buttonVariants({ size: "lg" }), CTA)}>
-            {t("getStarted")}
-          </Link>
-          <Link href="/login" className={cn(buttonVariants({ size: "lg", variant: "outline" }), CTA)}>
-            {t("logIn")}
+      <section className="mx-auto grid w-full max-w-7xl items-center gap-10 px-4 py-12 sm:py-20 lg:grid-cols-2 lg:gap-16 lg:py-28">
+        <div className="grid justify-items-start gap-6">
+          <h1 className="text-5xl font-semibold tracking-tight text-balance lg:text-7xl rtl:font-bold">
+            {t("Home.tagline")}
+          </h1>
+          <p className="text-muted-foreground max-w-xl text-lg text-pretty lg:text-xl">{t("Home.intro")}</p>
+          {/* One clear way in; "Log in" lives in the header. */}
+          <Link href="/register" className={cn(buttonVariants(), "h-14 rounded-2xl px-7 text-lg")}>
+            {t("Home.getStarted")}
           </Link>
         </div>
+        <RoadIllustration
+          stages={STOPS.map((status) => t(`Status.${status}`))}
+          yes={t("Home.road.yes")}
+          label={t("Home.road.label")}
+          className="mx-auto max-w-xl"
+        />
       </section>
-      <section className="mx-auto grid w-full max-w-5xl gap-4 px-4 pb-16 sm:grid-cols-3">
+      <section className="mx-auto grid w-full max-w-7xl gap-4 px-4 pb-20 sm:grid-cols-3">
         {FEATURES.map(({ key, Icon }) => (
-          <div key={key} className="bg-card rounded-xl border p-5">
+          <div key={key} className="bg-card rounded-2xl border p-6">
             <Icon className="text-primary mb-3 size-6" aria-hidden />
-            <h2 className="mb-1 font-semibold">{t(`features.${key}.title`)}</h2>
-            <p className="text-muted-foreground text-sm">{t(`features.${key}.body`)}</p>
+            <h2 className="mb-1 font-semibold">{t(`Home.features.${key}.title`)}</h2>
+            <p className="text-muted-foreground text-sm">{t(`Home.features.${key}.body`)}</p>
           </div>
         ))}
       </section>
