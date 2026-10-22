@@ -1,8 +1,8 @@
-import { BellRing } from "lucide-react";
 import type { Metadata } from "next";
 import { getLocale, getTranslations, setRequestLocale } from "next-intl/server";
 import { Suspense } from "react";
 
+import { RoadLine } from "@/components/brand/road";
 import { FollowUpItem } from "@/components/follow-ups/follow-up-item";
 import { buttonVariants } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
@@ -32,11 +32,11 @@ export default async function FollowUpsPage({ params }: PageProps<"/[locale]/fol
   return (
     <div className="mx-auto grid w-full max-w-3xl gap-6">
       <div className="grid gap-1">
-        <h1 className="text-2xl font-bold">{t("title")}</h1>
+        <h1 className="text-2xl font-semibold">{t("title")}</h1>
         <p className="text-muted-foreground">{t("intro")}</p>
       </div>
       {/* The session and "today" (in the user's timezone) are per request. */}
-      <Suspense fallback={<div className="bg-muted h-64 animate-pulse rounded-xl" />}>
+      <Suspense fallback={<div className="bg-muted h-64 animate-pulse rounded-2xl" />}>
         <Inbox />
       </Suspense>
     </div>
@@ -51,8 +51,8 @@ async function Inbox() {
 
   if (items.length === 0) {
     return (
-      <section className="grid justify-items-center gap-3 rounded-xl border border-dashed px-6 py-12 text-center">
-        <BellRing aria-hidden className="text-primary size-10" />
+      <section className="bg-card grid justify-items-center gap-3 rounded-2xl border px-6 py-12 text-center">
+        <RoadLine className="mb-2 max-w-48" />
         <h2 className="text-lg font-semibold">{t("empty.title")}</h2>
         <p className="text-muted-foreground max-w-md">{t("empty.body")}</p>
         <Link

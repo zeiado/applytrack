@@ -1,9 +1,10 @@
 "use client";
 
 import { Check, Clock } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useActionState } from "react";
 
+import { CompanyInitial } from "@/components/applications/company-initial";
 import { StatusBadge } from "@/components/applications/status-badge";
 import { FormError } from "@/components/auth/form-parts";
 import { Button } from "@/components/ui/button";
@@ -20,23 +21,33 @@ const SNOOZE_DAYS = 3;
 export function FollowUpItem({ reminder, today, date }: { reminder: DueReminder; today: string; date: string }) {
   const t = useTranslations("FollowUps");
   const [state, action, pending] = useActionState(setFollowUp.bind(null, reminder.application_id), undefined);
+  const locale = useLocale();
   const late = reminder.days_overdue;
 
   return (
     <li className="bg-card grid gap-3 rounded-xl border p-4 sm:flex sm:items-center sm:justify-between">
-      <div className="grid min-w-0 gap-1">
-        <Link href={`/applications/${reminder.application_id}`} className="truncate font-semibold hover:underline">
-          {reminder.company}
-        </Link>
-        <span className="text-muted-foreground truncate text-sm">{reminder.role_title}</span>
-        <span className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
-          <StatusBadge status={reminder.status} />
-          <span className={cn(late >= 0 ? "text-destructive font-medium" : "text-muted-foreground")}>
-            {late > 0 ? t("overdueBy", { days: late }) : late === 0 ? t("dueToday") : t("dueIn", { days: -late })}
-            <span className="text-muted-foreground font-normal"> · {date}</span>
+      <div className="flex min-w-0 items-start gap-3">
+        <CompanyInitial company={reminder.company} locale={locale} />
+        <div className="grid min-w-0 gap-1">
+          <Link href={`/applications/${reminder.application_id}`} className="truncate font-semibold hover:underline">
+            {reminder.company}
+          </Link>
+          <span className="text-muted-foreground truncate text-sm">{reminder.role_title}</span>
+          <span className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm">
+            <StatusBadge status={reminder.status} />
+            {/* Calm on purpose: a late follow-up isn't an error. Teal when it's time, grey before. */}
+            <span
+              className={cn(
+                "rounded-md px-2 py-0.5 text-xs",
+                late >= 0 ? "bg-primary/10 text-primary font-medium" : "bg-muted text-muted-foreground",
+              )}
+            >
+              {late > 0 ? t("overdueBy", { days: late }) : late === 0 ? t("dueToday") : t("dueIn", { days: -late })}
+              <span className="font-normal"> · {date}</span>
+            </span>
           </span>
-        </span>
-        <FormError error={state?.error} />
+          <FormError error={state?.error} />
+        </div>
       </div>
       <div className="flex shrink-0 flex-wrap gap-2">
         <form action={action}>
