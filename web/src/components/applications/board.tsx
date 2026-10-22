@@ -73,8 +73,8 @@ export function Board({ applications, today }: { applications: Application[]; to
               key={status}
               aria-labelledby={`column-${status}`}
               className={cn(
-                "bg-muted/50 flex w-[85vw] max-w-72 shrink-0 snap-start flex-col gap-2 rounded-xl border p-2 transition-colors sm:w-72",
-                dragging && (canDrop ? "border-primary bg-primary/5" : "opacity-60"),
+                "bg-muted flex w-[85vw] max-w-[300px] shrink-0 snap-start scroll-mx-4 flex-col gap-2.5 rounded-2xl p-3 transition sm:w-[300px]",
+                dragging && (canDrop ? "ring-primary bg-primary/5 ring-2" : "opacity-60"),
               )}
               onDragOver={(event) => {
                 if (canDrop) event.preventDefault();
@@ -85,12 +85,14 @@ export function Board({ applications, today }: { applications: Application[]; to
                 setDragging(null);
               }}
             >
-              <h2 id={`column-${status}`} className="flex items-center gap-2 px-1 py-1 text-sm font-semibold">
-                <StatusDot status={status} />
+              <h2
+                id={`column-${status}`}
+                className="flex scroll-mt-4 items-center gap-2 px-1 pt-0.5 pb-1 text-[0.9375rem] font-semibold"
+              >
                 {t(`Status.${status}`)}
-                <span className="text-muted-foreground ms-auto font-normal tabular-nums">{cards.length}</span>
+                <span className="text-muted-foreground ms-auto text-sm font-normal tabular-nums">{cards.length}</span>
               </h2>
-              <ul className="flex min-h-16 flex-col gap-2">
+              <ul className="flex min-h-16 flex-col gap-2.5">
                 {cards.map((app) => (
                   <li key={app.id}>
                     <Card
@@ -139,16 +141,22 @@ function Card({
         onDragStart();
       }}
       onDragEnd={onDragEnd}
-      className="bg-card grid gap-1 rounded-lg border p-3 shadow-xs"
+      className="bg-card grid gap-2 rounded-xl border p-3.5"
     >
-      <div className="flex items-start gap-2">
+      <div className="flex items-center gap-2.5">
+        <span
+          aria-hidden
+          className="bg-primary/10 text-primary flex size-[34px] shrink-0 items-center justify-center rounded-lg font-semibold"
+        >
+          {initial(app.company, locale)}
+        </span>
         <div className="min-w-0 flex-1">
           <h3 className="truncate font-semibold">
             <Link href={href} className="hover:underline">
               {app.company}
             </Link>
           </h3>
-          <p className="text-muted-foreground truncate text-sm">{app.role_title}</p>
+          <p className="text-muted-foreground truncate text-[0.8125rem]">{app.role_title}</p>
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger
@@ -176,9 +184,20 @@ function Card({
         </DropdownMenu>
       </div>
       {(followUp || app.applied_on) && (
-        <p className="flex flex-wrap gap-x-3 text-xs">
+        <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+          {app.applied_on && (
+            <span className="text-muted-foreground">
+              {t("Applications.card.applied", { date: formatDate(app.applied_on, locale, today) })}
+            </span>
+          )}
           {followUp && app.follow_up_on && (
-            <span className={cn(followUp === "upcoming" ? "text-muted-foreground" : "text-destructive font-medium")}>
+            // Calm on purpose: a late follow-up isn't an error. Teal when it's time, grey before.
+            <span
+              className={cn(
+                "ms-auto rounded-md px-2 py-0.5",
+                followUp === "upcoming" ? "bg-muted text-muted-foreground" : "bg-primary/10 text-primary font-medium",
+              )}
+            >
               {followUp === "overdue"
                 ? t("Applications.card.followUpOverdue")
                 : followUp === "due"
@@ -186,13 +205,13 @@ function Card({
                   : t("Applications.card.followUp", { date: formatDate(app.follow_up_on, locale, today) })}
             </span>
           )}
-          {app.applied_on && (
-            <span className="text-muted-foreground">
-              {t("Applications.card.applied", { date: formatDate(app.applied_on, locale, today) })}
-            </span>
-          )}
-        </p>
+        </div>
       )}
     </article>
   );
+}
+
+/** The company's first letter, for the tile on its card. */
+function initial(company: string, locale: string): string {
+  return (Array.from(company.trim())[0] ?? "?").toLocaleUpperCase(locale);
 }

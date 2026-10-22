@@ -198,7 +198,11 @@
     "previous": "السابق",
     "next": "التالي",
     "pagination": "الصفحات",
-    "exportCsv": "تنزيل CSV"
+    "exportCsv": "تنزيل CSV",
+    "offer": {
+      "title": "وصلك عرض عمل من {company}"
+    },
+    "columns": "أعمدة اللوحة"
   },
   "ApplicationForm": {
     "newTitle": "إضافة طلب",
