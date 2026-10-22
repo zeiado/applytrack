@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1440">
+<title>Sekka landing hero</title>
+<!-- Reference mockup for Sekka. Static HTML: copy structure, spacing and tokens, not the markup verbatim. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0;background:#FAF8F4}
+a{color:#1B1F1E}a:hover{color:#00695A}
+</style>
+</head>
+<body>
+<div style="min-height: 820px; background: #FAF8F4; font-family: 'IBM Plex Sans Arabic', system-ui, sans-serif; color: #1B1F1E">
+  <div style="max-width: 1200px; margin: 0 auto; padding: 0 32px; box-sizing: border-box">
+
+    <header style="display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding: 28px 0">
+      <img src="assets/sekka-horizontal-latin-color.svg" alt="sekka" style="width: 132px; height: auto; display: block">
+      <nav style="display: flex; align-items: center; gap: 28px; font-size: 15px">
+        <a href="#" lang="ar" style="text-decoration: none">العربية</a>
+        <a href="#" style="text-decoration: none; font-weight: 500">Log in</a>
+      </nav>
+    </header>
+
+    <section style="display: flex; flex-wrap: wrap; align-items: center; gap: 48px; padding: 72px 0 96px">
+      <div style="flex: 1 1 440px; min-width: 0; display: flex; flex-direction: column; gap: 28px">
+        <h1 style="margin: 0; font-size: clamp(2.75rem, 6vw, 4.75rem); line-height: 1.05; font-weight: 600; letter-spacing: -0.02em; text-wrap: balance">Stay on track.</h1>
+        <p style="margin: 0; font-size: 1.25rem; line-height: 1.6; color: #5C6461; max-width: 30rem; text-wrap: pretty">Sekka keeps every job application in one place and tells you when to follow up, until someone says yes.</p>
+        <div style="display: flex">
+          <a href="#" style="display: inline-flex; align-items: center; height: 56px; padding: 0 28px; border-radius: 16px; background: #00695A; color: #FFFFFF; font-size: 17px; font-weight: 600; text-decoration: none">Start free</a>
+        </div>
+      </div>
+
+      <div style="flex: 1 1 440px; min-width: 0">
+        <svg role="img" aria-label="A road through the stages of a job search: wishlist, applied, screening, interviewing, offer, and finally a yes" viewBox="0 0 560 470" style="width: 100%; height: auto; display: block; font-family: inherit">
+          <path d="M40 410 H400 A65 65 0 0 0 400 280 H160 A65 65 0 0 1 160 150 H420" fill="none" stroke="#00695A" stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M40 410 H400 A65 65 0 0 0 400 280 H160 A65 65 0 0 1 160 150 H420" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-dasharray="10 10" opacity="0.8"/>
+          <circle cx="480" cy="150" r="22" fill="#F2A541"/>
+          <g fill="#FFFFFF" stroke="#00695A" stroke-width="3">
+            <circle cx="90" cy="410" r="8"/><circle cx="290" cy="410" r="8"/><circle cx="330" cy="280" r="8"/><circle cx="200" cy="280" r="8"/><circle cx="300" cy="150" r="8"/>
+          </g>
+          <g font-size="15" fill="#5C6461" text-anchor="middle">
+            <text x="90" y="452">Wishlist</text><text x="290" y="452">Applied</text>
+            <text x="330" y="322">Screening</text><text x="200" y="322">Interviewing</text>
+            <text x="300" y="120">Offer</text>
+          </g>
+          <text x="480" y="112" font-size="17" font-weight="600" fill="#1B1F1E" text-anchor="middle">Yes!</text>
+        </svg>
+      </div>
+    </section>
+  </div>
+</div>
+</body>
+</html>

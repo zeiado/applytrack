@@ -46,5 +46,5 @@ test("settings explain how to install it", async ({ page }) => {
   await register(page);
   await page.goto("/en/settings");
   const app = page.locator("section").filter({ has: page.getByRole("heading", { name: "App", level: 2 }) });
-  await expect(app).toContainText("Add ApplyTrack to your home screen", AUTH_TIMEOUT);
+  await expect(app).toContainText("Add Sekka to your home screen", AUTH_TIMEOUT);
 });

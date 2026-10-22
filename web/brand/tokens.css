@@ -1,0 +1,88 @@
+/* Sekka colour tokens for shadcn/ui + Tailwind v4.
+ * Replace the :root and .dark blocks in src/app/globals.css with these two blocks,
+ * and add the two --color-yes lines below to the @theme inline block.
+ *
+ * --accent stays a quiet teal-grey: shadcn uses it for hover states on menus and lists.
+ * Brand amber lives in --yes and is ONLY for good news (offer, accepted, a "yes").
+ * Every text pair passes WCAG AA in both modes.
+ */
+
+/* add inside @theme inline { ... } */
+/*
+  --color-yes: var(--yes);
+  --color-yes-foreground: var(--yes-foreground);
+*/
+
+:root {
+  /* Sekka brand. Generated from brand/tokens.json. */
+  --background: oklch(0.980 0.006 84.6); /* #FAF8F4 */
+  --foreground: oklch(0.235 0.006 179.1); /* #1B1F1E */
+  --card: oklch(1.000 0 0); /* #FFFFFF */
+  --card-foreground: oklch(0.235 0.006 179.1); /* #1B1F1E */
+  --popover: oklch(1.000 0 0); /* #FFFFFF */
+  --popover-foreground: oklch(0.235 0.006 179.1); /* #1B1F1E */
+  --primary: oklch(0.466 0.086 178.4); /* #00695A */
+  --primary-foreground: oklch(1.000 0 0); /* #FFFFFF */
+  --secondary: oklch(0.950 0.009 84.6); /* #F1EEE8 */
+  --secondary-foreground: oklch(0.235 0.006 179.1); /* #1B1F1E */
+  --muted: oklch(0.950 0.009 84.6); /* #F1EEE8 */
+  --muted-foreground: oklch(0.495 0.011 171.4); /* #5C6461 */
+  --accent: oklch(0.959 0.007 174.4); /* #EDF3F1 */
+  --accent-foreground: oklch(0.235 0.006 179.1); /* #1B1F1E */
+  --destructive: oklch(0.500 0.182 29.5); /* #B42318 */
+  --border: oklch(0.902 0.013 82.4); /* #E3DED5 */
+  --input: oklch(0.902 0.013 82.4); /* #E3DED5 */
+  --ring: oklch(0.466 0.086 178.4); /* #00695A */
+  --chart-1: oklch(0.466 0.086 178.4); /* #00695A */
+  --chart-2: oklch(0.627 0.101 178.7); /* #2E9C89 */
+  --chart-3: oklch(0.769 0.075 180.5); /* #7CC4B6 */
+  --chart-4: oklch(0.780 0.144 69.4); /* #F2A541 */
+  --chart-5: oklch(0.495 0.011 171.4); /* #5C6461 */
+  --sidebar: oklch(0.964 0.007 88.6); /* #F5F3EE */
+  --sidebar-foreground: oklch(0.235 0.006 179.1); /* #1B1F1E */
+  --sidebar-primary: oklch(0.466 0.086 178.4); /* #00695A */
+  --sidebar-primary-foreground: oklch(1.000 0 0); /* #FFFFFF */
+  --sidebar-accent: oklch(0.959 0.007 174.4); /* #EDF3F1 */
+  --sidebar-accent-foreground: oklch(0.235 0.006 179.1); /* #1B1F1E */
+  --sidebar-border: oklch(0.902 0.013 82.4); /* #E3DED5 */
+  --sidebar-ring: oklch(0.466 0.086 178.4); /* #00695A */
+  --yes: oklch(0.780 0.144 69.4); /* #F2A541 */
+  --yes-foreground: oklch(0.286 0.056 76.1); /* #3A2604 */
+  --radius: 0.75rem;
+}
+
+.dark {
+  --background: oklch(0.198 0.009 184.2); /* #111716 */
+  --foreground: oklch(0.946 0.006 128.5); /* #ECEEEA */
+  --card: oklch(0.239 0.013 188.0); /* #182120 */
+  --card-foreground: oklch(0.946 0.006 128.5); /* #ECEEEA */
+  --popover: oklch(0.239 0.013 188.0); /* #182120 */
+  --popover-foreground: oklch(0.946 0.006 128.5); /* #ECEEEA */
+  --primary: oklch(0.742 0.110 179.3); /* #4CC2AD */
+  --primary-foreground: oklch(0.220 0.035 179.1); /* #04201B */
+  --secondary: oklch(0.271 0.014 181.6); /* #1F2927 */
+  --secondary-foreground: oklch(0.946 0.006 128.5); /* #ECEEEA */
+  --muted: oklch(0.271 0.014 181.6); /* #1F2927 */
+  --muted-foreground: oklch(0.735 0.013 170.1); /* #A2ACA8 */
+  --accent: oklch(0.302 0.021 186.5); /* #223230 */
+  --accent-foreground: oklch(0.946 0.006 128.5); /* #ECEEEA */
+  --destructive: oklch(0.712 0.147 27.4); /* #F07A6E */
+  --border: oklch(0.326 0.015 183.1); /* #2C3735 */
+  --input: oklch(0.326 0.015 183.1); /* #2C3735 */
+  --ring: oklch(0.742 0.110 179.3); /* #4CC2AD */
+  --chart-1: oklch(0.742 0.110 179.3); /* #4CC2AD */
+  --chart-2: oklch(0.627 0.101 178.7); /* #2E9C89 */
+  --chart-3: oklch(0.837 0.065 181.3); /* #9AD8CC */
+  --chart-4: oklch(0.812 0.129 71.8); /* #F5B35C */
+  --chart-5: oklch(0.735 0.013 170.1); /* #A2ACA8 */
+  --sidebar: oklch(0.218 0.012 187.0); /* #141C1B */
+  --sidebar-foreground: oklch(0.946 0.006 128.5); /* #ECEEEA */
+  --sidebar-primary: oklch(0.742 0.110 179.3); /* #4CC2AD */
+  --sidebar-primary-foreground: oklch(0.220 0.035 179.1); /* #04201B */
+  --sidebar-accent: oklch(0.302 0.021 186.5); /* #223230 */
+  --sidebar-accent-foreground: oklch(0.946 0.006 128.5); /* #ECEEEA */
+  --sidebar-border: oklch(0.326 0.015 183.1); /* #2C3735 */
+  --sidebar-ring: oklch(0.742 0.110 179.3); /* #4CC2AD */
+  --yes: oklch(0.812 0.129 71.8); /* #F5B35C */
+  --yes-foreground: oklch(0.249 0.048 77.4); /* #2E1E03 */
+}
