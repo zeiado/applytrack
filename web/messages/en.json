@@ -198,7 +198,11 @@
     "previous": "Previous",
     "next": "Next",
     "pagination": "Pages",
-    "exportCsv": "Download CSV"
+    "exportCsv": "Download CSV",
+    "offer": {
+      "title": "{company} sent you an offer"
+    },
+    "columns": "Board columns"
   },
   "ApplicationForm": {
     "newTitle": "Add an application",

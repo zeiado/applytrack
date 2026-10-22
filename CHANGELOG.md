@@ -16,6 +16,7 @@ changes, a minor version for new features, and a patch version for fixes.
 - The project is no longer open source: all rights are reserved from this version on. Earlier versions stay under the MIT License
 - The web app is now called Sekka: new colours (a warm off-white background, the Sekka teal, and amber for good news), brand colours for each status, new app icons and favicon, and a dark-mode palette ready for use. The brand guide and the redesign plan live in `web/brand/`
 - The Sekka logo in the header, in Arabic or English lettering to match the page. On phones the app's sections (applications, follow-ups, stats, settings) move to a tab bar at the bottom, and the current section is marked
+- A new look for the applications board: when an offer arrives, a banner at the top links to it; on phones a row of stages with their counts jumps to each column; cards show the company's initial, the date applied and a calm follow-up label (no more red for a late follow-up)
 
 ### Fixed
 
