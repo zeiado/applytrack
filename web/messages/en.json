@@ -121,7 +121,9 @@
     "applications": "Applications",
     "logOut": "Log out",
     "menu": "Main",
-    "settings": "Settings"
+    "settings": "Settings",
+    "followUps": "Follow-ups",
+    "stats": "Stats"
   },
   "Status": {
     "wishlist": "Wishlist",
@@ -195,7 +197,8 @@
     "page": "Page {page} of {pages}",
     "previous": "Previous",
     "next": "Next",
-    "pagination": "Pages"
+    "pagination": "Pages",
+    "exportCsv": "Download CSV"
   },
   "ApplicationForm": {
     "newTitle": "Add an application",
@@ -351,6 +354,71 @@
       "confirm": "Delete my account forever",
       "googleConfirm": "Confirm by signing in with Google again:",
       "cancel": "Cancel"
+    }
+  },
+  "FollowUps": {
+    "title": "Follow-ups",
+    "intro": "Applications you planned to check on. Send a short message, then mark it done or snooze it.",
+    "groups": {
+      "overdue": "Overdue ({count})",
+      "today": "Today ({count})",
+      "upcoming": "Next {days} days ({count})"
+    },
+    "overdueBy": "{days, plural, one {# day overdue} other {# days overdue}}",
+    "dueToday": "Due today",
+    "dueIn": "{days, plural, one {In # day} other {In # days}}",
+    "done": "Done",
+    "snooze": "Remind me in {days} days",
+    "empty": {
+      "title": "Nothing to follow up on",
+      "body": "Set a follow-up date on an application and it shows up here on that day. You also get a reminder email that morning.",
+      "action": "Go to applications"
+    },
+    "doneFor": "Mark {company} done",
+    "snoozeFor": "Remind me about {company} in {days} days"
+  },
+  "Stats": {
+    "title": "Stats",
+    "summary": "Summary",
+    "exportCsv": "Download all as CSV",
+    "tiles": {
+      "total": "Applications",
+      "applied": "{count, plural, one {# applied} other {# applied}}",
+      "responseRate": "Response rate",
+      "interviewRate": "Interview rate",
+      "offerRate": "Offer rate",
+      "of": "{count} of {total} applied"
+    },
+    "funnel": {
+      "title": "Funnel",
+      "note": "Of the applications you applied to, how many got further. A rejection counts as a reply.",
+      "none": "Nothing applied to yet. Move an application to Applied to start the funnel.",
+      "applied": "Applied",
+      "responded": "Got a reply",
+      "interviewed": "Interviewed",
+      "offers": "Offers",
+      "accepted": "Accepted"
+    },
+    "bySource": {
+      "title": "By source",
+      "note": "Where your applications came from, and which sources lead to offers.",
+      "source": "Source",
+      "applications": "Total",
+      "applied": "Applied",
+      "interviewed": "Interviewed",
+      "offers": "Offers",
+      "offerRate": "Offer rate"
+    },
+    "timeInStage": {
+      "title": "Time in each stage",
+      "note": "Average days before an application moved on, from your history.",
+      "none": "Not enough history yet. This fills in as your applications move between stages.",
+      "days": "{days} days on average · {count, plural, one {# time} other {# times}}"
+    },
+    "empty": {
+      "title": "No stats yet",
+      "body": "Add your applications and your funnel, response rate and best sources show up here.",
+      "action": "Add an application"
     }
   }
 }

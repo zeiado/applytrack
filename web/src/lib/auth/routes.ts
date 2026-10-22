@@ -1,6 +1,6 @@
 // Which pages need a session ("member") and which are only for visitors without one
 // ("guest"). Paths are without the language prefix.
-const MEMBER_ONLY = ["/applications", "/settings", "/dashboard"];
+const MEMBER_ONLY = ["/applications", "/follow-ups", "/stats", "/settings", "/dashboard"];
 const GUEST_ONLY = ["/login", "/register"];
 
 function under(path: string, prefixes: string[]): boolean {

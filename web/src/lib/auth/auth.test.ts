@@ -46,6 +46,8 @@ describe("protectedRoute", () => {
   it.each([
     ["/dashboard", "member"],
     ["/dashboard/settings", "member"],
+    ["/follow-ups", "member"],
+    ["/stats", "member"],
     ["/login", "guest"],
     ["/register", "guest"],
     ["/", null],

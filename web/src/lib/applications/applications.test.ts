@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 
-import { followUpState, formatDate, todayIn } from "./dates";
+import { addDays, followUpState, formatDate, todayIn } from "./dates";
 import { applicationBody, invalidFields, parseAmount } from "./form";
-import { hasFilters, parseListQuery, toApiParams, toSearch } from "./query";
+import { hasFilters, parseListQuery, searchParamsObject, toApiParams, toExportSearch, toSearch } from "./query";
 
 describe("parseListQuery", () => {
   it("reads filters, sort and page from the URL", () => {
@@ -143,5 +143,28 @@ describe("dates", () => {
     expect(followUpState("2026-10-20", "2026-10-21")).toBe("overdue");
     expect(followUpState("2026-10-21", "2026-10-21")).toBe("due");
     expect(followUpState("2026-10-22", "2026-10-21")).toBe("upcoming");
+  });
+
+  it("adds days across months and leap years", () => {
+    expect(addDays("2026-10-30", 3)).toBe("2026-11-02");
+    expect(addDays("2028-02-28", 1)).toBe("2028-02-29");
+    expect(addDays("2026-12-31", 7)).toBe("2027-01-07");
+  });
+});
+
+describe("CSV export query", () => {
+  it("keeps the list's filters and sort, but not the page", () => {
+    const url = new URLSearchParams("view=list&status=applied&status=offer&company=Valeo&sort=company&page=3");
+    const query = parseListQuery(searchParamsObject(url));
+    expect(toExportSearch(query)).toBe("?status=applied&status=offer&company=Valeo&sort=company");
+  });
+
+  it("exports everything, newest first, without filters", () => {
+    expect(toExportSearch(parseListQuery({}))).toBe("?sort=-created_at");
+  });
+
+  it("drops values the API would reject", () => {
+    const query = parseListQuery(searchParamsObject(new URLSearchParams("status=nope&source=fax&bom=false")));
+    expect(toExportSearch(query)).toBe("?sort=-created_at");
   });
 });
