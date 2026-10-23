@@ -3439,6 +3439,61 @@
         ]
       }
     },
+    "/api/v1/email/unsubscribe": {
+      "post": {
+        "description": "Turn off reminder emails with the token from a reminder email's unsubscribe link.\n\nNo login needed, so it works from the email itself (including one-click unsubscribe\nin Gmail and Yahoo, RFC 8058). Using a link again does nothing more. Account emails\n(verification, password reset) are not affected.",
+        "operationId": "unsubscribe_api_v1_email_unsubscribe_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailTokenRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`invalid_unsubscribe_token`"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unexpected error"
+          }
+        },
+        "summary": "Unsubscribe",
+        "tags": [
+          "email"
+        ]
+      }
+    },
     "/api/v1/reminders/due": {
       "get": {
         "description": "Open applications you should follow up on, most overdue first.",

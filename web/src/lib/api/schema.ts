@@ -361,6 +361,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/email/unsubscribe": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Unsubscribe
+         * @description Turn off reminder emails with the token from a reminder email's unsubscribe link.
+         *
+         *     No login needed, so it works from the email itself (including one-click unsubscribe
+         *     in Gmail and Yahoo, RFC 8058). Using a link again does nothing more. Account emails
+         *     (verification, password reset) are not affected.
+         */
+        post: operations["unsubscribe_api_v1_email_unsubscribe_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/reminders/due": {
         parameters: {
             query?: never;
@@ -2355,6 +2379,55 @@ export interface operations {
             };
             /** @description Too many verification emails this hour; see Retry-After */
             429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unexpected error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    unsubscribe_api_v1_email_unsubscribe_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EmailTokenRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description `invalid_unsubscribe_token` */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation error */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };

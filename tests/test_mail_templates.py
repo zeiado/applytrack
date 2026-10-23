@@ -74,6 +74,7 @@ def test_header_band_only_when_the_email_has_a_title() -> None:
             "more": 0,
             "link": "https://app.example.com/follow-ups",
             "settings_link": "https://app.example.com/settings",
+            "unsubscribe_link": "https://app.example.com/ar/unsubscribe#token=x",
         },
     )
     assert "background-color:#00695A;border-radius:20px 20px 0 0" in reminder.html

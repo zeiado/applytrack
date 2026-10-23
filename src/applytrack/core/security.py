@@ -1,9 +1,12 @@
-"""Password hashing, JWT access tokens, and random tokens (refresh tokens, email links).
+"""Password hashing, JWT access tokens, random tokens (refresh tokens, email links), and
+signed unsubscribe tokens.
 
 See docs/adr/0003-jwt-authentication.md and docs/adr/0006-rotating-refresh-tokens.md.
 """
 
+import base64
 import hashlib
+import hmac
 import secrets
 import uuid
 from dataclasses import dataclass
@@ -87,3 +90,35 @@ def new_random_token() -> str:
 def hash_token(token: str) -> str:
     """SHA-256 hex digest. A fast hash is enough here: the token is random, not a password."""
     return hashlib.sha256(token.encode()).hexdigest()
+
+
+# Unsubscribe links (#71). The token is the user's id plus an HMAC of it, so it needs
+# no database row and never expires: a link in a months-old email still works. It can
+# only turn off reminder emails, so a leaked one does little harm. Changing
+# APPLYTRACK_JWT_SECRET_KEY invalidates every link already sent.
+_UNSUBSCRIBE_PURPOSE = b"unsubscribe-reminders:"
+
+
+def _unsubscribe_signature(user_id: uuid.UUID, settings: Settings) -> str:
+    key = settings.jwt_secret_key.get_secret_value().encode()
+    digest = hmac.new(key, _UNSUBSCRIBE_PURPOSE + user_id.bytes, hashlib.sha256).digest()
+    return base64.urlsafe_b64encode(digest[:16]).rstrip(b"=").decode()
+
+
+def create_unsubscribe_token(user_id: uuid.UUID, settings: Settings) -> str:
+    return f"{user_id.hex}.{_unsubscribe_signature(user_id, settings)}"
+
+
+def read_unsubscribe_token(token: str, settings: Settings) -> uuid.UUID | None:
+    """The user id from a valid unsubscribe token, or None."""
+    user_hex, _, signature = token.partition(".")
+    try:
+        user_id = uuid.UUID(hex=user_hex)
+    except ValueError:
+        return None
+    if user_id.hex != user_hex or not signature:
+        return None
+    expected = _unsubscribe_signature(user_id, settings)
+    if not hmac.compare_digest(expected.encode(), signature.encode()):
+        return None
+    return user_id

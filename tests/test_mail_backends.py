@@ -3,6 +3,7 @@
 import json
 import logging
 import smtplib
+from dataclasses import replace
 from email.message import EmailMessage as MimeMessage
 from typing import Any, ClassVar
 
@@ -339,3 +340,28 @@ def test_send_test_email_command_reports_failures(
 
     assert send_test.main(["ada@example.com"]) == 1
     assert "Failed (permanent): Resend returned 403" in capsys.readouterr().err
+
+
+UNSUBSCRIBE_HEADERS = {
+    "List-Unsubscribe": "<https://app.example.com/api/unsubscribe?token=abc>",
+    "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+}
+
+
+def test_resend_passes_extra_headers() -> None:
+    seen: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append(request)
+        return httpx.Response(200, json={"id": "x"})
+
+    resend(handler).send(replace(MESSAGE, headers=UNSUBSCRIBE_HEADERS))
+    assert json.loads(seen[0].content)["headers"] == UNSUBSCRIBE_HEADERS
+
+
+def test_smtp_passes_extra_headers() -> None:
+    backend = smtp_backend()
+    backend.send(replace(MESSAGE, headers=UNSUBSCRIBE_HEADERS))
+    [mime] = FakeSMTP.instances[0].sent
+    assert mime["List-Unsubscribe"] == UNSUBSCRIBE_HEADERS["List-Unsubscribe"]
+    assert mime["List-Unsubscribe-Post"] == "List-Unsubscribe=One-Click"

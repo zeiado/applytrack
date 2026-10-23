@@ -10,6 +10,7 @@ changes, a minor version for new features, and a patch version for fixes.
 ### Added
 
 - Install the web app on a phone's home screen (Android and iPhone): app icons, a manifest, and an offline page when there's no connection. Settings shows how to install it on each device ([#72])
+- Unsubscribe from reminder emails from the email itself, without logging in: a link at the bottom opens a page with a button, and Gmail's and Yahoo's own "Unsubscribe" button works in one click (List-Unsubscribe, RFC 8058) ([#71])
 
 ### Changed
 
@@ -25,6 +26,7 @@ changes, a minor version for new features, and a patch version for fixes.
 
 ### Fixed
 
+- The "See all follow-ups" button in reminder emails opened a page that doesn't exist; it now opens the follow-ups page
 - A deploy no longer hangs when the database stalls during startup: migrations give up after a time limit and are retried twice, instead of waiting until the host cancels the deploy 15 minutes later
 
 ## [0.6.0] - 2026-10-22
@@ -154,5 +156,6 @@ First release.
 [#66]: https://github.com/zeiado/applytrack/issues/66
 [#67]: https://github.com/zeiado/applytrack/issues/67
 [#68]: https://github.com/zeiado/applytrack/issues/68
+[#71]: https://github.com/zeiado/applytrack/issues/71
 [#72]: https://github.com/zeiado/applytrack/issues/72
 [#50]: https://github.com/zeiado/applytrack/issues/50
