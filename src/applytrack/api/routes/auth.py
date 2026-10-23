@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Request, Response, status
 from fastapi.security import OAuth2PasswordRequestForm
 
-from applytrack.api.deps import AppSettings, CurrentUser, DbSession, Now
+from applytrack.api.deps import AppAnalytics, AppSettings, CurrentUser, DbSession, Now
 from applytrack.core.config import Settings
 from applytrack.core.errors import ErrorResponse, TooManyRequestsError, UnauthorizedError
 from applytrack.core.google import GoogleIdTokenVerifier
@@ -41,7 +41,13 @@ def _token_response(pair: TokenPair, settings: Settings) -> TokenResponse:
     status_code=status.HTTP_201_CREATED,
     responses={status.HTTP_409_CONFLICT: {"model": ErrorResponse}},
 )
-def register(body: RegisterRequest, db: DbSession, settings: AppSettings, now: Now) -> UserRead:
+def register(
+    body: RegisterRequest,
+    db: DbSession,
+    settings: AppSettings,
+    analytics: AppAnalytics,
+    now: Now,
+) -> UserRead:
     """Create an account, and email a link to verify the address."""
     verification = EmailVerificationService(db, settings)
     user = AuthService(db).register(
@@ -50,6 +56,7 @@ def register(body: RegisterRequest, db: DbSession, settings: AppSettings, now: N
         locale=body.locale,
         on_created=lambda new_user: verification.queue_email(new_user, now),
     )
+    analytics.capture(user.id, "signed_up", {"method": "password", "locale": user.locale})
     return UserRead.model_validate(user)
 
 
@@ -169,7 +176,12 @@ def login(
     },
 )
 def sign_in_with_google(
-    body: GoogleSignInRequest, request: Request, db: DbSession, settings: AppSettings, now: Now
+    body: GoogleSignInRequest,
+    request: Request,
+    db: DbSession,
+    settings: AppSettings,
+    analytics: AppAnalytics,
+    now: Now,
 ) -> TokenResponse:
     """Exchange a Google ID token for the same tokens as `/auth/login`.
 
@@ -192,7 +204,10 @@ def sign_in_with_google(
     except UnauthorizedError:
         limiter.hit(ip)
         raise
-    user = GoogleSignInService(db).sign_in(identity, locale=body.locale, now=now)
+    service = GoogleSignInService(db)
+    user = service.sign_in(identity, locale=body.locale, now=now)
+    if service.created:
+        analytics.capture(user.id, "signed_up", {"method": "google", "locale": user.locale})
     return _token_response(TokenService(db, settings).issue(user.id, now), settings)
 
 

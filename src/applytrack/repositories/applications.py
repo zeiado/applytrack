@@ -102,6 +102,10 @@ class ApplicationRepository:
         ).all()
         return list(items), total
 
+    def count_for_user(self, user_id: uuid.UUID) -> int:
+        query = select(func.count()).select_from(Application).where(Application.user_id == user_id)
+        return self.session.scalar(query) or 0
+
     def add(self, application: Application) -> Application:
         self.session.add(application)
         self.session.flush()

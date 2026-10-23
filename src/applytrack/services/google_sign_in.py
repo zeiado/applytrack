@@ -20,6 +20,8 @@ class GoogleSignInService:
     def __init__(self, session: Session) -> None:
         self.session = session
         self.users = UserRepository(session)
+        # Whether the last sign_in created the account (for the sign-up event).
+        self.created = False
 
     def sign_in(self, identity: GoogleIdentity, *, locale: str, now: datetime) -> User:
         """The user for this Google account: already linked, linked now to the account
@@ -57,6 +59,7 @@ class GoogleSignInService:
                 google_subject=identity.subject,
             )
             self.users.add(user)
+            self.created = True
             logger.info("Account created with Google", extra={"user_id": str(user.id)})
             return user
 
