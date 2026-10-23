@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sekka</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header>
+      <img src="icons/icon-32.png" width="24" height="24" alt="" />
+      <h1 data-i18n="title">Save this job</h1>
+    </header>
+
+    <section data-view="loading">
+      <p class="muted" data-i18n="loading">Reading the page…</p>
+    </section>
+
+    <section data-view="signed-out" hidden>
+      <p><strong data-i18n="signInTitle">Log in to Sekka first</strong></p>
+      <p class="muted" data-i18n="signInBody">Log in on the website, then open this again.</p>
+      <a id="sign-in" class="button" target="_blank" rel="noopener" data-i18n="signIn">Log in</a>
+    </section>
+
+    <form id="form" data-view="form" hidden novalidate>
+      <p id="message" role="status" hidden></p>
+      <label>
+        <span data-i18n="company">Company</span>
+        <input id="company" name="company" required maxlength="200" autocomplete="off" />
+      </label>
+      <label>
+        <span data-i18n="role">Role</span>
+        <input id="role" name="role" required maxlength="200" autocomplete="off" />
+      </label>
+      <label>
+        <span data-i18n="link">Link</span>
+        <input id="link" name="link" type="url" maxlength="2048" dir="ltr" autocomplete="off" />
+      </label>
+      <label>
+        <span data-i18n="status">Stage</span>
+        <select id="status" name="status">
+          <option value="applied" data-i18n="statusApplied">Applied</option>
+          <option value="wishlist" data-i18n="statusWishlist">Want to apply</option>
+        </select>
+      </label>
+      <button id="save" type="submit" data-i18n="save">Save to Sekka</button>
+    </form>
+
+    <section data-view="saved" hidden>
+      <p class="saved"><strong data-i18n="saved">Saved to Sekka</strong></p>
+      <a id="open" class="button" target="_blank" rel="noopener" data-i18n="open">Open in Sekka</a>
+    </section>
+
+    <script src="popup.js"></script>
+  </body>
+</html>

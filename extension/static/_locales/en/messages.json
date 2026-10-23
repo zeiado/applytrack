@@ -1,0 +1,23 @@
+{
+  "name": { "message": "Sekka: save jobs" },
+  "description": { "message": "Save the job you're looking at to Sekka in one click, from LinkedIn, Wuzzuf, Bayt, Forasna or any job page." },
+  "title": { "message": "Save this job" },
+  "loading": { "message": "Reading the page…" },
+  "signInTitle": { "message": "Log in to Sekka first" },
+  "signInBody": { "message": "Log in on the Sekka website in this browser, then open this again." },
+  "signIn": { "message": "Log in" },
+  "unreadable": { "message": "Couldn't read this page. Fill in the details yourself." },
+  "company": { "message": "Company" },
+  "role": { "message": "Role" },
+  "link": { "message": "Link" },
+  "status": { "message": "Stage" },
+  "statusApplied": { "message": "Applied" },
+  "statusWishlist": { "message": "Want to apply" },
+  "save": { "message": "Save to Sekka" },
+  "saving": { "message": "Saving…" },
+  "saved": { "message": "Saved to Sekka" },
+  "open": { "message": "Open in Sekka" },
+  "errorInvalid": { "message": "Check the fields: company and role are needed, and the link must start with https://" },
+  "errorNetwork": { "message": "Couldn't reach Sekka. Check your connection and try again." },
+  "errorUnknown": { "message": "Something went wrong. Try again." }
+}

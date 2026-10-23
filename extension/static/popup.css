@@ -1,0 +1,124 @@
+/* Sekka's colours (web/brand/tokens.css), light only: popups don't follow the page. */
+:root {
+  --background: #faf8f4;
+  --card: #ffffff;
+  --foreground: #1b1f1e;
+  --muted: #5c6461;
+  --border: #e8e3da;
+  --primary: #00695a;
+  --primary-hover: #004d42;
+  --error: #b42318;
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  width: 340px;
+  margin: 0;
+  padding: 16px;
+  background: var(--background);
+  color: var(--foreground);
+  font: 14px/1.5 "IBM Plex Sans Arabic", "Segoe UI", Tahoma, system-ui, sans-serif;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+h1 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+p {
+  margin: 0 0 8px;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+form,
+section {
+  display: grid;
+  gap: 12px;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+label {
+  display: grid;
+  gap: 4px;
+  font-weight: 500;
+}
+
+input,
+select {
+  width: 100%;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--card);
+  color: inherit;
+  font: inherit;
+}
+
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 0;
+  border-color: var(--primary);
+}
+
+button,
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--primary);
+  color: #ffffff;
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+button:hover,
+.button:hover {
+  background: var(--primary-hover);
+}
+
+button:disabled {
+  opacity: 0.7;
+  cursor: progress;
+}
+
+#message {
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--muted);
+}
+
+#message[data-kind="error"] {
+  color: var(--error);
+  border-color: currentColor;
+}
+
+.saved {
+  color: var(--primary);
+}

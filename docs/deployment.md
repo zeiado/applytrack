@@ -121,6 +121,13 @@ and as `API_PROXY_SECRET` in Vercel (Production for the production API, Preview 
 staging). The web server then sends each visitor's IP in `X-Client-IP` with the secret
 in `X-Proxy-Secret`; the API ignores `X-Client-IP` from anyone without the secret.
 
+## Browser extension
+
+The extension (`extension/`, #69) is built from this repo and published to the Chrome
+Web Store by hand; the steps are in `extension/README.md`. Once it's published, set
+`EXTENSION_IDS` in Vercel (Production) to its store id, so only our extension can use
+the web app's `/api/extension/*` routes.
+
 ## Error tracking and analytics
 
 Both are off until their keys are set (#70). Neither receives personal data; see the
