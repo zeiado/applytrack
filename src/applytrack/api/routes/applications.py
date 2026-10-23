@@ -5,7 +5,7 @@ from typing import Annotated, Any
 from fastapi import APIRouter, Query, Request, Response, status
 from fastapi.responses import StreamingResponse
 
-from applytrack.api.deps import CurrentUser, DbSession, Now
+from applytrack.api.deps import AppAnalytics, CurrentUser, DbSession, Now
 from applytrack.core.errors import ErrorResponse
 from applytrack.repositories.applications import ApplicationRepository
 from applytrack.schemas.applications import (
@@ -78,10 +78,24 @@ def export_applications(
 
 @router.post("", status_code=status.HTTP_201_CREATED)
 def create_application(
-    body: ApplicationCreate, db: DbSession, user: CurrentUser, response: Response
+    body: ApplicationCreate,
+    db: DbSession,
+    user: CurrentUser,
+    analytics: AppAnalytics,
+    response: Response,
 ) -> ApplicationRead:
     """Add a job application."""
-    application = ApplicationService(db, user).create(body)
+    service = ApplicationService(db, user)
+    application = service.create(body)
+    analytics.capture(
+        user.id,
+        "application_created",
+        {
+            "status": application.status,
+            "source": application.source,
+            "first": service.repo.count_for_user(user.id) == 1,
+        },
+    )
     response.headers["Location"] = f"/api/v1/applications/{application.id}"
     return ApplicationRead.model_validate(application)
 

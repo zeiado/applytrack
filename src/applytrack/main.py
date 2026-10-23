@@ -6,11 +6,13 @@ from fastapi import FastAPI
 from applytrack import __version__
 from applytrack.api.router import api_router
 from applytrack.api.routes import health
+from applytrack.core.analytics import DailyActivity, build_analytics
 from applytrack.core.config import Settings, get_settings, resolved_log_format
 from applytrack.core.errors import ErrorResponse, register_exception_handlers
 from applytrack.core.google import GoogleIdTokenVerifier
 from applytrack.core.logging import configure_logging
 from applytrack.core.middleware import RequestContextMiddleware
+from applytrack.core.observability import init_error_tracking
 from applytrack.core.rate_limit import InMemoryRateLimiter, LoginRateLimiter
 from applytrack.db.session import build_engine, build_session_factory
 from applytrack.jobs.worker import WorkerThread
@@ -35,6 +37,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         yield
         if worker_thread is not None:
             worker_thread.stop()
+        app.state.analytics.close()
         engine.dispose()
 
     app = FastAPI(
@@ -49,6 +52,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.settings = settings
     app.state.engine = engine
     app.state.session_factory = session_factory
+    app.state.analytics = build_analytics(settings)
+    app.state.daily_activity = DailyActivity()
     app.state.login_limiter = LoginRateLimiter(
         per_account=InMemoryRateLimiter(
             limit=settings.login_max_failures_per_account,
@@ -86,6 +91,7 @@ def create_production_app() -> FastAPI:
     """Entry point for uvicorn: configure logging once for the process, then build the app."""
     settings = get_settings()
     configure_logging(level=settings.log_level, log_format=resolved_log_format(settings))
+    init_error_tracking(settings, component="api")
     return create_app(settings)
 
 

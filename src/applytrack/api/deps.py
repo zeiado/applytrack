@@ -5,6 +5,7 @@ from fastapi import Depends, Request
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
+from applytrack.core.analytics import Analytics, DailyActivity
 from applytrack.core.config import Settings
 from applytrack.core.errors import UnauthorizedError
 from applytrack.core.security import decode_access_token
@@ -26,9 +27,28 @@ def get_settings_from_app(request: Request) -> Settings:
 AppSettings = Annotated[Settings, Depends(get_settings_from_app)]
 
 
+def get_analytics(request: Request) -> Analytics:
+    analytics: Analytics = request.app.state.analytics
+    return analytics
+
+
+AppAnalytics = Annotated[Analytics, Depends(get_analytics)]
+
+
+def get_now() -> datetime:
+    """The current time. A dependency, so tests can freeze it with dependency_overrides."""
+    return datetime.now(UTC)
+
+
+Now = Annotated[datetime, Depends(get_now)]
+
+
 def get_current_user(
+    request: Request,
     db: DbSession,
     settings: AppSettings,
+    analytics: AppAnalytics,
+    now: Now,
     token: Annotated[str | None, Depends(oauth2_scheme)],
 ) -> User:
     if token is None:
@@ -40,15 +60,9 @@ def get_current_user(
     # Tokens issued before a password reset stop working (ADR 0008).
     if user.password_changed_at is not None and claims.issued_at < user.password_changed_at:
         raise UnauthorizedError("Token was revoked; log in again", code="token_revoked")
+    activity: DailyActivity = request.app.state.daily_activity
+    activity.record(analytics, user.id, now.date())
     return user
 
 
 CurrentUser = Annotated[User, Depends(get_current_user)]
-
-
-def get_now() -> datetime:
-    """The current time. A dependency, so tests can freeze it with dependency_overrides."""
-    return datetime.now(UTC)
-
-
-Now = Annotated[datetime, Depends(get_now)]

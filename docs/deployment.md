@@ -121,6 +121,25 @@ and as `API_PROXY_SECRET` in Vercel (Production for the production API, Preview 
 staging). The web server then sends each visitor's IP in `X-Client-IP` with the secret
 in `X-Proxy-Secret`; the API ignores `X-Client-IP` from anyone without the secret.
 
+## Error tracking and analytics
+
+Both are off until their keys are set (#70). Neither receives personal data; see the
+[privacy notes](privacy.md).
+
+1. **Sentry** (sentry.io, free plan, EU data region): create two projects, *Python /
+   FastAPI* for the API and *Next.js* for the web app. Set the API project's DSN as
+   `APPLYTRACK_SENTRY_DSN` on each Render service, and the web project's DSN as
+   `NEXT_PUBLIC_SENTRY_DSN` in Vercel, then redeploy the web app (the value is built in).
+   Each service reports its environment (`production`, `preview`), so one project can
+   hold staging and production.
+2. **PostHog** (posthog.com, free plan, **EU Cloud**): create a project and set its
+   project API key (`phc_...`, not a secret) as `APPLYTRACK_POSTHOG_API_KEY` on the
+   production Render service only, so staging doesn't count as real users. In the
+   project settings, turn on "Discard client IP data".
+   Useful insights: sign-ups per week (`signed_up`), activation (`signed_up` →
+   `application_created` with `first = true` within 7 days), and weekly active users
+   (unique users with `active`).
+
 Then add the Vercel URL (and later the real domain) to the Google OAuth client's
 "Authorized JavaScript origins", and set `APPLYTRACK_PUBLIC_APP_URL` on the API to it,
 so links in emails open the web app.

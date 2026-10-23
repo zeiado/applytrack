@@ -506,3 +506,17 @@ def test_delete_without_a_password_needs_google(
     assert response.status_code == 403
     assert response.json()["error"]["code"] == "invalid_password"
     assert user_count(app) == 1
+
+
+def test_a_new_account_counts_as_a_sign_up(
+    app: FastAPI, client: TestClient, google: Google
+) -> None:
+    from applytrack.core.analytics import MemoryAnalytics
+
+    analytics = MemoryAnalytics()
+    app.state.analytics = analytics
+    signed_in(client, google.token(), locale="ar")
+    signed_in(client, google.token())  # signing in again isn't a sign-up
+
+    sign_ups = [props for _, name, props in analytics.events if name == "signed_up"]
+    assert sign_ups == [{"method": "google", "locale": "ar"}]

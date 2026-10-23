@@ -80,6 +80,13 @@ class Settings(BaseSettings):
     worker_poll_seconds: float = Field(default=2, gt=0, le=60)
     job_max_attempts: int = Field(default=5, ge=1, le=20)
 
+    # Error tracking (Sentry) and product analytics (PostHog), #70. Both are off while
+    # unset. Neither receives personal data (docs/privacy.md).
+    sentry_dsn: str | None = None
+    sentry_traces_sample_rate: float = Field(default=0.0, ge=0, le=1)
+    posthog_api_key: str | None = None
+    posthog_host: str = "https://eu.i.posthog.com"
+
     @field_validator("public_app_url")
     @classmethod
     def _http_url_without_trailing_slash(cls, url: str) -> str:

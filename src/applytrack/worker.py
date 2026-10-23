@@ -13,6 +13,7 @@ from sqlalchemy.orm import Session, sessionmaker
 
 from applytrack.core.config import Settings, get_settings, resolved_log_format
 from applytrack.core.logging import configure_logging
+from applytrack.core.observability import init_error_tracking
 from applytrack.db.session import build_engine, build_session_factory
 from applytrack.jobs.worker import JobHandler, PeriodicTask, Worker
 from applytrack.mail.backends import EmailBackend, build_email_backend
@@ -56,6 +57,7 @@ def warn_if_emails_only_logged(settings: Settings) -> None:
 def main() -> None:
     settings = get_settings()
     configure_logging(level=settings.log_level, log_format=resolved_log_format(settings))
+    init_error_tracking(settings, component="worker")
     warn_if_emails_only_logged(settings)
     engine = build_engine(settings.database_url, echo=settings.database_echo)
     worker = build_worker(settings, build_session_factory(engine))

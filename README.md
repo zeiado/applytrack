@@ -458,6 +458,10 @@ All settings are environment variables (or a `.env` file). See [.env.example](.e
 | `APPLYTRACK_RUN_WORKER_IN_API` | `false` | Run the job worker inside the API process (for hosts without worker services) |
 | `APPLYTRACK_WORKER_POLL_SECONDS` | `2` | How often an idle worker checks for jobs |
 | `APPLYTRACK_JOB_MAX_ATTEMPTS` | `5` | Attempts before a job is marked failed |
+| `APPLYTRACK_SENTRY_DSN` | unset | Report errors to Sentry, without personal data ([privacy notes](docs/privacy.md)) |
+| `APPLYTRACK_SENTRY_TRACES_SAMPLE_RATE` | `0` | Share of requests traced for performance (0–1) |
+| `APPLYTRACK_POSTHOG_API_KEY` | unset | Send product analytics events to PostHog ([privacy notes](docs/privacy.md)) |
+| `APPLYTRACK_POSTHOG_HOST` | `https://eu.i.posthog.com` | PostHog's address (EU cloud) |
 
 ---
 
