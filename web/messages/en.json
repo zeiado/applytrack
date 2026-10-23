@@ -110,7 +110,8 @@
     "invalid_salary_range": "The salary “From” can't be more than “To”.",
     "not_found": "That application doesn't exist anymore.",
     "invalid_password": "That password isn't right.",
-    "wrong_google_account": "That's a different Google account from the one linked to this account."
+    "wrong_google_account": "That's a different Google account from the one linked to this account.",
+    "invalid_unsubscribe_token": "This unsubscribe link isn't valid. You can turn off reminder emails in your settings."
   },
   "Dashboard": {
     "title": "Dashboard",
@@ -436,5 +437,13 @@
       "body": "Add your applications and your funnel, response rate and best sources show up here.",
       "action": "Add an application"
     }
+  },
+  "Unsubscribe": {
+    "title": "Stop reminder emails?",
+    "description": "You won't get the morning email about follow-ups any more. Emails about your account, like password resets, still come.",
+    "submit": "Stop reminder emails",
+    "done": "Done. You won't get reminder emails any more.",
+    "settings": "Turn them back on in settings",
+    "noToken": "This link is incomplete. Open it again from the email, or turn off reminders in your settings."
   }
 }

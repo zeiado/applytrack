@@ -13,4 +13,6 @@ It's time to follow up on {{ "this application" if total == 1 else "these applic
 
 See them all: {{ link }}
 
-You get this email on mornings when a follow-up is due. Turn it off in your settings: {{ settings_link }}
+You get this email on mornings when a follow-up is due.
+Unsubscribe: {{ unsubscribe_link }}
+Settings: {{ settings_link }}

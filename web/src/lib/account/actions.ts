@@ -26,6 +26,20 @@ function failed(error: unknown): ActionState {
   return { error: { code: "network" } };
 }
 
+/** Turns off reminder emails with the token from an email's unsubscribe link. Needs no
+ * login: the link may be opened anywhere. */
+export async function unsubscribeFromReminders(_state: ActionState, form: FormData): Promise<ActionState> {
+  const token = form.get("token");
+  if (typeof token !== "string" || !token) return { error: { code: "invalid_unsubscribe_token" } };
+  try {
+    const api = await visitorApi();
+    const { error, response } = await api.POST("/api/v1/email/unsubscribe", { body: { token } });
+    return response.ok ? { ok: true } : { error: toActionError(error, response) };
+  } catch (error) {
+    return failed(error);
+  }
+}
+
 /** Email language, timezone and the morning reminder email. */
 export async function updatePreferences(_state: ActionState, form: FormData): Promise<ActionState> {
   const locale = form.get("locale") === "ar" ? "ar" : "en";

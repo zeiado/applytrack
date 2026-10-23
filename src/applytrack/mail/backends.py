@@ -7,8 +7,8 @@ change (APPLYTRACK_EMAIL_BACKEND), not a code change.
 import logging
 import smtplib
 import ssl
-from collections.abc import Callable
-from dataclasses import dataclass
+from collections.abc import Callable, Mapping
+from dataclasses import dataclass, field
 from email.message import EmailMessage as MimeMessage
 from email.utils import formatdate, make_msgid, parseaddr
 from typing import Any, Literal, Protocol
@@ -31,6 +31,8 @@ class EmailMessage:
     reply_to: str | None = None
     # Lets a provider drop a duplicate when a job is retried after the email was sent.
     idempotency_key: str | None = None
+    # Extra headers, e.g. List-Unsubscribe on reminder emails.
+    headers: Mapping[str, str] = field(default_factory=dict)
 
 
 class EmailError(Exception):
@@ -106,6 +108,8 @@ class ResendEmailBackend:
         }
         if message.reply_to:
             body["reply_to"] = message.reply_to
+        if message.headers:
+            body["headers"] = dict(message.headers)
         headers = {
             "Authorization": f"Bearer {self._api_key}",
             "User-Agent": f"applytrack/{__version__}",
@@ -207,6 +211,8 @@ def _to_mime(message: EmailMessage) -> MimeMessage:
     mime["Message-ID"] = make_msgid(domain=sender_address.partition("@")[2] or None)
     if message.reply_to:
         mime["Reply-To"] = message.reply_to
+    for name, value in message.headers.items():
+        mime[name] = value
     mime.set_content(message.text)
     mime.add_alternative(message.html, subtype="html")
     return mime

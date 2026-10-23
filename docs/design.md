@@ -161,6 +161,7 @@ All routes are under `/api/v1`. Data routes require `Authorization: Bearer <toke
 | GET | `/applications/{id}/history` | Status history |
 | GET/POST | `/applications/{id}/interviews` | List / add interviews |
 | GET | `/reminders/due` | Applications whose follow-up date has arrived |
+| POST | `/email/unsubscribe` | Turn off reminder emails with an email's token (no login needed) |
 | GET | `/stats` | Aggregate stats |
 | GET | `/health` | Liveness (no auth) |
 | GET | `/ready` | Readiness: checks the database (no auth) |
@@ -243,6 +244,25 @@ earlier, most overdue first, with `days_overdue` on each item.
   calling `datetime.now()` themselves, so tests freeze the clock with
   `app.dependency_overrides` instead of mocking.
 - Served by an index on `(user_id, follow_up_on)`.
+
+### Unsubscribing from reminder emails
+
+Every reminder email can turn reminders off without logging in (#71):
+
+- **The token** is the user's id plus an HMAC of it, keyed with
+  `APPLYTRACK_JWT_SECRET_KEY` (`core/security.py`). It needs no database row and
+  never expires, so a link in an old email still works. It can only turn off reminder
+  emails, so a leaked one does little harm. Changing the secret breaks every link
+  already sent.
+- **The link in the email** opens `<APPLYTRACK_PUBLIC_APP_URL>/<locale>/unsubscribe#token=…`,
+  a page with a button. Opening it changes nothing, because link scanners open every
+  link in an email.
+- **One-click unsubscribe (RFC 8058)**, which Gmail and Yahoo require from bulk
+  senders: the email's `List-Unsubscribe` header points at the web app's
+  `/api/unsubscribe?token=…`, and `List-Unsubscribe-Post: List-Unsubscribe=One-Click`
+  tells the email app to POST there. The web app passes the token to
+  `POST /email/unsubscribe`.
+- Account emails (verification, password reset) are not affected.
 
 ### Reminder emails
 

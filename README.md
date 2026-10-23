@@ -224,6 +224,7 @@ need `Authorization: Bearer <token>`, and other users' resources return `404`.
 | `GET` `PATCH` `DELETE` | `/api/v1/applications/{id}/interviews/{iid}` | One interview |
 | `GET` | `/api/v1/applications/export.csv` | Download as CSV (same filters as the list) |
 | `GET` | `/api/v1/reminders/due` | Follow-ups due: `tz`, `within_days` |
+| `POST` | `/api/v1/email/unsubscribe` | Turn off reminder emails with the token from an email (no login) |
 | `GET` | `/api/v1/stats` | Funnel, rates, by-source results, days in stage |
 
 <details>

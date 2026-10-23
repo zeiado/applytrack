@@ -29,6 +29,7 @@ class SendEmailPayload(BaseModel):
     template: str
     locale: Locale
     context: dict[str, ContextValue]
+    headers: dict[str, str] = {}
 
 
 class Mailer:
@@ -50,9 +51,14 @@ class Mailer:
         template: str,
         locale: Locale,
         context: Mapping[str, ContextValue] | None = None,
+        headers: Mapping[str, str] | None = None,
     ) -> Job:
         payload = SendEmailPayload(
-            to=to, template=template, locale=locale, context=dict(context or {})
+            to=to,
+            template=template,
+            locale=locale,
+            context=dict(context or {}),
+            headers=dict(headers or {}),
         )
         # Render once now, so a missing template or variable fails in the request that
         # caused it (and its test), not later in the worker.
@@ -90,6 +96,7 @@ class SendEmailHandler:
             html=rendered.html,
             reply_to=self.settings.email_reply_to,
             idempotency_key=f"applytrack-job-{job.job_id}",
+            headers=email.headers,
         )
         try:
             provider_id = self.backend.send(message)

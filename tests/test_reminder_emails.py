@@ -229,7 +229,7 @@ def test_long_lists_are_cut_short(
     assert "- Company 11: Backend Engineer (11 days overdue)" in email.text  # most overdue first
     assert "Company 01" not in email.text and "Company 00" not in email.text
     assert "...and 2 more." in email.text
-    assert f"{settings.public_app_url}/reminders" in email.text
+    assert f"{settings.public_app_url}/follow-ups" in email.text
     assert f'href="{settings.public_app_url}/settings"' in email.html
 
 

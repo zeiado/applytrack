@@ -20,6 +20,7 @@ from applytrack.mail.mailer import Mailer
 from applytrack.models import User
 from applytrack.models.user import DEFAULT_TIMEZONE
 from applytrack.services.reminders import ReminderService
+from applytrack.services.unsubscribe import unsubscribe_links
 
 logger = logging.getLogger("applytrack.reminders")
 
@@ -81,6 +82,7 @@ class ReminderEmailScheduler:
             items, total = ReminderService(session, user).due(today, limit=MAX_LISTED)
             user.reminders_checked_on = today
             if total:
+                page_link, one_click_link = unsubscribe_links(user, self.settings)
                 Mailer(session, self.settings).send(
                     to=user.email,
                     template="follow_up_reminder",
@@ -97,8 +99,14 @@ class ReminderEmailScheduler:
                             }
                             for a in items
                         ],
-                        "link": f"{self.settings.public_app_url}/reminders",
+                        "link": f"{self.settings.public_app_url}/follow-ups",
                         "settings_link": f"{self.settings.public_app_url}/settings",
+                        "unsubscribe_link": page_link,
+                    },
+                    # One-click unsubscribe (RFC 8058), which Gmail and Yahoo require.
+                    headers={
+                        "List-Unsubscribe": f"<{one_click_link}>",
+                        "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
                     },
                 )
             session.commit()
