@@ -15,6 +15,7 @@ data ([design](design.md)).
 | Resend or an SMTP provider | Sends emails | The address, the email's content | `APPLYTRACK_EMAIL_BACKEND=console` |
 | Google | Sign in with Google | Only what Google already has; the app receives the email and Google account id | `APPLYTRACK_GOOGLE_CLIENT_IDS` unset |
 | PostHog (EU) | Product analytics (#70) | Account id and the events below | `APPLYTRACK_POSTHOG_API_KEY` unset |
+| Sekka browser extension | Saves a job from the page the user is on (#69) | The company, role and link of that page, when the user clicks Save | Not installed |
 | Sentry | Error reports (#70) | Error details with personal data removed | `APPLYTRACK_SENTRY_DSN` / `NEXT_PUBLIC_SENTRY_DSN` unset |
 
 ## Product analytics (PostHog)
@@ -46,6 +47,14 @@ Before an event leaves, these are removed:
 
 No session replay and no performance tracing. Code: `src/applytrack/core/observability.py`
 and `web/src/lib/sentry.ts`.
+
+## Browser extension
+
+The extension (`extension/`) reads the open page only when the user clicks it
+(`activeTab`), shows what it found, and sends it to the user's own Sekka account only
+when they click Save. It has no access to other tabs or the browsing history, and keeps
+nothing itself. The Chrome Web Store's privacy form asks for this; the answers are in
+`extension/README.md`.
 
 ## Still to do before launch
 

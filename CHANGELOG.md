@@ -12,6 +12,7 @@ changes, a minor version for new features, and a patch version for fixes.
 - Install the web app on a phone's home screen (Android and iPhone): app icons, a manifest, and an offline page when there's no connection. Settings shows how to install it on each device ([#72])
 - Unsubscribe from reminder emails from the email itself, without logging in: a link at the bottom opens a page with a button, and Gmail's and Yahoo's own "Unsubscribe" button works in one click (List-Unsubscribe, RFC 8058) ([#71])
 - Error tracking with Sentry (API, worker and web app) and product analytics with PostHog (sign-ups, first application, active users), both off until their keys are set. No personal data is sent, and analytics run on the server, so there's no tracking in the browser; see `docs/privacy.md` ([#70])
+- A Chrome extension: on a job page (LinkedIn, Wuzzuf, Bayt, Forasna or any other), click it to read the company, role and link, check them, and save the job to Sekka. It uses the website's login, so there's nothing to sign in to ([#69])
 
 ### Changed
 
@@ -157,6 +158,7 @@ First release.
 [#66]: https://github.com/zeiado/applytrack/issues/66
 [#67]: https://github.com/zeiado/applytrack/issues/67
 [#68]: https://github.com/zeiado/applytrack/issues/68
+[#69]: https://github.com/zeiado/applytrack/issues/69
 [#70]: https://github.com/zeiado/applytrack/issues/70
 [#71]: https://github.com/zeiado/applytrack/issues/71
 [#72]: https://github.com/zeiado/applytrack/issues/72

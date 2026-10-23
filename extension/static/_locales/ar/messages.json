@@ -1,0 +1,23 @@
+{
+  "name": { "message": "سكة: احفظ الوظايف" },
+  "description": { "message": "احفظ الوظيفة اللي بتشوفها على سكة في ضغطة، من LinkedIn وWuzzuf وBayt وفرصنا أو أي صفحة وظيفة." },
+  "title": { "message": "احفظ الوظيفة دي" },
+  "loading": { "message": "بنقرا الصفحة…" },
+  "signInTitle": { "message": "سجّل دخول على سكة الأول" },
+  "signInBody": { "message": "سجّل دخول على موقع سكة في المتصفح ده، وبعدين افتح ده تاني." },
+  "signIn": { "message": "سجّل دخول" },
+  "unreadable": { "message": "مقدرناش نقرا الصفحة دي. اكتب البيانات بنفسك." },
+  "company": { "message": "الشركة" },
+  "role": { "message": "الوظيفة" },
+  "link": { "message": "اللينك" },
+  "status": { "message": "المرحلة" },
+  "statusApplied": { "message": "قدّمت" },
+  "statusWishlist": { "message": "عايز أقدّم" },
+  "save": { "message": "احفظ على سكة" },
+  "saving": { "message": "بنحفظ…" },
+  "saved": { "message": "اتحفظت على سكة" },
+  "open": { "message": "افتحها على سكة" },
+  "errorInvalid": { "message": "راجع الخانات: الشركة والوظيفة لازم، واللينك لازم يبدأ بـ https://" },
+  "errorNetwork": { "message": "مش قادرين نوصل لسكة. اتأكد من النت وجرّب تاني." },
+  "errorUnknown": { "message": "حصلت مشكلة. جرّب تاني." }
+}
