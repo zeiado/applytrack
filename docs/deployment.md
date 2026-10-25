@@ -106,7 +106,8 @@ The web app (`web/`, [ADR 0010](adr/0010-web-app.md)) deploys to Vercel. One-tim
 3. Environment variables: `API_URL` = the API's URL
    (`https://applytrack-production-jxnw.onrender.com` for Production,
    `https://applytrack-staging-jxnw.onrender.com` for Preview), and optionally
-   `NEXT_PUBLIC_APP_NAME`.
+   `NEXT_PUBLIC_APP_NAME` and `NEXT_PUBLIC_CONTACT_EMAIL` (the address shown on the
+   privacy and terms pages).
 4. Settings › Functions › Region: Frankfurt (`fra1`), next to the API.
 5. For Sign in with Google: `NEXT_PUBLIC_GOOGLE_CLIENT_ID` = the same client ID as the
    API's `APPLYTRACK_GOOGLE_CLIENT_IDS`. Without it, the Google button is hidden.

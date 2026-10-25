@@ -11,6 +11,7 @@ import { GoogleButton } from "./google-button";
 
 export function RegisterForm() {
   const t = useTranslations("Auth");
+  const tLegal = useTranslations("Legal");
   const [state, action] = useActionState(register, undefined);
 
   return (
@@ -45,6 +46,21 @@ export function RegisterForm() {
         <Link href="/login" className="text-primary hover:underline">
           {t("register.login")}
         </Link>
+      </p>
+      {/* Covers both ways in: the Google button and the form. */}
+      <p className="text-muted-foreground text-center text-xs leading-5">
+        {tLegal.rich("agree", {
+          terms: (chunks) => (
+            <Link href="/terms" className="hover:text-foreground underline">
+              {chunks}
+            </Link>
+          ),
+          privacy: (chunks) => (
+            <Link href="/privacy" className="hover:text-foreground underline">
+              {chunks}
+            </Link>
+          ),
+        })}
       </p>
     </div>
   );
