@@ -1,4 +1,4 @@
-import { Download } from "lucide-react";
+import { Download, MessageSquare } from "lucide-react";
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Suspense } from "react";
@@ -6,6 +6,7 @@ import { Suspense } from "react";
 import { InstallApp } from "@/components/pwa/install-app";
 import { DeleteAccount, PreferencesForm, SetPassword } from "@/components/settings/settings-forms";
 import { buttonVariants } from "@/components/ui/button";
+import { FEEDBACK_URL } from "@/config/brand";
 import { Link, redirect } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { allTimeZones, SUGGESTED_TIME_ZONES, timeZoneLabel } from "@/lib/account/time-zones";
@@ -83,6 +84,21 @@ async function Sections({ locale }: { locale: Locale }) {
       <Section title={t("app.title")}>
         <InstallApp />
       </Section>
+
+      {FEEDBACK_URL && (
+        <Section title={t("feedback.title")}>
+          <p className="text-muted-foreground text-sm">{t("feedback.body")}</p>
+          <a
+            href={FEEDBACK_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={buttonVariants({ variant: "outline", className: "h-10 w-fit gap-1.5" })}
+          >
+            <MessageSquare aria-hidden />
+            {t("feedback.action")}
+          </a>
+        </Section>
+      )}
 
       <Section title={t("data.title")}>
         <p className="text-muted-foreground text-sm">{t("data.body")}</p>

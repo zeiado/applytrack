@@ -128,7 +128,8 @@
     "menu": "Main",
     "settings": "Settings",
     "followUps": "Follow-ups",
-    "stats": "Stats"
+    "stats": "Stats",
+    "feedback": "Feedback"
   },
   "Status": {
     "wishlist": "Wishlist",
@@ -349,6 +350,11 @@
       "send": "Email me a link",
       "sent": "Check your inbox: the link to set a password works for 30 minutes.",
       "change": "To change your password, log out and use “Forgot your password?”."
+    },
+    "feedback": {
+      "title": "Feedback",
+      "body": "Tell us what works, what doesn't, and what you'd like next. It takes a minute and goes straight to the people building Sekka.",
+      "action": "Send feedback"
     },
     "data": {
       "title": "Your data",

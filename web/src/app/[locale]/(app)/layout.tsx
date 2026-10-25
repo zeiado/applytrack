@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Suspense } from "react";
 
 import { AppNav, AppNavLinks } from "@/components/app-nav";
+import { FeedbackLink } from "@/components/feedback-link";
 import { SiteHeader } from "@/components/site-header";
 import { Button } from "@/components/ui/button";
 import type { Locale } from "@/i18n/routing";
@@ -20,6 +21,7 @@ export default async function AppLayout({ children, params }: LayoutProps<"/[loc
         <Suspense fallback={<AppNavLinks kind="header" current={null} />}>
           <AppNav kind="header" />
         </Suspense>
+        <FeedbackLink />
         <form action={logOut}>
           <Button type="submit" variant="ghost" size="sm" className="gap-1.5">
             <LogOut aria-hidden className="size-4 md:hidden rtl:-scale-x-100" />

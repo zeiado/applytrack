@@ -159,6 +159,7 @@ jobs:
         run: npm run build
         env:
           API_URL: http://127.0.0.1:8000
+          NEXT_PUBLIC_FEEDBACK_URL: https://tally.so/r/e2e-feedback
       - name: Build the browser extension for the local web app
         working-directory: extension
         run: |
@@ -168,6 +169,8 @@ jobs:
           SEKKA_APP_URL: http://localhost:3000
       - name: Run end-to-end tests (starts the API and the web app)
         run: npm run e2e
+        env:
+          NEXT_PUBLIC_FEEDBACK_URL: https://tally.so/r/e2e-feedback
       - name: Keep the report and traces of failed tests
         if: failure()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
