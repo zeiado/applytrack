@@ -5,6 +5,7 @@ import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { ServiceWorker } from "@/components/pwa/service-worker";
+import { ThemeSync } from "@/components/theme-sync";
 import { DirectionProvider } from "@/components/ui/direction";
 import { APP_NAME } from "@/config/brand";
 import { direction, routing } from "@/i18n/routing";
@@ -54,7 +55,10 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
       </head>
       <body className="flex min-h-full flex-col">
         <DirectionProvider direction={dir}>
-          <NextIntlClientProvider>{children}</NextIntlClientProvider>
+          <NextIntlClientProvider>
+            <ThemeSync />
+            {children}
+          </NextIntlClientProvider>
         <ServiceWorker />
         </DirectionProvider>
       </body>

@@ -32,3 +32,20 @@ test("follows the device until light or dark is chosen in settings", async ({ pa
   await appearance.getByText("System", { exact: true }).click();
   await expect(html(page)).not.toHaveClass(/\bdark\b/);
 });
+
+test("the theme stays when switching language", async ({ page }) => {
+  await page.goto("/en");
+  await page.evaluate(() => localStorage.setItem("theme", "dark"));
+  await page.reload();
+  await expect(html(page)).toHaveClass(/\bdark\b/);
+
+  // The language link changes page without a full reload.
+  await page.getByRole("link", { name: "العربية" }).click();
+  await expect(page).toHaveURL(/\/ar$/);
+  await expect(html(page)).toHaveAttribute("dir", "rtl");
+  await expect(html(page)).toHaveClass(/\bdark\b/);
+
+  await page.getByRole("link", { name: "English" }).click();
+  await expect(html(page)).toHaveAttribute("dir", "ltr");
+  await expect(html(page)).toHaveClass(/\bdark\b/);
+});
