@@ -9,10 +9,14 @@ changes, a minor version for new features, and a patch version for fixes.
 
 ### Added
 
-- Dark mode: settings offers System, Light or Dark (Appearance). System follows the device, and the choice is kept in the browser and applied before the page shows, so there's no flash ([#110])
+- Dark mode: a sun/moon button in the header of every page switches between light and dark, and settings offers System, Light or Dark (Appearance). System follows the device, and the choice is kept in the browser and applied before the page shows, so there's no flash ([#110])
 - A "Feedback" link in the app header and a Feedback section in settings, opening a short form in a new tab. Set `NEXT_PUBLIC_FEEDBACK_URL` (https) to turn them on ([#109])
 - A first-run guide on the board: add your first application, set a follow-up date and (once it's in the Chrome Web Store, `NEXT_PUBLIC_EXTENSION_URL`) get the extension. Each step is ticked off when it's done; the guide goes away once a follow-up date is set, or with its Hide button ([#108])
 - A privacy policy and terms of use, in Arabic and English, at `/privacy` and `/terms`. The home page footer, the sign-up page and settings link to them. Set `NEXT_PUBLIC_CONTACT_EMAIL` to show an address for questions ([#107])
+
+### Changed
+
+- Text fields have darker edges (3:1 contrast against the page), so they're easier to see in light and dark mode
 
 ## [0.7.0] - 2026-10-25
 
