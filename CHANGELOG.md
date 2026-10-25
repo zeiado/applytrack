@@ -7,6 +7,10 @@ changes, a minor version for new features, and a patch version for fixes.
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-10-25
+
+Sekka: the new name and look, the Chrome extension, unsubscribe from reminder emails, and error tracking and analytics.
+
 ### Added
 
 - Install the web app on a phone's home screen (Android and iPhone): app icons, a manifest, and an offline page when there's no connection. Settings shows how to install it on each device ([#72])
@@ -124,7 +128,8 @@ First release.
 - Interview times are returned in UTC on create, matching reads ([#25])
 - CI tests the Python version the Docker image ships ([#35])
 
-[Unreleased]: https://github.com/zeiado/applytrack/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/zeiado/applytrack/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/zeiado/applytrack/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/zeiado/applytrack/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/zeiado/applytrack/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/zeiado/applytrack/compare/v0.3.0...v0.4.0
