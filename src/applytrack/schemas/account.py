@@ -6,6 +6,7 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 from applytrack.schemas.applications import ApplicationRead, StatusChangeRead
 from applytrack.schemas.auth import UserRead
 from applytrack.schemas.interviews import InterviewRead
+from applytrack.schemas.profiles import ProfileRead
 
 
 class ExportedApplication(ApplicationRead):
@@ -18,6 +19,7 @@ class AccountExport(BaseModel):
 
     exported_at: datetime
     user: UserRead
+    profile: ProfileRead
     applications: list[ExportedApplication]
 
 

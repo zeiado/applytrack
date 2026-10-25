@@ -12,7 +12,9 @@ from applytrack.core.google import GoogleIdentity, GoogleIdTokenVerifier
 from applytrack.core.rate_limit import LoginRateLimiter
 from applytrack.schemas.account import AccountExport, DeleteAccountRequest
 from applytrack.schemas.auth import UserRead, UserUpdate
+from applytrack.schemas.profiles import ProfileRead, ProfileUpdate
 from applytrack.services.account import AccountService
+from applytrack.services.profiles import ProfileService
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -38,6 +40,24 @@ def update_me(body: UserUpdate, user: CurrentUser, db: DbSession) -> UserRead:
         setattr(user, field, value)
     db.commit()
     return UserRead.model_validate(user)
+
+
+@router.get("/me/profile", responses={status.HTTP_401_UNAUTHORIZED: {"model": ErrorResponse}})
+def read_my_profile(user: CurrentUser, db: DbSession) -> ProfileRead:
+    """Your profile: empty fields until you save it."""
+    return ProfileService(db, user).read()
+
+
+@router.patch(
+    "/me/profile",
+    responses={
+        status.HTTP_401_UNAUTHORIZED: {"model": ErrorResponse},
+        status.HTTP_422_UNPROCESSABLE_CONTENT: {"model": ErrorResponse},
+    },
+)
+def update_my_profile(body: ProfileUpdate, user: CurrentUser, db: DbSession) -> ProfileRead:
+    """Change your profile. It's private unless you set visibility to "recruiters"."""
+    return ProfileService(db, user).update(body)
 
 
 @router.get("/me/export", responses={status.HTTP_401_UNAUTHORIZED: {"model": ErrorResponse}})

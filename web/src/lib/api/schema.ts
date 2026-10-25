@@ -478,6 +478,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/users/me/profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read My Profile
+         * @description Your profile: empty fields until you save it.
+         */
+        get: operations["read_my_profile_api_v1_users_me_profile_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update My Profile
+         * @description Change your profile. It's private unless you set visibility to "recruiters".
+         */
+        patch: operations["update_my_profile_api_v1_users_me_profile_patch"];
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -534,6 +558,7 @@ export interface components {
              * Format: date-time
              */
             exported_at: string;
+            profile: components["schemas"]["ProfileRead"];
             user: components["schemas"]["UserRead"];
         };
         /** ApplicationCreate */
@@ -747,6 +772,11 @@ export interface components {
         ErrorResponse: {
             error: components["schemas"]["ErrorDetail"];
         };
+        /**
+         * ExperienceLevel
+         * @enum {string}
+         */
+        ExperienceLevel: "student" | "graduate" | "junior" | "mid" | "senior";
         /** ExportedApplication */
         ExportedApplication: {
             /** Applied On */
@@ -926,6 +956,72 @@ export interface components {
              */
             total: number;
         };
+        /**
+         * ProfileRead
+         * @description Your profile. Empty until you save it for the first time.
+         */
+        ProfileRead: {
+            /** City */
+            city?: string | null;
+            /** Display Name */
+            display_name?: string | null;
+            /**
+             * Education
+             * @description Degree, school and year, in your words
+             */
+            education?: string | null;
+            experience_level?: components["schemas"]["ExperienceLevel"] | null;
+            /**
+             * Headline
+             * @description e.g. "Final-year computer science student"
+             */
+            headline?: string | null;
+            /** Languages */
+            languages?: string[];
+            /** Skills */
+            skills?: string[];
+            /**
+             * Updated At
+             * @description Null until the first save
+             */
+            updated_at?: string | null;
+            /**
+             * @description private: only you. recruiters: verified employers can find it (coming later)
+             * @default private
+             */
+            visibility: components["schemas"]["ProfileVisibility"];
+        };
+        /**
+         * ProfileUpdate
+         * @description Fields to change. Leave a field out to keep it; send null or "" to clear a text field.
+         */
+        ProfileUpdate: {
+            /** City */
+            city?: string | null;
+            /** Display Name */
+            display_name?: string | null;
+            /** Education */
+            education?: string | null;
+            experience_level?: components["schemas"]["ExperienceLevel"] | null;
+            /** Headline */
+            headline?: string | null;
+            /**
+             * Languages
+             * @description Up to 10
+             */
+            languages?: string[] | null;
+            /**
+             * Skills
+             * @description Up to 30, each up to 50 characters
+             */
+            skills?: string[] | null;
+            visibility?: components["schemas"]["ProfileVisibility"] | null;
+        };
+        /**
+         * ProfileVisibility
+         * @enum {string}
+         */
+        ProfileVisibility: "private" | "recruiters";
         /**
          * RatesRead
          * @description Shares of applied applications, between 0 and 1. null if nothing was applied to yet.
@@ -2740,6 +2836,104 @@ export interface operations {
                 };
             };
             /** @description Validation error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unexpected error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    read_my_profile_api_v1_users_me_profile_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProfileRead"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unexpected error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    update_my_profile_api_v1_users_me_profile_patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProfileUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProfileRead"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
             422: {
                 headers: {
                     [name: string]: unknown;

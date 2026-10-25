@@ -38,3 +38,16 @@ class JobStatus(StrEnum):
     RUNNING = "running"  # claimed by a worker until locked_until
     DONE = "done"
     FAILED = "failed"  # gave up: a permanent error, or out of attempts
+
+
+class ExperienceLevel(StrEnum):
+    STUDENT = "student"
+    GRADUATE = "graduate"  # a fresh graduate, looking for a first job
+    JUNIOR = "junior"  # up to 2 years
+    MID = "mid"  # 3 to 5 years
+    SENIOR = "senior"  # 6 years or more
+
+
+class ProfileVisibility(StrEnum):
+    PRIVATE = "private"  # only the user (and Sekka AI, with their consent)
+    RECRUITERS = "recruiters"  # verified employers can find it (M4)

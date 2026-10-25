@@ -14,6 +14,7 @@ from applytrack.schemas.account import AccountExport, ExportedApplication
 from applytrack.schemas.applications import ApplicationRead, StatusChangeRead
 from applytrack.schemas.auth import UserRead
 from applytrack.schemas.interviews import InterviewRead
+from applytrack.services.profiles import ProfileService
 
 logger = logging.getLogger("applytrack.account")
 
@@ -35,7 +36,10 @@ class AccountService:
             for app in data.applications
         ]
         return AccountExport(
-            exported_at=now, user=UserRead.model_validate(self.user), applications=applications
+            exported_at=now,
+            user=UserRead.model_validate(self.user),
+            profile=ProfileService(self.session, self.user).read(),
+            applications=applications,
         )
 
     def delete(self, *, password: str | None = None, google: GoogleIdentity | None = None) -> None:
