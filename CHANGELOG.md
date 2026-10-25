@@ -9,6 +9,7 @@ changes, a minor version for new features, and a patch version for fixes.
 
 ### Added
 
+- A first-run guide on the board: add your first application, set a follow-up date and (once it's in the Chrome Web Store, `NEXT_PUBLIC_EXTENSION_URL`) get the extension. Each step is ticked off when it's done; the guide goes away once a follow-up date is set, or with its Hide button ([#108])
 - A privacy policy and terms of use, in Arabic and English, at `/privacy` and `/terms`. The home page footer, the sign-up page and settings link to them. Set `NEXT_PUBLIC_CONTACT_EMAIL` to show an address for questions ([#107])
 
 ## [0.7.0] - 2026-10-25
@@ -172,4 +173,5 @@ First release.
 [#71]: https://github.com/zeiado/applytrack/issues/71
 [#72]: https://github.com/zeiado/applytrack/issues/72
 [#107]: https://github.com/zeiado/applytrack/issues/107
+[#108]: https://github.com/zeiado/applytrack/issues/108
 [#50]: https://github.com/zeiado/applytrack/issues/50

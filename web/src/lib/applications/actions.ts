@@ -7,6 +7,7 @@ import { redirect } from "@/i18n/navigation";
 import { type ActionError, toActionError } from "@/lib/auth/errors";
 import { ensureFreshSession } from "@/lib/auth/fresh-session";
 import { getCurrentUser, visitorApi } from "@/lib/auth/session";
+import { finishGuide } from "@/lib/onboarding/guide";
 
 import { applicationBody, type Field, type FormValues, formValues, invalidFields } from "./form";
 import { type InterviewField, interviewBody, type InterviewValues, interviewValues } from "./interview-form";
@@ -64,6 +65,7 @@ export async function createApplication(_state: FormState, form: FormData): Prom
       values,
     };
   }
+  if (result.data.follow_up_on) await finishGuide();
   return toBoard();
 }
 
@@ -96,6 +98,7 @@ export async function updateApplication(
       values,
     };
   }
+  if (result.data.follow_up_on) await finishGuide();
   return redirect({ href: `/applications/${id}`, locale: await getLocale() });
 }
 
@@ -176,6 +179,7 @@ export async function setFollowUp(
     return { error: failed(error) };
   }
   if (result.response.status === 401) return toLogin();
+  if (result.data?.follow_up_on) await finishGuide();
   refresh();
   return result.data ? { ok: true } : { error: toActionError(result.error, result.response) };
 }

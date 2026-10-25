@@ -7,6 +7,7 @@ import { Board } from "@/components/applications/board";
 import { RoadLine } from "@/components/brand/road";
 import { ListView } from "@/components/applications/list-view";
 import { VerifyBanner } from "@/components/auth/verify-banner";
+import { GettingStarted } from "@/components/onboarding/getting-started";
 import { buttonVariants } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
@@ -15,6 +16,7 @@ import { todayIn } from "@/lib/applications/dates";
 import { type Application, STATUSES } from "@/lib/applications/model";
 import { parseListQuery } from "@/lib/applications/query";
 import { getCurrentUser } from "@/lib/auth/session";
+import { guideSteps } from "@/lib/onboarding/guide";
 import { cn } from "@/lib/utils";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/applications">): Promise<Metadata> {
@@ -68,9 +70,11 @@ async function Content({ searchParams }: { searchParams: PageProps<"/[locale]/ap
 async function BoardView({ today }: { today: string }) {
   const t = await getTranslations("Applications");
   const { items, truncated } = await allApplications();
-  if (items.length === 0) return <Empty />;
+  const guide = await guideSteps(items);
+  if (items.length === 0) return guide ? <GettingStarted steps={guide} /> : <Empty />;
   return (
     <>
+      {guide && <GettingStarted steps={guide} />}
       <OfferBanner applications={items} />
       <StageChips applications={items} />
       {truncated && <p className="text-muted-foreground text-sm">{t("truncated")}</p>}

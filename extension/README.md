@@ -72,4 +72,5 @@ The end-to-end test (`web/e2e/extension.spec.ts`) loads `dist/` (built for
 6. Visibility: **Unlisted** first (only people with the link can install it), then
    Public once it has been tried.
 7. After the first upload, copy the item's id and set `EXTENSION_IDS` to it in Vercel
-   (Production), then redeploy the web app.
+   (Production), and `NEXT_PUBLIC_EXTENSION_URL` to its store page (the board's first-run
+   guide links to it), then redeploy the web app.
