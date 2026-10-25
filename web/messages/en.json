@@ -492,5 +492,9 @@
         "action": "Get the extension"
       }
     }
+  },
+  "Theme": {
+    "toDark": "Switch to dark theme",
+    "toLight": "Switch to light theme"
   }
 }

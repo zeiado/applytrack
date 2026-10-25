@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { Logo } from "@/components/brand/logo";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { SiteHeader } from "@/components/site-header";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 
@@ -15,11 +16,14 @@ export default async function AuthLayout({ children, params }: LayoutProps<"/[lo
 
   return (
     <>
-      {/* Phones: just the logo, centred, with the language switch in the corner. */}
+      {/* Phones: just the logo, centred, with the theme and language switches in the corners. */}
       <div className="relative flex justify-center px-4 pt-12 pb-2 sm:hidden">
         <Link href="/">
           <Logo className="h-9" />
         </Link>
+        <div className="absolute start-2 top-2.5">
+          <ThemeToggle />
+        </div>
         <div className="absolute end-4 top-4 text-sm">
           <Suspense>
             <LanguageSwitcher />
