@@ -5,6 +5,7 @@ import { ACCESS_COOKIE } from "@/lib/auth/cookies";
 import { ensureFreshSession } from "@/lib/auth/fresh-session";
 import { visitorApi } from "@/lib/auth/session";
 import { extensionError, fromExtension } from "@/lib/extension";
+import { markExtensionUsed } from "@/lib/onboarding/guide";
 
 type Source = components["schemas"]["ApplicationSource"];
 const SOURCES: readonly Source[] = ["job_board", "company_site", "referral", "recruiter", "other"];
@@ -45,6 +46,7 @@ export async function POST(request: Request): Promise<Response> {
     return extensionError("network", 502);
   }
   if (result.data) {
+    await markExtensionUsed();
     return Response.json({ id: result.data.id }, { status: 201, headers: { "Cache-Control": "no-store" } });
   }
   if (result.response.status === 401) return extensionError("not_signed_in", 401);

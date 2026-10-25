@@ -26,7 +26,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 test("a new account sees how to start", async ({ page }) => {
-  await expect(page.getByRole("heading", { name: "No applications yet" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Get started" })).toBeVisible();
 });
 
 test("add applications and see them in their columns", async ({ page }) => {
@@ -142,7 +142,8 @@ test("delete an application after confirming", async ({ page }) => {
   await page.getByRole("button", { name: "Yes, delete it" }).click();
 
   await expect(page).toHaveURL(/\/en\/applications$/, AUTH_TIMEOUT);
-  await expect(page.getByRole("heading", { name: "No applications yet" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Get started" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Halan" })).toHaveCount(0);
 });
 
 test("an overdue follow-up stands out", async ({ page }) => {

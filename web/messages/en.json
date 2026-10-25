@@ -456,5 +456,28 @@
     "contact": "For questions or requests about your data or these terms, email <email>{address}</email>.",
     "contactNoEmail": "To download or delete your data, go to Settings.",
     "agree": "By creating an account, you agree to the <terms>terms of use</terms> and the <privacy>privacy policy</privacy>."
+  },
+  "Guide": {
+    "title": "Get started",
+    "progress": "{done} of {total} done",
+    "hide": "Hide",
+    "done": "Done",
+    "steps": {
+      "add": {
+        "title": "Add your first application",
+        "body": "A job you applied to, or one you want to apply to.",
+        "action": "Add an application"
+      },
+      "followUp": {
+        "title": "Set a follow-up date",
+        "body": "Pick a day to check in with the company. Sekka emails you that morning.",
+        "action": "Set a date"
+      },
+      "extension": {
+        "title": "Save jobs in one click",
+        "body": "Add the Sekka extension to Chrome on your computer, then save jobs straight from LinkedIn, Wuzzuf and other sites.",
+        "action": "Get the extension"
+      }
+    }
   }
 }
