@@ -508,7 +508,7 @@
     "fields": {
       "display_name": {
         "label": "Name",
-        "placeholder": ""
+        "placeholder": "Your name as you'd like employers to see it"
       },
       "headline": {
         "label": "Headline",

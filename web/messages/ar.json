@@ -508,7 +508,7 @@
     "fields": {
       "display_name": {
         "label": "الاسم",
-        "placeholder": ""
+        "placeholder": "اسمك زي ما تحب أصحاب الشغل يشوفوه"
       },
       "headline": {
         "label": "عنوان قصير عنك",
