@@ -59,7 +59,7 @@ export const privacy: LegalText = {
         id: "cookies",
         title: "Cookies",
         body: [
-          "Sekka only uses the cookies it needs to keep you logged in and remember your language. There are no advertising or tracking cookies, which is why there's no cookie banner.",
+          "Sekka only keeps what it needs in your browser: cookies that keep you logged in, and your choices, such as your language, light or dark theme, and whether you've closed the getting-started guide. There are no advertising or tracking cookies, which is why there's no cookie banner.",
         ],
       },
       {
@@ -167,7 +167,7 @@ export const privacy: LegalText = {
         id: "cookies",
         title: "الكوكيز",
         body: [
-          "سكة بتستخدم بس الكوكيز اللي محتاجاها عشان تفضل داخل حسابك وتفتكر لغتك. مفيش كوكيز إعلانات أو تتبّع، وعشان كده مفيش رسالة كوكيز.",
+          "سكة بتحفظ في المتصفح بتاعك بس اللي محتاجاه: كوكيز عشان تفضل داخل حسابك، واختياراتك زي اللغة، والشكل الفاتح أو الغامق، ولو قفلت دليل البداية. مفيش كوكيز إعلانات أو تتبّع، وعشان كده مفيش رسالة كوكيز.",
         ],
       },
       {
