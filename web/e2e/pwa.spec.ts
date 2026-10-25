@@ -45,6 +45,6 @@ test("offline, pages show the offline page", async ({ page, context }) => {
 test("settings explain how to install it", async ({ page }) => {
   await register(page);
   await page.goto("/en/settings");
-  const app = page.locator("section").filter({ has: page.getByRole("heading", { name: "App", level: 2 }) });
+  const app = page.locator("section").filter({ has: page.getByRole("heading", { name: "App", level: 2, exact: true }) });
   await expect(app).toContainText("Add Sekka to your home screen", AUTH_TIMEOUT);
 });
