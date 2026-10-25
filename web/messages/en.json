@@ -344,6 +344,13 @@
       "save": "Save preferences",
       "saved": "Saved."
     },
+    "theme": {
+      "title": "Appearance",
+      "system": "System",
+      "light": "Light",
+      "dark": "Dark",
+      "hint": "System follows your device's light or dark setting. Saved in this browser."
+    },
     "password": {
       "title": "Password",
       "googleOnly": "You sign in with Google. To also sign in with your email and a password, we'll email you a link to set one.",

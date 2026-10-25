@@ -5,6 +5,7 @@ import { Suspense } from "react";
 
 import { InstallApp } from "@/components/pwa/install-app";
 import { DeleteAccount, PreferencesForm, SetPassword } from "@/components/settings/settings-forms";
+import { ThemePicker } from "@/components/settings/theme-picker";
 import { buttonVariants } from "@/components/ui/button";
 import { FEEDBACK_URL } from "@/config/brand";
 import { Link, redirect } from "@/i18n/navigation";
@@ -71,6 +72,10 @@ async function Sections({ locale }: { locale: Locale }) {
           suggested={SUGGESTED_TIME_ZONES.map(zone)}
           zones={allTimeZones().map(zone)}
         />
+      </Section>
+
+      <Section title={t("theme.title")}>
+        <ThemePicker />
       </Section>
 
       <Section title={t("password.title")}>

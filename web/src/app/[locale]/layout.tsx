@@ -8,6 +8,7 @@ import { ServiceWorker } from "@/components/pwa/service-worker";
 import { DirectionProvider } from "@/components/ui/direction";
 import { APP_NAME } from "@/config/brand";
 import { direction, routing } from "@/i18n/routing";
+import { THEME_SCRIPT } from "@/lib/theme/theme";
 
 import "../globals.css";
 
@@ -46,7 +47,11 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
   const dir = direction(locale);
 
   return (
-    <html lang={locale} dir={dir} className={`${fontSans.variable} h-full antialiased`}>
+    // The theme script changes <html>'s class and style before React loads.
+    <html lang={locale} dir={dir} className={`${fontSans.variable} h-full antialiased`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+      </head>
       <body className="flex min-h-full flex-col">
         <DirectionProvider direction={dir}>
           <NextIntlClientProvider>{children}</NextIntlClientProvider>
