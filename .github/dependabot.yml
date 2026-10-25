@@ -28,10 +28,10 @@ updates:
       web-minor-and-patch:
         update-types: ["minor", "patch"]
     ignore:
-      # typescript-eslint (via eslint-config-next) supports TypeScript below 6.1 only.
-      # Lift this once it supports newer versions.
+      # openapi-typescript needs TypeScript 5, and typescript-eslint (via
+      # eslint-config-next) refuses 7. Lift this once both support newer versions.
       - dependency-name: typescript
-        versions: [">=6.1.0"]
+        versions: [">=6.0.0"]
       # Types for the Node version the app runs on (24, see `engines`); bump with Node.
       - dependency-name: "@types/node"
         update-types: ["version-update:semver-major"]
