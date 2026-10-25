@@ -56,9 +56,16 @@ when they click Save. It has no access to other tabs or the browsing history, an
 nothing itself. The Chrome Web Store's privacy form asks for this; the answers are in
 `extension/README.md`.
 
+## Public privacy policy and terms
+
+`/[locale]/privacy` and `/[locale]/terms` (text in `web/src/content/legal/`), written
+from this file: when a service is added here, add it to the policy too and change its
+date. The home page footer, sign-up and settings link to them. Before a wide launch, a
+lawyer should review both, and the operator's legal name goes in once the company is
+registered.
+
 ## Still to do before launch
 
-- A public privacy policy and terms, linked from sign-up and the home page.
 - Data processing terms with each service above (PostHog, Sentry, Resend and Neon offer
   standard DPAs).
 - If analytics ever moves into the browser (page views, session recordings), it needs a

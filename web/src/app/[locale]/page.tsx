@@ -3,6 +3,7 @@ import { Suspense } from "react";
 
 import { DeletedNotice } from "@/components/deleted-notice";
 import { HomeHero } from "@/components/home-hero";
+import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
@@ -26,6 +27,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
         </Suspense>
         <HomeHero />
       </main>
+      <SiteFooter />
     </>
   );
 }

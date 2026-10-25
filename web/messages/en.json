@@ -445,5 +445,16 @@
     "done": "Done. You won't get reminder emails any more.",
     "settings": "Turn them back on in settings",
     "noToken": "This link is incomplete. Open it again from the email, or turn off reminders in your settings."
+  },
+  "Legal": {
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "nav": "Legal",
+    "updated": "Last updated {date}",
+    "contents": "On this page",
+    "contactTitle": "Contact",
+    "contact": "For questions or requests about your data or these terms, email <email>{address}</email>.",
+    "contactNoEmail": "To download or delete your data, go to Settings.",
+    "agree": "By creating an account, you agree to the <terms>terms of use</terms> and the <privacy>privacy policy</privacy>."
   }
 }

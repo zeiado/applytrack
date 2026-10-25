@@ -7,6 +7,10 @@ changes, a minor version for new features, and a patch version for fixes.
 
 ## [Unreleased]
 
+### Added
+
+- A privacy policy and terms of use, in Arabic and English, at `/privacy` and `/terms`. The home page footer, the sign-up page and settings link to them. Set `NEXT_PUBLIC_CONTACT_EMAIL` to show an address for questions ([#107])
+
 ## [0.7.0] - 2026-10-25
 
 Sekka: the new name and look, the Chrome extension, unsubscribe from reminder emails, and error tracking and analytics.
@@ -167,4 +171,5 @@ First release.
 [#70]: https://github.com/zeiado/applytrack/issues/70
 [#71]: https://github.com/zeiado/applytrack/issues/71
 [#72]: https://github.com/zeiado/applytrack/issues/72
+[#107]: https://github.com/zeiado/applytrack/issues/107
 [#50]: https://github.com/zeiado/applytrack/issues/50

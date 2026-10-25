@@ -68,7 +68,7 @@ The end-to-end test (`web/e2e/extension.spec.ts`) loads `dist/` (built for
    - Host permission: "Sends the job the user chose to save to their Sekka account."
    - Data collected: website content (the job's company, role and link), sent only when
      the user clicks Save. Not sold, not used for anything else.
-   - Privacy policy URL: the web app's privacy page, once it exists (`docs/privacy.md`).
+   - Privacy policy URL: the web app's privacy page, `<web app URL>/en/privacy`.
 6. Visibility: **Unlisted** first (only people with the link can install it), then
    Public once it has been tried.
 7. After the first upload, copy the item's id and set `EXTENSION_IDS` to it in Vercel

@@ -6,7 +6,7 @@ import { Suspense } from "react";
 import { InstallApp } from "@/components/pwa/install-app";
 import { DeleteAccount, PreferencesForm, SetPassword } from "@/components/settings/settings-forms";
 import { buttonVariants } from "@/components/ui/button";
-import { redirect } from "@/i18n/navigation";
+import { Link, redirect } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { allTimeZones, SUGGESTED_TIME_ZONES, timeZoneLabel } from "@/lib/account/time-zones";
 import { getCurrentUser } from "@/lib/auth/session";
@@ -36,6 +36,7 @@ export default async function SettingsPage({ params }: PageProps<"/[locale]/sett
 
 async function Sections({ locale }: { locale: Locale }) {
   const t = await getTranslations("Settings");
+  const tLegal = await getTranslations("Legal");
   const user = await getCurrentUser();
   if (!user) return redirect({ href: "/login?next=/settings", locale });
 
@@ -100,6 +101,15 @@ async function Sections({ locale }: { locale: Locale }) {
         <p className="text-muted-foreground text-sm">{t("delete.body")}</p>
         <DeleteAccount hasPassword={methods.includes("password")} />
       </Section>
+
+      <nav aria-label={tLegal("nav")} className="text-muted-foreground flex gap-5 border-t pt-6 text-sm">
+        <Link href="/privacy" className="hover:text-foreground hover:underline">
+          {tLegal("privacy")}
+        </Link>
+        <Link href="/terms" className="hover:text-foreground hover:underline">
+          {tLegal("terms")}
+        </Link>
+      </nav>
     </>
   );
 }
