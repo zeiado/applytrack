@@ -23,13 +23,16 @@ test("the guide ticks off each step and goes away once a follow-up is set", asyn
   await guide(page).getByRole("link", { name: "Set a date" }).click();
   await expect(page).toHaveURL(/\/en\/applications\/[\w-]+#follow_up_on$/);
 
-  await page.getByLabel("Follow up on").fill("2030-01-05");
-  await page.getByRole("button", { name: "Save date" }).click();
-  await expect(page.getByText("Saved.")).toBeVisible(AUTH_TIMEOUT);
+  const followUp = page
+    .locator("section")
+    .filter({ has: page.getByRole("heading", { name: "Follow-up", level: 2 }) });
+  await followUp.getByLabel("Follow up on").fill("2030-01-05");
+  await followUp.getByRole("button", { name: "Save date" }).click();
+  await expect(followUp.getByRole("status")).toHaveText("Saved.", AUTH_TIMEOUT);
 
   // Clearing the date later doesn't bring the guide back.
-  await page.getByRole("button", { name: "Clear" }).click();
-  await expect(page.getByLabel("Follow up on")).toHaveValue("", AUTH_TIMEOUT);
+  await followUp.getByRole("button", { name: "Clear" }).click();
+  await expect(followUp.getByLabel("Follow up on")).toHaveValue("", AUTH_TIMEOUT);
   await page.goto("/en/applications");
   await expect(page.getByRole("heading", { name: "Paymob" })).toBeVisible();
   await expect(guide(page)).toHaveCount(0);
