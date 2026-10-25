@@ -4,6 +4,7 @@ import { Suspense } from "react";
 
 import { AppNav, AppNavLinks } from "@/components/app-nav";
 import { FeedbackLink } from "@/components/feedback-link";
+import { ProfileLink } from "@/components/profile-link";
 import { SiteHeader } from "@/components/site-header";
 import { Button } from "@/components/ui/button";
 import type { Locale } from "@/i18n/routing";
@@ -20,6 +21,10 @@ export default async function AppLayout({ children, params }: LayoutProps<"/[loc
       <SiteHeader>
         <Suspense fallback={<AppNavLinks kind="header" current={null} />}>
           <AppNav kind="header" />
+        </Suspense>
+        {/* It marks itself when it's the current page, which is only known per request. */}
+        <Suspense>
+          <ProfileLink />
         </Suspense>
         <FeedbackLink />
         <form action={logOut}>

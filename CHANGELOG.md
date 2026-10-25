@@ -7,6 +7,10 @@ changes, a minor version for new features, and a patch version for fixes.
 
 ## [Unreleased]
 
+### Added
+
+- A profile icon in the app header, so the profile is one tap away from any page
+
 ## [0.8.0] - 2026-10-25
 
 Profiles, dark mode, a first-run guide, a feedback link, and the privacy policy and terms.
