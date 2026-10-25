@@ -7,6 +7,10 @@ changes, a minor version for new features, and a patch version for fixes.
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-10-25
+
+Profiles, dark mode, a first-run guide, a feedback link, and the privacy policy and terms.
+
 ### Added
 
 - Profiles: name, headline, city, education, experience, skills and languages, on a profile page linked from settings (`GET`/`PATCH /api/v1/users/me/profile`). Private by default, with an "Open to recruiters" opt-in for later. Included in the data download and deleted with the account ([#114])
@@ -140,7 +144,8 @@ First release.
 - Interview times are returned in UTC on create, matching reads ([#25])
 - CI tests the Python version the Docker image ships ([#35])
 
-[Unreleased]: https://github.com/zeiado/applytrack/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/zeiado/applytrack/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/zeiado/applytrack/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/zeiado/applytrack/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/zeiado/applytrack/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/zeiado/applytrack/compare/v0.4.0...v0.5.0
