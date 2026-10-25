@@ -330,6 +330,11 @@
       "password": "Password",
       "google": "Google"
     },
+    "profile": {
+      "title": "Profile",
+      "body": "Your name, education, skills and languages. Sekka AI uses them to tailor its help.",
+      "edit": "Edit your profile"
+    },
     "preferences": {
       "title": "Preferences",
       "language": "Email language",
@@ -496,5 +501,54 @@
   "Theme": {
     "toDark": "Switch to dark theme",
     "toLight": "Switch to light theme"
+  },
+  "Profile": {
+    "title": "Your profile",
+    "description": "Tell Sekka about yourself. Sekka AI uses it to tailor your CV and interview prep. It's private unless you choose otherwise.",
+    "fields": {
+      "display_name": {
+        "label": "Name",
+        "placeholder": "Your name as you'd like employers to see it"
+      },
+      "headline": {
+        "label": "Headline",
+        "placeholder": "e.g. Final-year computer science student looking for a backend role"
+      },
+      "city": {
+        "label": "City",
+        "placeholder": "e.g. Cairo"
+      },
+      "education": {
+        "label": "Education",
+        "placeholder": "e.g. BSc Computer Science, Cairo University, 2026"
+      },
+      "experience_level": {
+        "label": "Experience",
+        "none": "Choose one"
+      },
+      "skills": {
+        "label": "Skills",
+        "placeholder": "e.g. Python, SQL, Excel",
+        "hint": "Separate them with commas. Up to 30."
+      },
+      "languages": {
+        "label": "Languages",
+        "placeholder": "e.g. Arabic, English",
+        "hint": "Separate them with commas. Up to 10."
+      }
+    },
+    "levels": {
+      "student": "Student",
+      "graduate": "Fresh graduate",
+      "junior": "Up to 2 years",
+      "mid": "3 to 5 years",
+      "senior": "6 years or more"
+    },
+    "recruiters": {
+      "label": "Open to recruiters",
+      "hint": "Coming soon: verified employers on Sekka will be able to find your profile. Your applications and notes are never shown."
+    },
+    "save": "Save profile",
+    "saved": "Saved."
   }
 }

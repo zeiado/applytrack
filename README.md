@@ -213,6 +213,8 @@ need `Authorization: Bearer <token>`, and other users' resources return `404`.
 | `POST` | `/api/v1/auth/logout` | Revoke a refresh token |
 | `GET` | `/api/v1/users/me` | The current user |
 | `PATCH` | `/api/v1/users/me` | Change email language, timezone, or reminder emails on/off |
+| `GET` | `/api/v1/users/me/profile` | Your profile (empty until saved) |
+| `PATCH` | `/api/v1/users/me/profile` | Change your profile; private unless `visibility` is `recruiters` |
 | `GET` | `/api/v1/users/me/export` | Download all your data as JSON |
 | `DELETE` | `/api/v1/users/me` | Delete your account and all its data (needs your password, or Google) |
 | `GET` | `/api/v1/applications` | List: `status`, `source`, `company`, `sort`, `limit`, `offset` |

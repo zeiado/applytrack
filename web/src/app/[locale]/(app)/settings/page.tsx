@@ -1,4 +1,4 @@
-import { Download, MessageSquare } from "lucide-react";
+import { Download, MessageSquare, UserRound } from "lucide-react";
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Suspense } from "react";
@@ -64,6 +64,14 @@ async function Sections({ locale }: { locale: Locale }) {
             <dd>{methods.map((method) => t(`account.${method}`)).join(" · ")}</dd>
           </div>
         </dl>
+      </Section>
+
+      <Section title={t("profile.title")}>
+        <p className="text-muted-foreground text-sm">{t("profile.body")}</p>
+        <Link href="/profile" className={buttonVariants({ variant: "outline", className: "h-10 w-fit gap-1.5" })}>
+          <UserRound aria-hidden />
+          {t("profile.edit")}
+        </Link>
       </Section>
 
       <Section title={t("preferences.title")}>

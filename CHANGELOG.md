@@ -9,6 +9,7 @@ changes, a minor version for new features, and a patch version for fixes.
 
 ### Added
 
+- Profiles: name, headline, city, education, experience, skills and languages, on a profile page linked from settings (`GET`/`PATCH /api/v1/users/me/profile`). Private by default, with an "Open to recruiters" opt-in for later. Included in the data download and deleted with the account ([#114])
 - Dark mode: a sun/moon button in the header of every page switches between light and dark, and settings offers System, Light or Dark (Appearance). System follows the device, and the choice is kept in the browser and applied before the page shows, so there's no flash ([#110])
 - A "Feedback" link in the app header and a Feedback section in settings, opening a short form in a new tab. Set `NEXT_PUBLIC_FEEDBACK_URL` (https) to turn them on ([#109])
 - A first-run guide on the board: add your first application, set a follow-up date and (once it's in the Chrome Web Store, `NEXT_PUBLIC_EXTENSION_URL`) get the extension. Each step is ticked off when it's done; the guide goes away once a follow-up date is set, or with its Hide button ([#108])
@@ -182,4 +183,5 @@ First release.
 [#108]: https://github.com/zeiado/applytrack/issues/108
 [#109]: https://github.com/zeiado/applytrack/issues/109
 [#110]: https://github.com/zeiado/applytrack/issues/110
+[#114]: https://github.com/zeiado/applytrack/issues/114
 [#50]: https://github.com/zeiado/applytrack/issues/50

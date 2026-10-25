@@ -16,6 +16,9 @@
             "title": "Exported At",
             "type": "string"
           },
+          "profile": {
+            "$ref": "#/components/schemas/ProfileRead"
+          },
           "user": {
             "$ref": "#/components/schemas/UserRead"
           }
@@ -23,6 +26,7 @@
         "required": [
           "exported_at",
           "user",
+          "profile",
           "applications"
         ],
         "title": "AccountExport",
@@ -658,6 +662,17 @@
         "title": "ErrorResponse",
         "type": "object"
       },
+      "ExperienceLevel": {
+        "enum": [
+          "student",
+          "graduate",
+          "junior",
+          "mid",
+          "senior"
+        ],
+        "title": "ExperienceLevel",
+        "type": "string"
+      },
       "ExportedApplication": {
         "properties": {
           "applied_on": {
@@ -1144,6 +1159,221 @@
         ],
         "title": "Page[ApplicationRead]",
         "type": "object"
+      },
+      "ProfileRead": {
+        "description": "Your profile. Empty until you save it for the first time.",
+        "properties": {
+          "city": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City"
+          },
+          "display_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Display Name"
+          },
+          "education": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Degree, school and year, in your words",
+            "title": "Education"
+          },
+          "experience_level": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ExperienceLevel"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "headline": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "e.g. \"Final-year computer science student\"",
+            "title": "Headline"
+          },
+          "languages": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Languages",
+            "type": "array"
+          },
+          "skills": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Skills",
+            "type": "array"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Null until the first save",
+            "title": "Updated At"
+          },
+          "visibility": {
+            "$ref": "#/components/schemas/ProfileVisibility",
+            "default": "private",
+            "description": "private: only you. recruiters: verified employers can find it (coming later)"
+          }
+        },
+        "title": "ProfileRead",
+        "type": "object"
+      },
+      "ProfileUpdate": {
+        "additionalProperties": false,
+        "description": "Fields to change. Leave a field out to keep it; send null or \"\" to clear a text field.",
+        "properties": {
+          "city": {
+            "anyOf": [
+              {
+                "maxLength": 100,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City"
+          },
+          "display_name": {
+            "anyOf": [
+              {
+                "maxLength": 100,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Display Name"
+          },
+          "education": {
+            "anyOf": [
+              {
+                "maxLength": 300,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Education"
+          },
+          "experience_level": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ExperienceLevel"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "headline": {
+            "anyOf": [
+              {
+                "maxLength": 160,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Headline"
+          },
+          "languages": {
+            "anyOf": [
+              {
+                "items": {
+                  "maxLength": 50,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "maxItems": 10,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Up to 10",
+            "title": "Languages"
+          },
+          "skills": {
+            "anyOf": [
+              {
+                "items": {
+                  "maxLength": 50,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "maxItems": 30,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Up to 30, each up to 50 characters",
+            "title": "Skills"
+          },
+          "visibility": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ProfileVisibility"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "title": "ProfileUpdate",
+        "type": "object"
+      },
+      "ProfileVisibility": {
+        "enum": [
+          "private",
+          "recruiters"
+        ],
+        "title": "ProfileVisibility",
+        "type": "string"
       },
       "RatesRead": {
         "description": "Shares of applied applications, between 0 and 1. null if nothing was applied to yet.",
@@ -3912,6 +4142,128 @@
           }
         ],
         "summary": "Export My Data",
+        "tags": [
+          "users"
+        ]
+      }
+    },
+    "/api/v1/users/me/profile": {
+      "get": {
+        "description": "Your profile: empty fields until you save it.",
+        "operationId": "read_my_profile_api_v1_users_me_profile_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unexpected error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Read My Profile",
+        "tags": [
+          "users"
+        ]
+      },
+      "patch": {
+        "description": "Change your profile. It's private unless you set visibility to \"recruiters\".",
+        "operationId": "update_my_profile_api_v1_users_me_profile_patch",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProfileUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unexpected error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Update My Profile",
         "tags": [
           "users"
         ]
