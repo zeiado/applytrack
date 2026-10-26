@@ -325,7 +325,7 @@ def test_update_settings_needs_a_login(client: TestClient) -> None:
 
 
 def test_the_worker_checks_reminders_periodically(worker: Worker, settings: Settings) -> None:
-    [task] = worker.periodic
+    task = next(t for t in worker.periodic if t.name == "follow_up_reminders")
     assert task.name == "follow_up_reminders"
     assert task.every == timedelta(minutes=settings.reminder_check_minutes)
 

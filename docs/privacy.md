@@ -12,6 +12,7 @@ data ([design](design.md)).
 | Neon (Postgres) | The database | Everything the app stores | Never |
 | Render | Hosts the API and the worker | Requests and logs (log lines mask email addresses) | Never |
 | Vercel | Hosts the web app | Requests, the visitor's IP (for rate limits) | Never |
+| Cloudflare R2 | Stores uploaded CVs (#115, [ADR 0011](adr/0011-object-storage-for-cvs.md)) | The CV files, in a private bucket | `APPLYTRACK_STORAGE_*` unset (uploads off) |
 | Resend or an SMTP provider | Sends emails | The address, the email's content | `APPLYTRACK_EMAIL_BACKEND=console` |
 | Google | Sign in with Google | Only what Google already has; the app receives the email and Google account id | `APPLYTRACK_GOOGLE_CLIENT_IDS` unset |
 | PostHog (EU) | Product analytics (#70) | Account id and the events below | `APPLYTRACK_POSTHOG_API_KEY` unset |
@@ -55,6 +56,15 @@ The extension (`extension/`) reads the open page only when the user clicks it
 when they click Save. It has no access to other tabs or the browsing history, and keeps
 nothing itself. The Chrome Web Store's privacy form asks for this; the answers are in
 `extension/README.md`.
+
+## Uploaded CVs
+
+Users can upload up to 3 CVs (PDF or Word, 5 MB each). The file is kept in a private R2
+bucket; the API reads its text on the job queue and keeps the text in the database, for
+Sekka AI. Files are only reachable through signed links valid for a few minutes. The
+data download includes each CV's details and text (not the file, which the user can
+download from the profile page). Deleting a CV or the account deletes the files from the
+bucket within minutes (retried for about four hours if R2 is down).
 
 ## Public privacy policy and terms
 

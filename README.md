@@ -71,6 +71,7 @@ stories and priorities.
 | ORM and migrations | SQLAlchemy 2.0 (typed) + Alembic | Explicit queries, versioned schema |
 | Auth | PyJWT + pwdlib (Argon2id) | Stateless tokens ([ADR 0003](docs/adr/0003-jwt-authentication.md)) |
 | Background jobs and email | A job table in PostgreSQL, Jinja2 templates, Resend or SMTP | No extra infrastructure; jobs commit with the change that caused them ([ADR 0007](docs/adr/0007-database-job-queue-and-email.md)) |
+| File storage | Cloudflare R2 (S3 API via boto3), pypdf, python-docx | CVs upload straight from the browser with signed links; their text is read on the job queue ([ADR 0011](docs/adr/0011-object-storage-for-cvs.md)) |
 | Tooling | uv, Ruff, mypy `--strict`, pytest, pre-commit | Fast, reproducible, strict |
 | Delivery | Docker (multi-stage, non-root), GitHub Actions, GHCR | Same image from CI to production |
 | Web app | Next.js, TypeScript, Tailwind CSS, shadcn/ui, next-intl | Arabic and English with RTL; typed client generated from the OpenAPI schema ([ADR 0010](docs/adr/0010-web-app.md)) |
@@ -215,6 +216,10 @@ need `Authorization: Bearer <token>`, and other users' resources return `404`.
 | `PATCH` | `/api/v1/users/me` | Change email language, timezone, or reminder emails on/off |
 | `GET` | `/api/v1/users/me/profile` | Your profile (empty until saved) |
 | `PATCH` | `/api/v1/users/me/profile` | Change your profile; private unless `visibility` is `recruiters` |
+| `GET` `POST` | `/api/v1/cvs` | List your CVs; start uploading one (returns a signed upload link) |
+| `POST` | `/api/v1/cvs/{id}/complete` | The file is uploaded: read its text in the background |
+| `GET` `DELETE` | `/api/v1/cvs/{id}` | A CV with its text; delete it and its file |
+| `GET` | `/api/v1/cvs/{id}/download` | A short-lived download link |
 | `GET` | `/api/v1/users/me/export` | Download all your data as JSON |
 | `DELETE` | `/api/v1/users/me` | Delete your account and all its data (needs your password, or Google) |
 | `GET` | `/api/v1/applications` | List: `status`, `source`, `company`, `sort`, `limit`, `offset` |

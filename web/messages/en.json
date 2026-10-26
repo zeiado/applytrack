@@ -111,7 +111,19 @@
     "not_found": "That application doesn't exist anymore.",
     "invalid_password": "That password isn't right.",
     "wrong_google_account": "That's a different Google account from the one linked to this account.",
-    "invalid_unsubscribe_token": "This unsubscribe link isn't valid. You can turn off reminder emails in your settings."
+    "invalid_unsubscribe_token": "This unsubscribe link isn't valid. You can turn off reminder emails in your settings.",
+    "too_many_cvs": "You can keep up to 3 CVs. Delete one first.",
+    "upload_missing": "The file didn't finish uploading. Try again.",
+    "upload_invalid": "The file changed while it was uploading. Try again.",
+    "uploads_unavailable": "CV uploads aren't available right now. Try again later.",
+    "storage_unavailable": "We can't reach file storage right now. Try again in a minute.",
+    "already_uploaded": "This CV is already uploaded.",
+    "cv_not_found": "That CV doesn't exist anymore.",
+    "not_uploaded": "This CV hasn't finished uploading.",
+    "upload_failed": "The upload didn't go through. Check your connection and try again.",
+    "cv_type": "Choose a PDF or Word (.docx) file.",
+    "cv_too_big": "That file is over 5 MB. Choose a smaller one.",
+    "cv_empty": "That file is empty."
   },
   "Dashboard": {
     "title": "Dashboard",
@@ -371,12 +383,12 @@
     },
     "data": {
       "title": "Your data",
-      "body": "Download everything we store about you: your profile, applications, their history and interviews (JSON).",
+      "body": "Download everything we store about you: your profile, CVs, applications, their history and interviews (JSON). CV files download from your profile.",
       "download": "Download my data"
     },
     "delete": {
       "title": "Delete account",
-      "body": "This deletes your account and all your applications, history and interviews right away. It can't be undone.",
+      "body": "This deletes your account and all your CVs, applications, history and interviews right away. It can't be undone.",
       "start": "Delete my account",
       "passwordLabel": "Enter your password to confirm",
       "confirm": "Delete my account forever",
@@ -551,5 +563,35 @@
     },
     "save": "Save profile",
     "saved": "Saved."
+  },
+  "Cvs": {
+    "title": "Your CV",
+    "description": "Upload your CV as a PDF or Word file, up to 5 MB. Sekka AI reads it to tailor it to each job. You can keep up to {max}, for example one in Arabic and one in English.",
+    "choose": "Choose a CV file",
+    "upload": "Upload your CV",
+    "uploadAnother": "Upload another CV",
+    "uploading": "Uploading…",
+    "limit": "You have {max} CVs, the most you can keep. Replace or delete one to add another.",
+    "download": "Download",
+    "downloadNamed": "Download {name}",
+    "replace": "Replace",
+    "replaceNamed": "Replace {name}",
+    "delete": "Delete",
+    "deleteNamed": "Delete {name}",
+    "deleteWarning": "Delete this CV? The file and the text Sekka read from it are deleted for good.",
+    "deleteConfirm": "Delete it",
+    "cancel": "Cancel",
+    "status": {
+      "uploading": "Uploading…",
+      "processing": "Reading your CV…",
+      "ready": "Ready for Sekka AI"
+    },
+    "readErrors": {
+      "wrong_type": "This file isn't really a PDF or Word file. Save it again as a PDF and upload it.",
+      "encrypted": "This PDF is password protected. Upload a copy without a password.",
+      "unreadable": "We couldn't read this file. Save it again as a PDF and upload it.",
+      "no_text": "We found no text in this file; it may be a scanned image. Upload a PDF made from Word or Google Docs.",
+      "storage_error": "We couldn't read this file just now. Delete it and upload it again."
+    }
   }
 }

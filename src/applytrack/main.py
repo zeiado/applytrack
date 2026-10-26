@@ -5,7 +5,7 @@ from fastapi import FastAPI
 
 from applytrack import __version__
 from applytrack.api.router import api_router
-from applytrack.api.routes import health
+from applytrack.api.routes import health, local_storage
 from applytrack.core.analytics import DailyActivity, build_analytics
 from applytrack.core.config import Settings, get_settings, resolved_log_format
 from applytrack.core.errors import ErrorResponse, register_exception_handlers
@@ -16,6 +16,8 @@ from applytrack.core.observability import init_error_tracking
 from applytrack.core.rate_limit import InMemoryRateLimiter, LoginRateLimiter
 from applytrack.db.session import build_engine, build_session_factory
 from applytrack.jobs.worker import WorkerThread
+from applytrack.storage import build_storage
+from applytrack.storage.local import LocalStorage
 from applytrack.worker import build_worker, warn_if_emails_only_logged
 
 
@@ -24,6 +26,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     settings = settings or get_settings()
     engine = build_engine(settings.database_url, echo=settings.database_echo)
     session_factory = build_session_factory(engine)
+    storage = build_storage(settings)
 
     @asynccontextmanager
     async def lifespan(_: FastAPI) -> AsyncIterator[None]:
@@ -31,7 +34,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         if settings.run_worker_in_api:
             warn_if_emails_only_logged(settings)
             worker_thread = WorkerThread(
-                build_worker(settings, session_factory), settings.worker_poll_seconds
+                build_worker(settings, session_factory, storage=storage),
+                settings.worker_poll_seconds,
             )
             worker_thread.start()
         yield
@@ -52,6 +56,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.settings = settings
     app.state.engine = engine
     app.state.session_factory = session_factory
+    app.state.storage = storage
     app.state.analytics = build_analytics(settings)
     app.state.daily_activity = DailyActivity()
     app.state.login_limiter = LoginRateLimiter(
@@ -83,6 +88,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         ),
     )
     app.include_router(health.router)
+    if isinstance(storage, LocalStorage):
+        app.include_router(local_storage.router)
     app.include_router(api_router)
     return app
 

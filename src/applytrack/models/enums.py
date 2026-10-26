@@ -51,3 +51,10 @@ class ExperienceLevel(StrEnum):
 class ProfileVisibility(StrEnum):
     PRIVATE = "private"  # only the user (and Sekka AI, with their consent)
     RECRUITERS = "recruiters"  # verified employers can find it (M4)
+
+
+class CVStatus(StrEnum):
+    UPLOADING = "uploading"  # waiting for the browser to upload the file
+    PROCESSING = "processing"  # uploaded; the worker is reading its text
+    READY = "ready"
+    FAILED = "failed"  # the file couldn't be read; ``error`` says why

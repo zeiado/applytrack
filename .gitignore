@@ -15,3 +15,6 @@ build/
 .idea/
 .vscode/
 .audit-requirements.txt
+
+# Uploaded files in local development (APPLYTRACK_STORAGE_LOCAL_DIR)
+.storage/
