@@ -7,6 +7,10 @@ changes, a minor version for new features, and a patch version for fixes.
 
 ## [Unreleased]
 
+### Fixed
+
+- The browser extension reads job descriptions from LinkedIn's new page layout, and from Indeed (the job page and the job shown beside search results, with its role, company and link). On other pages it takes the text under a "Job description" heading, in English or Arabic
+
 ## [0.10.0] - 2026-10-26
 
 Job descriptions on applications, saved by the browser extension too.

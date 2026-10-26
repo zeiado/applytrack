@@ -45,10 +45,12 @@ export function extractJob(doc: Document = document, href: string = location.hre
         out += NL;
         return;
       }
+      // A paragraph inside a list item stays on the item's line.
+      const block = BLOCK.test(tag) && !(node as Element).parentElement?.closest("li");
       if (tag === "LI") out += NL + "- ";
-      else if (BLOCK.test(tag)) out += NL + NL;
+      else if (block) out += NL + NL;
       for (const child of Array.from(node.childNodes)) walk(child);
-      if (BLOCK.test(tag)) out += NL + NL;
+      if (block) out += NL + NL;
     };
     walk(root);
     const lines = out.split(NL).map((line) => line.replace(/\s+/g, " ").trim());
@@ -67,7 +69,7 @@ export function extractJob(doc: Document = document, href: string = location.hre
 
   const url = new URL(href);
   const host = url.hostname.toLowerCase().replace(/^www\./, "");
-  const BOARDS = ["linkedin.com", "wuzzuf.net", "bayt.com", "forasna.com"];
+  const BOARDS = ["linkedin.com", "wuzzuf.net", "bayt.com", "forasna.com", "indeed.com"];
   const board = BOARDS.find((domain) => host === domain || host.endsWith(`.${domain}`)) ?? null;
 
   let role = "";
@@ -115,10 +117,42 @@ export function extractJob(doc: Document = document, href: string = location.hre
     }
   }
 
-  // LinkedIn's description box: #job-details when signed in, the other when signed out.
+  // Indeed's search page shows the chosen job beside the list (?vjk=), without a JobPosting.
+  const indeedId =
+    board === "indeed.com" ? (url.searchParams.get("vjk") ?? url.searchParams.get("jk")) : null;
+  if (board === "indeed.com") {
+    role ||= clean(doc.querySelector('[data-testid="vj-job-title"], [data-testid="jobsearch-JobInfoHeader-title"]')?.textContent);
+    company ||= clean(
+      doc.querySelector('[data-testid="inlineHeader-companyName"], [data-company-name], .jobsearch-RightPane a[href*="/cmp/"]')
+        ?.textContent,
+    );
+  }
+
+  // LinkedIn's description (checked October 2026): the first expandable text box, under
+  // "About the job" (the second is "About the company"); older layouts had these ids.
   if (board === "linkedin.com" && !description) {
-    const box = doc.querySelector("#job-details, .jobs-description__content, .show-more-less-html__markup");
+    const box =
+      doc.querySelector('[data-testid="expandable-text-box"]') ??
+      doc.querySelector("#job-details, .jobs-description__content, .show-more-less-html__markup");
     if (box) description = textOf(box);
+  }
+
+  // Any other page (Indeed's side panel, careers pages): the text under a "Job
+  // description" heading, from the nearest block that holds more than the heading.
+  if (!description) {
+    const HEADING =
+      /^(full )?job description$|^about the (job|role)$|^(وصف|تفاصيل) الوظيفة$|^(نبذة )?عن الوظيفة$/i;
+    const heading = Array.from(doc.querySelectorAll("h1, h2, h3, h4, h5")).find((h) => HEADING.test(clean(h.textContent)));
+    let block: Element | null = heading ?? null;
+    for (let level = 0; level < 6 && block; level++) {
+      block = block.parentElement;
+      const lines = block ? textOf(block).split(NL) : [];
+      while (lines.length && (lines[0] === "" || HEADING.test(lines[0] ?? ""))) lines.shift();
+      if (lines.join("").length > 100) {
+        description = lines.join(NL).trim();
+        break;
+      }
+    }
   }
 
   // 3. Any other page: its title. A company's own careers page often names the company
@@ -138,6 +172,8 @@ export function extractJob(doc: Document = document, href: string = location.hre
   let jobUrl: string;
   if (linkedInId) {
     jobUrl = `https://www.linkedin.com/jobs/view/${linkedInId}/`;
+  } else if (indeedId && /^[0-9a-f]{8,32}$/i.test(indeedId)) {
+    jobUrl = `${url.origin}/viewjob?jk=${indeedId}`;
   } else {
     const canonical = doc.querySelector('link[rel="canonical"]')?.getAttribute("href");
     let resolved: URL | null = null;
