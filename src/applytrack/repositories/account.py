@@ -3,7 +3,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 
 from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, undefer
 
 from applytrack.models import Application, Interview, StatusChange, User
 
@@ -26,6 +26,7 @@ class AccountRepository:
         applications = list(
             self.session.scalars(
                 select(Application)
+                .options(undefer(Application.job_description))
                 .where(Application.user_id == user_id)
                 .order_by(Application.created_at, Application.id)
             )

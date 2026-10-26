@@ -14,6 +14,9 @@ function text(value: unknown): string {
   return typeof value === "string" ? value.trim() : "";
 }
 
+// The API's limit; the extension already cuts the text to it.
+const MAX_JOB_DESCRIPTION = 20_000;
+
 /** Saves the job the extension read from a page, after the user checked it. The API
  * validates the fields; this only passes on the ones the extension may set. */
 export async function POST(request: Request): Promise<Response> {
@@ -31,6 +34,7 @@ export async function POST(request: Request): Promise<Response> {
     company: text(input.company),
     role_title: text(input.role_title),
     job_url: text(input.job_url) || null,
+    job_description: text(input.job_description).slice(0, MAX_JOB_DESCRIPTION) || null,
     source: SOURCES.find((source) => source === input.source) ?? "other",
     status: input.status === "wishlist" ? ("wishlist" as const) : ("applied" as const),
   };

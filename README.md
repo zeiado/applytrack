@@ -222,9 +222,9 @@ need `Authorization: Bearer <token>`, and other users' resources return `404`.
 | `GET` | `/api/v1/cvs/{id}/download` | A short-lived download link |
 | `GET` | `/api/v1/users/me/export` | Download all your data as JSON |
 | `DELETE` | `/api/v1/users/me` | Delete your account and all its data (needs your password, or Google) |
-| `GET` | `/api/v1/applications` | List: `status`, `source`, `company`, `sort`, `limit`, `offset` |
+| `GET` | `/api/v1/applications` | List (without job descriptions): `status`, `source`, `company`, `sort`, `limit`, `offset` |
 | `POST` | `/api/v1/applications` | Create |
-| `GET` `PATCH` `DELETE` | `/api/v1/applications/{id}` | Read, partially update, delete |
+| `GET` `PATCH` `DELETE` | `/api/v1/applications/{id}` | Read (with the job description), partially update, delete |
 | `POST` | `/api/v1/applications/{id}/status` | Move to a new status (validated) |
 | `GET` | `/api/v1/applications/{id}/history` | Every status change, oldest first |
 | `GET` `POST` | `/api/v1/applications/{id}/interviews` | List, add interviews |

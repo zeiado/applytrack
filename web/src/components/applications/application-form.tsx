@@ -11,14 +11,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Link } from "@/i18n/navigation";
 import type { FormState } from "@/lib/applications/actions";
 import type { Field } from "@/lib/applications/form";
-import { type Application, SOURCES } from "@/lib/applications/model";
+import { type ApplicationDetail, SOURCES } from "@/lib/applications/model";
 
 import { NativeSelect } from "./native-select";
 
 type Action = (state: FormState, form: FormData) => Promise<FormState>;
 
 /** Add (no `application`) or edit an application. */
-export function ApplicationForm({ action, application }: { action: Action; application?: Application }) {
+export function ApplicationForm({ action, application }: { action: Action; application?: ApplicationDetail }) {
   const t = useTranslations("ApplicationForm");
   const tSource = useTranslations("Source");
   const [state, formAction] = useActionState(action, undefined);
@@ -27,7 +27,7 @@ export function ApplicationForm({ action, application }: { action: Action; appli
   // After a failed save, show what was typed; otherwise the stored values.
   const initial = (name: Field): string => {
     if (state?.values) return state.values[name] ?? "";
-    const stored = application?.[name as keyof Application];
+    const stored = application?.[name as keyof ApplicationDetail];
     return stored === null || stored === undefined ? "" : String(stored);
   };
 
@@ -68,6 +68,26 @@ export function ApplicationForm({ action, application }: { action: Action; appli
         {field("role_title", { required: true, maxLength: 200, autoComplete: "organization-title" })}
       </div>
       {field("job_url", { type: "url", dir: "ltr", maxLength: 2048, placeholder: "https://" }, t("job_urlHint"))}
+      <div className="grid gap-1.5">
+        <Label htmlFor="job_description">
+          {t("job_description")} <span className="text-muted-foreground text-xs font-normal">({t("optional")})</span>
+        </Label>
+        <Textarea
+          id="job_description"
+          name="job_description"
+          rows={6}
+          maxLength={20_000}
+          dir="auto"
+          defaultValue={initial("job_description")}
+          aria-invalid={invalid.has("job_description") || undefined}
+          aria-describedby={invalid.has("job_description") ? "job_description-hint job_description-error" : "job_description-hint"}
+          className="max-h-96"
+        />
+        <p id="job_description-hint" className="text-muted-foreground text-xs">
+          {t("job_descriptionHint")}
+        </p>
+        <FieldError name="job_description" show={invalid.has("job_description")} />
+      </div>
       <div className="grid gap-5 sm:grid-cols-2">
         <div className="grid gap-1.5">
           <Label htmlFor="source">{t("source")}</Label>

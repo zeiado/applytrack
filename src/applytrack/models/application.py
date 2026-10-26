@@ -55,3 +55,5 @@ class Application(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     applied_on: Mapped[date | None] = mapped_column(Date)
     follow_up_on: Mapped[date | None] = mapped_column(Date)
     notes: Mapped[str | None] = mapped_column(Text)
+    # Plain text, up to 20,000 characters. Loaded only when read: lists don't need it.
+    job_description: Mapped[str | None] = mapped_column(Text, deferred=True)

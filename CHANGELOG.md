@@ -7,6 +7,10 @@ changes, a minor version for new features, and a patch version for fixes.
 
 ## [Unreleased]
 
+### Added
+
+- A job description on each application, for Sekka AI to use: paste it in the form, or the browser extension saves it from the job page (schema.org JobPosting, or LinkedIn's description box) with a checkbox to leave it out. HTML is turned into plain text, up to 20,000 characters. It shows on the application's page and in the data download; lists leave it out ([#116])
+
 ## [0.9.0] - 2026-10-26
 
 CV uploads, and a profile icon in the header.
@@ -199,5 +203,6 @@ First release.
 [#109]: https://github.com/zeiado/applytrack/issues/109
 [#110]: https://github.com/zeiado/applytrack/issues/110
 [#115]: https://github.com/zeiado/applytrack/issues/115
+[#116]: https://github.com/zeiado/applytrack/issues/116
 [#114]: https://github.com/zeiado/applytrack/issues/114
 [#50]: https://github.com/zeiado/applytrack/issues/50

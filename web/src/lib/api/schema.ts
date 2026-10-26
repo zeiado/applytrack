@@ -13,7 +13,8 @@ export interface paths {
         };
         /**
          * List Applications
-         * @description List your applications, filtered, sorted and paginated.
+         * @description List your applications, filtered, sorted and paginated. Job descriptions are left
+         *     out; get one application to read its description.
          */
         get: operations["list_applications_api_v1_applications_get"];
         put?: never;
@@ -57,7 +58,7 @@ export interface paths {
         };
         /**
          * Get Application
-         * @description Get one of your applications.
+         * @description Get one of your applications, with its job description.
          */
         get: operations["get_application_api_v1_applications__application_id__get"];
         put?: never;
@@ -663,6 +664,8 @@ export interface components {
             company: string;
             /** Follow Up On */
             follow_up_on?: string | null;
+            /** Job Description */
+            job_description?: string | null;
             /** Job Url */
             job_url?: string | null;
             /** Notes */
@@ -681,6 +684,52 @@ export interface components {
              * @enum {string}
              */
             status: "wishlist" | "applied";
+        };
+        /**
+         * ApplicationDetail
+         * @description One application with its long fields, which lists leave out.
+         */
+        ApplicationDetail: {
+            /** Applied On */
+            applied_on: string | null;
+            /** Company */
+            company: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Follow Up On */
+            follow_up_on: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Job Description */
+            job_description: string | null;
+            /** Job Url */
+            job_url: string | null;
+            /**
+             * Next Statuses
+             * @description Statuses this application can move to next.
+             */
+            readonly next_statuses: components["schemas"]["ApplicationStatus"][];
+            /** Notes */
+            notes: string | null;
+            /** Role Title */
+            role_title: string;
+            /** Salary Max */
+            salary_max: number | null;
+            /** Salary Min */
+            salary_min: number | null;
+            source: components["schemas"]["ApplicationSource"];
+            status: components["schemas"]["ApplicationStatus"];
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
         };
         /** ApplicationRead */
         ApplicationRead: {
@@ -746,6 +795,8 @@ export interface components {
             company?: string | null;
             /** Follow Up On */
             follow_up_on?: string | null;
+            /** Job Description */
+            job_description?: string | null;
             /** Job Url */
             job_url?: string | null;
             /** Notes */
@@ -999,6 +1050,8 @@ export interface components {
             id: string;
             /** Interviews */
             interviews: components["schemas"]["InterviewRead"][];
+            /** Job Description */
+            job_description: string | null;
             /** Job Url */
             job_url: string | null;
             /**
@@ -1520,7 +1573,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApplicationRead"];
+                    "application/json": components["schemas"]["ApplicationDetail"];
                 };
             };
             /** @description Unauthorized */
@@ -1626,7 +1679,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApplicationRead"];
+                    "application/json": components["schemas"]["ApplicationDetail"];
                 };
             };
             /** @description Unauthorized */
@@ -1744,7 +1797,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApplicationRead"];
+                    "application/json": components["schemas"]["ApplicationDetail"];
                 };
             };
             /** @description Unauthorized */
@@ -2163,7 +2216,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApplicationRead"];
+                    "application/json": components["schemas"]["ApplicationDetail"];
                 };
             };
             /** @description Unauthorized */

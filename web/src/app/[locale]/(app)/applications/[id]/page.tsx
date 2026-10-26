@@ -11,7 +11,7 @@ import { Link } from "@/i18n/navigation";
 import { direction, type Locale } from "@/i18n/routing";
 import { getApplication, getHistory, getInterviews } from "@/lib/applications/data";
 import { followUpState, formatDate, todayIn } from "@/lib/applications/dates";
-import type { Application, StatusChange } from "@/lib/applications/model";
+import type { Application, ApplicationDetail, StatusChange } from "@/lib/applications/model";
 import { formatDateTime } from "@/lib/applications/zoned-time";
 import { getCurrentUser } from "@/lib/auth/session";
 
@@ -91,6 +91,9 @@ async function Detail({ params }: { params: Props["params"] }) {
               now={new Date().toISOString()}
             />
           </Section>
+          <Section title={t("jobDescription.title")}>
+            <JobDescription application={application} />
+          </Section>
           <Section title={t("history.title")}>
             <History history={history} timeZone={timeZone} />
           </Section>
@@ -134,6 +137,40 @@ async function FollowUpBadge({ date, today }: { date: string; today: string }) {
     <span className="bg-destructive/10 text-destructive rounded-full px-2 py-0.5 text-xs font-medium">
       {state === "overdue" ? t("overdue") : t("today")}
     </span>
+  );
+}
+
+async function JobDescription({ application }: { application: ApplicationDetail }) {
+  const t = await getTranslations("Detail.jobDescription");
+  if (!application.job_description) {
+    return (
+      <div className="bg-card grid justify-items-start gap-3 rounded-lg border border-dashed p-4 text-sm">
+        <p className="text-muted-foreground">{t("empty")}</p>
+        <Link
+          href={`/applications/${application.id}/edit`}
+          className={buttonVariants({ variant: "outline", className: "h-10 gap-1.5" })}
+        >
+          <Pencil aria-hidden />
+          {t("add")}
+        </Link>
+      </div>
+    );
+  }
+  return (
+    // Long posts scroll inside the box; tabIndex lets keyboard users scroll it too.
+    <div
+      role="region"
+      aria-label={t("label")}
+      tabIndex={0}
+      className="bg-card focus-visible:ring-ring max-h-96 overflow-y-auto rounded-lg border p-4 text-sm leading-relaxed wrap-anywhere focus-visible:ring-2 focus-visible:outline-none"
+    >
+      {/* Posts mix Arabic and English: each line takes the direction of its own text. */}
+      {application.job_description.split("\n").map((line, index) => (
+        <p key={index} dir="auto" className="min-h-[1lh] text-start">
+          {line}
+        </p>
+      ))}
+    </div>
   );
 }
 

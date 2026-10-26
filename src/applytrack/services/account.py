@@ -12,7 +12,7 @@ from applytrack.core.security import verify_password
 from applytrack.models import CV, User
 from applytrack.repositories.account import AccountRepository
 from applytrack.schemas.account import AccountExport, ExportedApplication
-from applytrack.schemas.applications import ApplicationRead, StatusChangeRead
+from applytrack.schemas.applications import ApplicationDetail, StatusChangeRead
 from applytrack.schemas.auth import UserRead
 from applytrack.schemas.cvs import CVDetail
 from applytrack.schemas.interviews import InterviewRead
@@ -32,7 +32,7 @@ class AccountService:
         data = self.repo.load_all(self.user.id)
         applications = [
             ExportedApplication(
-                **ApplicationRead.model_validate(app).model_dump(exclude={"next_statuses"}),
+                **ApplicationDetail.model_validate(app).model_dump(exclude={"next_statuses"}),
                 history=[StatusChangeRead.model_validate(c) for c in data.history[app.id]],
                 interviews=[InterviewRead.model_validate(i) for i in data.interviews[app.id]],
             )

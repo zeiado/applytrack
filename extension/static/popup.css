@@ -61,6 +61,20 @@ label {
   font-weight: 500;
 }
 
+label.check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 400;
+}
+
+label.check input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--primary);
+}
+
 input,
 select {
   width: 100%;
