@@ -10,6 +10,7 @@ changes, a minor version for new features, and a patch version for fixes.
 ### Added
 
 - A profile icon in the app header, so the profile is one tap away from any page
+- CV uploads on the profile page: up to 3 CVs (PDF or Word, 5 MB each), uploaded straight to private storage (Cloudflare R2) with signed links. Sekka reads each CV's text in the background for Sekka AI and says why when a file can't be read (for example a scanned image). Replace, download or delete them; files are deleted with the CV or the account, and the text is included in the data download. Set the `APPLYTRACK_STORAGE_*` settings to turn uploads on ([#115], [ADR 0011](docs/adr/0011-object-storage-for-cvs.md))
 
 ## [0.8.0] - 2026-10-25
 
@@ -192,5 +193,6 @@ First release.
 [#108]: https://github.com/zeiado/applytrack/issues/108
 [#109]: https://github.com/zeiado/applytrack/issues/109
 [#110]: https://github.com/zeiado/applytrack/issues/110
+[#115]: https://github.com/zeiado/applytrack/issues/115
 [#114]: https://github.com/zeiado/applytrack/issues/114
 [#50]: https://github.com/zeiado/applytrack/issues/50

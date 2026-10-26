@@ -96,6 +96,35 @@ delete the workflow then.
 When a paid plan allows it, run `python -m applytrack.worker` as a Render background
 worker and turn `APPLYTRACK_RUN_WORKER_IN_API` off.
 
+## CV uploads (Cloudflare R2)
+
+CVs are stored in R2 ([ADR 0011](adr/0011-object-storage-for-cvs.md)). Setup, once:
+
+1. Cloudflare › R2 Object Storage: create two private buckets, `sekka-cvs` and
+   `sekka-cvs-staging`. Leave public access and the r2.dev subdomain off.
+2. R2 › Manage API tokens: one token per bucket, with "Object Read & Write" on that
+   bucket only.
+3. On each Render service › Environment, set `APPLYTRACK_STORAGE_ENDPOINT` (the S3
+   endpoint, `https://<account-id>.r2.cloudflarestorage.com`), `APPLYTRACK_STORAGE_BUCKET`,
+   `APPLYTRACK_STORAGE_ACCESS_KEY_ID` and `APPLYTRACK_STORAGE_SECRET_ACCESS_KEY` (paste the
+   secret there only). Without them, uploads answer `503 uploads_unavailable`.
+4. Each bucket › Settings › CORS policy, so browsers on the web app can upload. List
+   every origin that serves the web app (add the new domain when it changes):
+
+```json
+[
+  {
+    "AllowedOrigins": ["https://applytrack-psi-five.vercel.app", "http://localhost:3000"],
+    "AllowedMethods": ["PUT", "GET"],
+    "AllowedHeaders": ["content-type"],
+    "MaxAgeSeconds": 3600
+  }
+]
+```
+
+Locally, `APPLYTRACK_STORAGE_LOCAL_DIR=.storage` keeps files in a folder instead, served
+by the API with the same kind of signed links (the end-to-end tests use this).
+
 ## Web app on Vercel
 
 The web app (`web/`, [ADR 0010](adr/0010-web-app.md)) deploys to Vercel. One-time setup:

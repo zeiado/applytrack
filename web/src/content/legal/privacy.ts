@@ -2,7 +2,7 @@ import type { LegalText } from "./types";
 
 // Written from docs/privacy.md: change both together when a service is added.
 export const privacy: LegalText = {
-  updated: "2026-10-25",
+  updated: "2026-10-26",
   en: {
     title: "Privacy policy",
     description: "What Sekka keeps about you, who else receives it, and how to download or delete it.",
@@ -17,6 +17,7 @@ export const privacy: LegalText = {
             list: [
               "Your account: your email, your password (stored only as a secure hash, never readable), or your Google account ID if you sign in with Google; your language, time zone and email preferences.",
               "What you enter: companies, roles, job links, statuses, dates, notes, interviews and follow-ups, and your profile (name, headline, city, education, experience, skills and languages). Your profile is private unless you turn on \"Open to recruiters\".",
+              "Your CVs, if you upload them: the files, and the text we read from them so Sekka AI can use it.",
               "Technical data: requests to our servers and error reports, with email addresses removed, and your IP address, which we use to stop abuse such as password guessing.",
             ],
           },
@@ -45,6 +46,7 @@ export const privacy: LegalText = {
           {
             list: [
               "Neon: the database where your account and applications are stored.",
+              "Cloudflare R2: stores the CV files you upload, in private storage.",
               "Render and Vercel: the servers that run Sekka and its website.",
               "Resend: sends our emails, so it receives your address and the email.",
               "Google: only if you choose Sign in with Google.",
@@ -76,7 +78,7 @@ export const privacy: LegalText = {
           {
             list: [
               "Download everything we keep about you from Settings › Your data.",
-              "Change or delete any application at any time.",
+              "Change or delete any application or CV at any time.",
               "Stop reminder emails from the email itself or from settings.",
               "Delete your account from Settings. This deletes your account and everything in it right away.",
             ],
@@ -125,6 +127,7 @@ export const privacy: LegalText = {
             list: [
               "حسابك: الإيميل، وكلمة السر (بتتخزن متشفّرة بطريقة آمنة ومحدش يقدر يقراها)، أو رقم حساب جوجل لو بتدخل بجوجل؛ واللغة والمنطقة الزمنية واختياراتك للإيميلات.",
               "اللي بتكتبه: الشركات، والوظايف، ولينكات الوظايف، والمراحل، والتواريخ، والملاحظات، والإنترفيوهات، والمتابعات، وبروفايلك (الاسم، والعنوان القصير، والمدينة، والتعليم، والخبرة، والمهارات، واللغات). بروفايلك خاص بيك إلا لو شغّلت «متاح لأصحاب الشغل».",
+              "الـ CV بتاعك لو رفعته: الملف، والكلام اللي بنقراه منه عشان Sekka AI يستخدمه.",
               "بيانات تقنية: الطلبات اللي بتوصل سيرفراتنا وتقارير الأخطاء من غير الإيميلات، وعنوان الـ IP بتاعك اللي بنستخدمه عشان نوقف أي إساءة زي تخمين كلمات السر.",
             ],
           },
@@ -153,6 +156,7 @@ export const privacy: LegalText = {
           {
             list: [
               "Neon: قاعدة البيانات اللي متخزن فيها حسابك وتقديماتك.",
+              "Cloudflare R2: بيخزّن ملفات الـ CV اللي بترفعها في مكان خاص.",
               "Render وVercel: السيرفرات اللي بتشغّل سكة وموقعها.",
               "Resend: بتبعت إيميلاتنا، فبيوصلها عنوانك والإيميل.",
               "جوجل: بس لو اخترت الدخول بجوجل.",
@@ -184,7 +188,7 @@ export const privacy: LegalText = {
           {
             list: [
               "نزّل كل اللي بنحتفظ بيه عنك من الإعدادات › بياناتك.",
-              "عدّل أو امسح أي تقديم في أي وقت.",
+              "عدّل أو امسح أي تقديم أو CV في أي وقت.",
               "وقّف إيميلات التذكير من الإيميل نفسه أو من الإعدادات.",
               "امسح حسابك من الإعدادات. ده بيمسح حسابك وكل اللي فيه على طول.",
             ],

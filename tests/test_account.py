@@ -118,7 +118,7 @@ def test_export_query_count_does_not_grow_with_data(
     for _ in range(9):
         add_interview(client, ada, add_application(client, ada), "2026-10-25T14:00:00+03:00")
 
-    assert queries() == one == 5  # user, profile, applications, history, interviews
+    assert queries() == one == 6  # user, profile, CVs, applications, history, interviews
 
 
 def test_export_requires_login(client: TestClient) -> None:

@@ -3,17 +3,20 @@
 import logging
 from datetime import datetime
 
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from applytrack.core.errors import ForbiddenError
 from applytrack.core.google import GoogleIdentity
 from applytrack.core.security import verify_password
-from applytrack.models import User
+from applytrack.models import CV, User
 from applytrack.repositories.account import AccountRepository
 from applytrack.schemas.account import AccountExport, ExportedApplication
 from applytrack.schemas.applications import ApplicationRead, StatusChangeRead
 from applytrack.schemas.auth import UserRead
+from applytrack.schemas.cvs import CVDetail
 from applytrack.schemas.interviews import InterviewRead
+from applytrack.services.cvs import queue_file_deletions
 from applytrack.services.profiles import ProfileService
 
 logger = logging.getLogger("applytrack.account")
@@ -39,6 +42,7 @@ class AccountService:
             exported_at=now,
             user=UserRead.model_validate(self.user),
             profile=ProfileService(self.session, self.user).read(),
+            cvs=[CVDetail.model_validate(cv) for cv in self._cvs()],
             applications=applications,
         )
 
@@ -54,6 +58,15 @@ class AccountService:
         elif not verify_password(password or "", self.user.password_hash):
             raise ForbiddenError("Incorrect password", code="invalid_password")
         user_id = self.user.id
+        # The rows go with the user (ON DELETE CASCADE); the files go on the job queue.
+        queue_file_deletions(self.session, self._cvs())
         self.repo.delete_user(self.user)
         self.session.commit()
         logger.info("Account deleted", extra={"user_id": str(user_id)})
+
+    def _cvs(self) -> list[CV]:
+        return list(
+            self.session.scalars(
+                select(CV).where(CV.user_id == self.user.id).order_by(CV.created_at, CV.id)
+            )
+        )

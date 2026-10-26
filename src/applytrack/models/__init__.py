@@ -2,10 +2,12 @@
 
 from applytrack.models.application import Application
 from applytrack.models.base import Base
+from applytrack.models.cv import CV
 from applytrack.models.email_token import EmailToken
 from applytrack.models.enums import (
     ApplicationSource,
     ApplicationStatus,
+    CVStatus,
     EmailTokenPurpose,
     ExperienceLevel,
     InterviewKind,
@@ -20,10 +22,12 @@ from applytrack.models.status_change import StatusChange
 from applytrack.models.user import User
 
 __all__ = [
+    "CV",
     "Application",
     "ApplicationSource",
     "ApplicationStatus",
     "Base",
+    "CVStatus",
     "EmailToken",
     "EmailTokenPurpose",
     "ExperienceLevel",

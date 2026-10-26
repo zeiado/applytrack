@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Suspense } from "react";
 
+import { CvSection } from "@/components/cvs/cv-section";
 import { ProfileForm } from "@/components/profile/profile-form";
 import type { Locale } from "@/i18n/routing";
+import { getCvs } from "@/lib/cvs/data";
 import { getProfile } from "@/lib/profile/data";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/profile">): Promise<Metadata> {
@@ -27,10 +29,18 @@ export default async function ProfilePage({ params }: PageProps<"/[locale]/profi
       <Suspense fallback={<div className="bg-muted h-[32rem] animate-pulse rounded-xl" />}>
         <Form />
       </Suspense>
+      <hr className="border-border" />
+      <Suspense fallback={<div className="bg-muted h-40 animate-pulse rounded-xl" />}>
+        <Cvs />
+      </Suspense>
     </div>
   );
 }
 
 async function Form() {
   return <ProfileForm profile={await getProfile()} />;
+}
+
+async function Cvs() {
+  return <CvSection cvs={await getCvs()} />;
 }

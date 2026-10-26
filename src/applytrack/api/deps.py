@@ -12,6 +12,7 @@ from applytrack.core.security import decode_access_token
 from applytrack.db.session import get_db
 from applytrack.models import User
 from applytrack.repositories.users import UserRepository
+from applytrack.storage import ObjectStorage
 
 DbSession = Annotated[Session, Depends(get_db)]
 
@@ -41,6 +42,15 @@ def get_now() -> datetime:
 
 
 Now = Annotated[datetime, Depends(get_now)]
+
+
+def get_storage(request: Request) -> ObjectStorage | None:
+    """Where uploaded files are kept; None when uploads are off."""
+    storage: ObjectStorage | None = request.app.state.storage
+    return storage
+
+
+Storage = Annotated[ObjectStorage | None, Depends(get_storage)]
 
 
 def get_current_user(

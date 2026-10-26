@@ -19,7 +19,15 @@ from applytrack.jobs.worker import JobHandler, PeriodicTask, Worker
 from applytrack.mail.backends import EmailBackend, build_email_backend
 from applytrack.mail.mailer import SEND_EMAIL, SendEmailHandler
 from applytrack.mail.templates import get_renderer
+from applytrack.services.cvs import (
+    DELETE_STORED_FILE,
+    EXTRACT_CV_TEXT,
+    AbandonedUploadCleaner,
+    DeleteStoredFileHandler,
+    ExtractCVTextHandler,
+)
 from applytrack.services.reminder_emails import ReminderEmailScheduler
+from applytrack.storage import ObjectStorage, build_storage
 
 logger = logging.getLogger("applytrack.jobs")
 
@@ -29,8 +37,10 @@ def build_worker(
     session_factory: sessionmaker[Session],
     *,
     email_backend: EmailBackend | None = None,
+    storage: ObjectStorage | None = None,
 ) -> Worker:
-    """A worker with every job handler. Tests pass their own email backend."""
+    """A worker with every job handler. Tests pass their own email backend and storage."""
+    storage = storage or build_storage(settings)
     handlers: dict[str, JobHandler] = {
         SEND_EMAIL: SendEmailHandler(
             email_backend or build_email_backend(settings),
@@ -38,13 +48,21 @@ def build_worker(
             settings,
         ),
     }
+    if storage is not None:
+        handlers[EXTRACT_CV_TEXT] = ExtractCVTextHandler(session_factory, storage)
+        handlers[DELETE_STORED_FILE] = DeleteStoredFileHandler(storage)
     reminders = ReminderEmailScheduler(session_factory, settings)
     periodic = [
         PeriodicTask(
             "follow_up_reminders",
             timedelta(minutes=settings.reminder_check_minutes),
             reminders.run,
-        )
+        ),
+        PeriodicTask(
+            "abandoned_uploads",
+            timedelta(hours=1),
+            AbandonedUploadCleaner(session_factory).run,
+        ),
     ]
     return Worker(session_factory, handlers, periodic=periodic)
 

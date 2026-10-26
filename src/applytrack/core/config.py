@@ -87,6 +87,18 @@ class Settings(BaseSettings):
     posthog_api_key: str | None = None
     posthog_host: str = "https://eu.i.posthog.com"
 
+    # Where uploaded CVs are kept (docs/adr/0011-object-storage-for-cvs.md). An
+    # S3-compatible bucket (Cloudflare R2) when storage_endpoint is set; otherwise a
+    # local folder (development and tests only). With neither, uploads are off.
+    storage_endpoint: str | None = None
+    storage_bucket: str | None = None
+    storage_access_key_id: str | None = None
+    storage_secret_access_key: SecretStr | None = None
+    storage_region: str = "auto"
+    storage_local_dir: str | None = None
+    # How the browser reaches this API, for upload links to the local folder.
+    storage_local_url: str = "http://localhost:8000"
+
     @field_validator("public_app_url")
     @classmethod
     def _http_url_without_trailing_slash(cls, url: str) -> str:
@@ -119,6 +131,24 @@ class Settings(BaseSettings):
             raise ValueError(
                 "APPLYTRACK_JWT_SECRET_KEY must be set to a random 32+ character value"
             )
+        return self
+
+    @model_validator(mode="after")
+    def _require_complete_storage_settings(self) -> Self:
+        s3 = {
+            "APPLYTRACK_STORAGE_ENDPOINT": self.storage_endpoint,
+            "APPLYTRACK_STORAGE_BUCKET": self.storage_bucket,
+            "APPLYTRACK_STORAGE_ACCESS_KEY_ID": self.storage_access_key_id,
+            "APPLYTRACK_STORAGE_SECRET_ACCESS_KEY": self.storage_secret_access_key,
+        }
+        missing = [name for name, value in s3.items() if not value]
+        if 0 < len(missing) < len(s3):
+            raise ValueError(f"Object storage is half configured: set {', '.join(missing)}")
+        if self.storage_endpoint and not self.storage_endpoint.startswith("https://"):
+            raise ValueError("APPLYTRACK_STORAGE_ENDPOINT must start with https://")
+        if self.storage_local_dir and self.environment == "production":
+            # The servers' disks are wiped on every deploy.
+            raise ValueError("APPLYTRACK_STORAGE_LOCAL_DIR is for development only")
         return self
 
     @model_validator(mode="after")

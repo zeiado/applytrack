@@ -1,3 +1,6 @@
+import os from "node:os";
+import path from "node:path";
+
 import { defineConfig, devices } from "@playwright/test";
 
 // End-to-end tests: the real API (with PostgreSQL) and the built web app.
@@ -36,6 +39,11 @@ export default defineConfig({
         APPLYTRACK_DATABASE_URL: DATABASE_URL,
         APPLYTRACK_EMAIL_BACKEND: "console",
         APPLYTRACK_PUBLIC_APP_URL: `http://localhost:${WEB_PORT}`,
+        // CV uploads go to a local folder, and the worker reads them inside the API.
+        APPLYTRACK_STORAGE_LOCAL_DIR: path.join(os.tmpdir(), "sekka-e2e-storage"),
+        APPLYTRACK_STORAGE_LOCAL_URL: `http://localhost:${API_PORT}`,
+        APPLYTRACK_RUN_WORKER_IN_API: "true",
+        APPLYTRACK_WORKER_POLL_SECONDS: "0.5",
       },
     },
     {

@@ -26,6 +26,15 @@ services:
       # console until there's a sending domain: emails go to the log (docs/deployment.md).
       - key: APPLYTRACK_EMAIL_BACKEND
         value: console
+      # CV uploads: an R2 bucket and a token for it alone (docs/deployment.md).
+      - key: APPLYTRACK_STORAGE_ENDPOINT
+        sync: false
+      - key: APPLYTRACK_STORAGE_BUCKET
+        value: sekka-cvs-staging
+      - key: APPLYTRACK_STORAGE_ACCESS_KEY_ID
+        sync: false
+      - key: APPLYTRACK_STORAGE_SECRET_ACCESS_KEY
+        sync: false
 
   - type: web
     name: applytrack-production
@@ -52,3 +61,12 @@ services:
       # console until there's a sending domain: emails go to the log (docs/deployment.md).
       - key: APPLYTRACK_EMAIL_BACKEND
         value: console
+      # CV uploads: an R2 bucket and a token for it alone (docs/deployment.md).
+      - key: APPLYTRACK_STORAGE_ENDPOINT
+        sync: false
+      - key: APPLYTRACK_STORAGE_BUCKET
+        value: sekka-cvs
+      - key: APPLYTRACK_STORAGE_ACCESS_KEY_ID
+        sync: false
+      - key: APPLYTRACK_STORAGE_SECRET_ACCESS_KEY
+        sync: false
