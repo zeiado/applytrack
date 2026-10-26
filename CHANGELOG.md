@@ -7,6 +7,10 @@ changes, a minor version for new features, and a patch version for fixes.
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-10-26
+
+CV uploads, and a profile icon in the header.
+
 ### Added
 
 - A profile icon in the app header, so the profile is one tap away from any page
@@ -149,7 +153,8 @@ First release.
 - Interview times are returned in UTC on create, matching reads ([#25])
 - CI tests the Python version the Docker image ships ([#35])
 
-[Unreleased]: https://github.com/zeiado/applytrack/compare/v0.8.0...HEAD
+[Unreleased]: https://github.com/zeiado/applytrack/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/zeiado/applytrack/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/zeiado/applytrack/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/zeiado/applytrack/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/zeiado/applytrack/compare/v0.5.0...v0.6.0
