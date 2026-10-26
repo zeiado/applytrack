@@ -37,6 +37,7 @@ const test = base.extend<{ context: BrowserContext; extensionId: string }>({
             "@type": "JobPosting",
             title: "Data Analyst",
             hiringOrganization: { "@type": "Organization", name: "Valu" },
+            description: "<p>Build dashboards for the lending team.</p><ul><li>SQL</li><li>Python</li></ul>",
           })}</script><h1>Data Analyst</h1>`,
       }),
     );
@@ -83,6 +84,7 @@ test("saves the job on the page to the signed-in account", async ({ context, ext
   await expect(popup.getByRole("status")).toBeHidden(); // no "couldn't reach Sekka"
   await expect(popup.getByLabel("Role")).toHaveValue("Data Analyst");
   await expect(popup.getByLabel("Link")).toHaveValue(JOB_PAGE);
+  await expect(popup.getByLabel("Save the job description")).toBeChecked();
 
   await popup.getByLabel("Role").fill("Junior Data Analyst"); // the user can correct it
   await popup.getByRole("button", { name: "Save to Sekka" }).click();
@@ -95,6 +97,10 @@ test("saves the job on the page to the signed-in account", async ({ context, ext
   await page.goto("/en/applications");
   await expect(page.getByRole("heading", { name: "Valu" })).toBeVisible();
   await expect(page.getByText("Junior Data Analyst")).toBeVisible();
+  await page.goto(new URL(await popup.getByRole("link", { name: "Open in Sekka" }).getAttribute("href") ?? "").pathname);
+  const description = page.getByRole("region", { name: "Full job description" });
+  await expect(description).toContainText("Build dashboards for the lending team.");
+  await expect(description).toContainText("- SQL");
 });
 
 test("asks to log in when no one is", async ({ context, extensionId }) => {

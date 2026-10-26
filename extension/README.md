@@ -3,13 +3,15 @@
 Save the job you're looking at to Sekka in one click (#69). Chrome, Manifest V3.
 
 1. On a job page, click the Sekka icon.
-2. The popup reads the company, role and link from the page, only then and only that
-   page. The user checks and corrects them, picks *Applied* or *Want to apply*.
+2. The popup reads the company, role, link and job description from the page, only then
+   and only that page. The user checks and corrects them, picks *Applied* or *Want to
+   apply*, and can untick *Save the job description*.
 3. *Save to Sekka* adds the application, and *Open in Sekka* opens it in the web app.
 
 It reads LinkedIn, Wuzzuf, Bayt and Forasna, and makes a rough guess on any other page
 (`src/extract.ts`): first the page's schema.org `JobPosting`, then LinkedIn's tab
-title, then the page's heading or title.
+title, then the page's heading or title. The job description comes from the
+`JobPosting` (HTML turned into plain text) or LinkedIn's description box.
 
 ## How it signs in
 

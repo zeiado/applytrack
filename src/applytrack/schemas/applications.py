@@ -14,6 +14,7 @@ from pydantic import (
     model_validator,
 )
 
+from applytrack.core.text import plain_text
 from applytrack.models import ApplicationSource, ApplicationStatus
 from applytrack.repositories.filters import ApplicationFilters
 from applytrack.schemas.pagination import MAX_PAGE_SIZE
@@ -35,6 +36,25 @@ JobUrl = Annotated[
 ]
 Salary = Annotated[int, Field(ge=0, le=100_000_000)]
 Notes = Annotated[str, Field(max_length=10_000)]
+MAX_JOB_DESCRIPTION = 20_000
+
+
+def _clean_job_description(value: str) -> str | None:
+    text = plain_text(value)
+    if len(text) > MAX_JOB_DESCRIPTION:
+        raise ValueError(f"Job description must be at most {MAX_JOB_DESCRIPTION} characters")
+    return text or None
+
+
+# HTML is turned into plain text; the limit applies to the text. Empty becomes null.
+JobDescription = Annotated[
+    str,
+    Field(
+        max_length=100_000,
+        description=f"Plain text, up to {MAX_JOB_DESCRIPTION} characters. HTML is removed.",
+    ),
+    AfterValidator(_clean_job_description),
+]
 
 
 def _check_salary_range(salary_min: int | None, salary_max: int | None) -> None:
@@ -58,6 +78,7 @@ class ApplicationCreate(BaseModel):
     applied_on: date | None = None
     follow_up_on: date | None = None
     notes: Notes | None = None
+    job_description: JobDescription | None = None
 
     @model_validator(mode="after")
     def _salary_range(self) -> Self:
@@ -82,6 +103,7 @@ class ApplicationUpdate(BaseModel):
     applied_on: date | None = None
     follow_up_on: date | None = None
     notes: Notes | None = None
+    job_description: JobDescription | None = None
 
     @model_validator(mode="after")
     def _required_fields_not_null(self) -> Self:
@@ -113,6 +135,12 @@ class ApplicationRead(BaseModel):
     def next_statuses(self) -> list[ApplicationStatus]:
         """Statuses this application can move to next."""
         return next_statuses(self.status)
+
+
+class ApplicationDetail(ApplicationRead):
+    """One application with its long fields, which lists leave out."""
+
+    job_description: str | None
 
 
 class StatusChangeRequest(BaseModel):

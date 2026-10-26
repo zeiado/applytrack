@@ -27,6 +27,7 @@ describe("job boards with a schema.org JobPosting", () => {
       role_title: "Software QA Engineer",
       job_url: "https://wuzzuf.net/jobs/p/qgirmns03vbu-software-qa-engineer-cairo-egypt",
       source: "job_board",
+      job_description: "",
     });
   });
 
@@ -75,6 +76,7 @@ describe("LinkedIn", () => {
       role_title: "Senior Full Stack .NET Developer (ASP.NET Core & Angular)",
       job_url: "https://www.linkedin.com/jobs/view/4477374392/",
       source: "job_board",
+      job_description: "",
     });
   });
 
@@ -103,12 +105,13 @@ describe("any other page", () => {
       role_title: "Backend Engineer",
       job_url: "https://instabug.com/careers/backend",
       source: "company_site",
+      job_description: "",
     });
   });
 
   it("a page with nothing to go on gives its title and leaves the rest to the user", () => {
     const job = extractJob(page("", "Some page"), "https://example.org/x");
-    expect(job).toEqual({ company: "", role_title: "Some page", job_url: "https://example.org/x", source: "other" });
+    expect(job).toEqual({ company: "", role_title: "Some page", job_url: "https://example.org/x", source: "other", job_description: "" });
   });
 
   it("ignores a canonical link to another site", () => {
@@ -119,6 +122,46 @@ describe("any other page", () => {
   it("keeps fields within the API's limits", () => {
     const job = extractJob(page("", "x".repeat(500)), "https://example.org/");
     expect(job.role_title).toHaveLength(200);
+  });
+});
+
+describe("job description", () => {
+  // Lines joined with newlines, to compare with the extracted text.
+  const text = (...lines: string[]) => lines.join("\n");
+
+  it("from the JobPosting's HTML, with paragraphs and lists", () => {
+    const doc = page(
+      jobPosting({
+        "@type": "JobPosting",
+        title: "QA Engineer",
+        description: "<p>We build <b>payments</b>.</p><h3>You have</h3><ul><li>3+ years</li><li>SQL</li></ul>Apply<br>today<style>p { color: red }</style>",
+      }),
+    );
+    expect(extractJob(doc, "https://wuzzuf.net/jobs/p/1").job_description).toBe(
+      text("We build payments.", "", "You have", "", "- 3+ years", "- SQL", "", "Apply", "today"),
+    );
+  });
+
+  it("reads HTML sent escaped, and Arabic", () => {
+    const doc = page(jobPosting({ "@type": "JobPosting", title: "x", description: "&lt;p&gt;مطلوب   محاسب&lt;/p&gt;&lt;p&gt;خبرة سنتين&lt;/p&gt;" }));
+    expect(extractJob(doc, "https://forasna.com/job/p/1").job_description).toBe(text("مطلوب محاسب", "", "خبرة سنتين"));
+  });
+
+  it("LinkedIn signed in: from the description box", () => {
+    const doc = page("", "Backend Engineer | Valu | LinkedIn");
+    doc.body.innerHTML = '<div id="job-details"><h2>About the job</h2><span><p>Build APIs.</p><button>Show more</button></span></div>';
+    expect(extractJob(doc, "https://www.linkedin.com/jobs/view/1/").job_description).toBe(text("About the job", "", "Build APIs."));
+  });
+
+  it("other sites' page text isn't taken", () => {
+    const doc = page("", "Careers");
+    doc.body.innerHTML = '<div id="job-details"><p>Not from LinkedIn</p></div>';
+    expect(extractJob(doc, "https://example.org/jobs/1").job_description).toBe("");
+  });
+
+  it("keeps it within the API's limit", () => {
+    const doc = page(jobPosting({ "@type": "JobPosting", title: "x", description: "a".repeat(30_000) }));
+    expect(extractJob(doc, "https://bayt.com/1").job_description).toHaveLength(20_000);
   });
 });
 

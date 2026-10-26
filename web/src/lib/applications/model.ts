@@ -2,6 +2,8 @@
 import type { components } from "@/lib/api/schema";
 
 export type Application = components["schemas"]["ApplicationRead"];
+/** One application with its job description, which lists leave out. */
+export type ApplicationDetail = components["schemas"]["ApplicationDetail"];
 export type ApplicationStatus = components["schemas"]["ApplicationStatus"];
 export type ApplicationSource = components["schemas"]["ApplicationSource"];
 export type ApplicationCreate = components["schemas"]["ApplicationCreate"];

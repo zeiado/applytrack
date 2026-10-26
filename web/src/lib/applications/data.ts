@@ -6,7 +6,7 @@ import { getLocale } from "next-intl/server";
 import { redirect } from "@/i18n/navigation";
 import { visitorApi } from "@/lib/auth/session";
 
-import { type Application, MAX_PAGE_SIZE } from "./model";
+import { type Application, type ApplicationDetail, MAX_PAGE_SIZE } from "./model";
 import { type ListQuery, toApiParams } from "./query";
 
 // Reads for pages. Each runs inside a <Suspense> boundary (it needs the session).
@@ -43,7 +43,7 @@ export async function listApplications(query: ListQuery) {
   return data;
 }
 
-export async function getApplication(id: string): Promise<Application> {
+export async function getApplication(id: string): Promise<ApplicationDetail> {
   // Not a UUID: the API would answer 422; it's simply not a page.
   if (!/^[0-9a-f-]{36}$/i.test(id)) notFound();
   const api = await visitorApi();

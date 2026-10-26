@@ -43,6 +43,22 @@ test("move to the next stage with a note, and see it in the history", async ({ p
   await expect(nextStep.getByLabel("Move to").locator("option")).toHaveText(["Offer", "Rejected", "Withdrawn"]);
 });
 
+test("add a job description, and see it on the application", async ({ page }) => {
+  await openNewApplication(page, "Fawry");
+  const jobDescription = section(page, "Job description");
+  await expect(jobDescription).toContainText("No job description yet.");
+
+  await jobDescription.getByRole("link", { name: "Add job description" }).click();
+  await expect(page.getByRole("heading", { name: "Edit application" })).toBeVisible();
+  await page.getByLabel("Job description").fill(["We need a backend engineer.", "", "You know Python and SQL."].join("\n"));
+  await page.getByRole("button", { name: "Save" }).click();
+
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Fawry", AUTH_TIMEOUT);
+  const description = page.getByRole("region", { name: "Full job description" });
+  await expect(description).toContainText("We need a backend engineer.");
+  await expect(description).toContainText("You know Python and SQL.");
+});
+
 test("set and clear the follow-up date", async ({ page }) => {
   await openNewApplication(page, "Paymob");
   const followUp = section(page, "Follow-up");

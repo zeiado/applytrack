@@ -10,6 +10,7 @@
   "company": { "message": "Company" },
   "role": { "message": "Role" },
   "link": { "message": "Link" },
+  "includeDescription": { "message": "Save the job description" },
   "status": { "message": "Stage" },
   "statusApplied": { "message": "Applied" },
   "statusWishlist": { "message": "Want to apply" },

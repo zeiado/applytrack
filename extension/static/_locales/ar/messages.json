@@ -10,6 +10,7 @@
   "company": { "message": "الشركة" },
   "role": { "message": "الوظيفة" },
   "link": { "message": "اللينك" },
+  "includeDescription": { "message": "احفظ وصف الوظيفة" },
   "status": { "message": "المرحلة" },
   "statusApplied": { "message": "قدّمت" },
   "statusWishlist": { "message": "عايز أقدّم" },

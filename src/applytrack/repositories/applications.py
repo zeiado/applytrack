@@ -58,7 +58,7 @@ class ApplicationRepository:
     ) -> tuple[list[Application], int]:
         """Return one page of matching applications and the total number of matches."""
         query = self._filtered(user_id, filters)
-        total = self.session.scalar(select(func.count()).select_from(query.subquery())) or 0
+        total = self._count(query)
         items = self.session.scalars(
             query.order_by(*self._order_by(sort)).limit(limit).offset(offset)
         ).all()
@@ -92,7 +92,7 @@ class ApplicationRepository:
             Application.follow_up_on <= on_or_before,
             Application.status.not_in(exclude_statuses),
         )
-        total = self.session.scalar(select(func.count()).select_from(query.subquery())) or 0
+        total = self._count(query)
         items = self.session.scalars(
             query.order_by(
                 Application.follow_up_on, func.lower(Application.company), Application.id
@@ -114,6 +114,11 @@ class ApplicationRepository:
     def delete(self, application: Application) -> None:
         self.session.delete(application)
         self.session.flush()
+
+    def _count(self, query: Select[Application]) -> int:
+        # Counts ids only, so long columns (job_description) aren't read.
+        ids = query.with_only_columns(Application.id).subquery()
+        return self.session.scalar(select(func.count()).select_from(ids)) or 0
 
     @staticmethod
     def _filtered(user_id: uuid.UUID, filters: ApplicationFilters) -> Select[Application]:

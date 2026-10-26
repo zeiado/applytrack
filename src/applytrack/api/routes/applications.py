@@ -10,6 +10,7 @@ from applytrack.core.errors import ErrorResponse
 from applytrack.repositories.applications import ApplicationRepository
 from applytrack.schemas.applications import (
     ApplicationCreate,
+    ApplicationDetail,
     ApplicationExportParams,
     ApplicationListParams,
     ApplicationRead,
@@ -33,7 +34,8 @@ NOT_FOUND: dict[int | str, dict[str, Any]] = {status.HTTP_404_NOT_FOUND: {"model
 def list_applications(
     params: Annotated[ApplicationListParams, Query()], db: DbSession, user: CurrentUser
 ) -> Page[ApplicationRead]:
-    """List your applications, filtered, sorted and paginated."""
+    """List your applications, filtered, sorted and paginated. Job descriptions are left
+    out; get one application to read its description."""
     items, total = ApplicationService(db, user).search(params)
     return Page[ApplicationRead](
         items=[ApplicationRead.model_validate(a) for a in items],
@@ -83,7 +85,7 @@ def create_application(
     user: CurrentUser,
     analytics: AppAnalytics,
     response: Response,
-) -> ApplicationRead:
+) -> ApplicationDetail:
     """Add a job application."""
     service = ApplicationService(db, user)
     application = service.create(body)
@@ -97,22 +99,24 @@ def create_application(
         },
     )
     response.headers["Location"] = f"/api/v1/applications/{application.id}"
-    return ApplicationRead.model_validate(application)
+    return ApplicationDetail.model_validate(application)
 
 
 @router.get("/{application_id}", responses=NOT_FOUND)
-def get_application(application_id: uuid.UUID, db: DbSession, user: CurrentUser) -> ApplicationRead:
-    """Get one of your applications."""
-    return ApplicationRead.model_validate(ApplicationService(db, user).get(application_id))
+def get_application(
+    application_id: uuid.UUID, db: DbSession, user: CurrentUser
+) -> ApplicationDetail:
+    """Get one of your applications, with its job description."""
+    return ApplicationDetail.model_validate(ApplicationService(db, user).get(application_id))
 
 
 @router.patch("/{application_id}", responses=NOT_FOUND)
 def update_application(
     application_id: uuid.UUID, body: ApplicationUpdate, db: DbSession, user: CurrentUser
-) -> ApplicationRead:
+) -> ApplicationDetail:
     """Change some fields of an application. Only the fields you send are updated."""
     application = ApplicationService(db, user).update(application_id, body)
-    return ApplicationRead.model_validate(application)
+    return ApplicationDetail.model_validate(application)
 
 
 @router.delete("/{application_id}", status_code=status.HTTP_204_NO_CONTENT, responses=NOT_FOUND)
@@ -127,10 +131,10 @@ def delete_application(application_id: uuid.UUID, db: DbSession, user: CurrentUs
 )
 def change_status(
     application_id: uuid.UUID, body: StatusChangeRequest, db: DbSession, user: CurrentUser
-) -> ApplicationRead:
+) -> ApplicationDetail:
     """Move an application to a new status. Invalid moves return 409 with the allowed ones."""
     application = ApplicationService(db, user).change_status(application_id, body.status, body.note)
-    return ApplicationRead.model_validate(application)
+    return ApplicationDetail.model_validate(application)
 
 
 @router.get("/{application_id}/history", responses=NOT_FOUND)

@@ -16,7 +16,7 @@ export const privacy: LegalText = {
           {
             list: [
               "Your account: your email, your password (stored only as a secure hash, never readable), or your Google account ID if you sign in with Google; your language, time zone and email preferences.",
-              "What you enter: companies, roles, job links, statuses, dates, notes, interviews and follow-ups, and your profile (name, headline, city, education, experience, skills and languages). Your profile is private unless you turn on \"Open to recruiters\".",
+              "What you enter: companies, roles, job links and job descriptions, statuses, dates, notes, interviews and follow-ups, and your profile (name, headline, city, education, experience, skills and languages). Your profile is private unless you turn on \"Open to recruiters\".",
               "Your CVs, if you upload them: the files, and the text we read from them so Sekka AI can use it.",
               "Technical data: requests to our servers and error reports, with email addresses removed, and your IP address, which we use to stop abuse such as password guessing.",
             ],
@@ -126,7 +126,7 @@ export const privacy: LegalText = {
           {
             list: [
               "حسابك: الإيميل، وكلمة السر (بتتخزن متشفّرة بطريقة آمنة ومحدش يقدر يقراها)، أو رقم حساب جوجل لو بتدخل بجوجل؛ واللغة والمنطقة الزمنية واختياراتك للإيميلات.",
-              "اللي بتكتبه: الشركات، والوظايف، ولينكات الوظايف، والمراحل، والتواريخ، والملاحظات، والإنترفيوهات، والمتابعات، وبروفايلك (الاسم، والعنوان القصير، والمدينة، والتعليم، والخبرة، والمهارات، واللغات). بروفايلك خاص بيك إلا لو شغّلت «متاح لأصحاب الشغل».",
+              "اللي بتكتبه: الشركات، والوظايف، ولينكات الوظايف ووصفها، والمراحل، والتواريخ، والملاحظات، والإنترفيوهات، والمتابعات، وبروفايلك (الاسم، والعنوان القصير، والمدينة، والتعليم، والخبرة، والمهارات، واللغات). بروفايلك خاص بيك إلا لو شغّلت «متاح لأصحاب الشغل».",
               "الـ CV بتاعك لو رفعته: الملف، والكلام اللي بنقراه منه عشان Sekka AI يستخدمه.",
               "بيانات تقنية: الطلبات اللي بتوصل سيرفراتنا وتقارير الأخطاء من غير الإيميلات، وعنوان الـ IP بتاعك اللي بنستخدمه عشان نوقف أي إساءة زي تخمين كلمات السر.",
             ],

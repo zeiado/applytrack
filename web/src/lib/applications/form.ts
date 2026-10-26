@@ -6,6 +6,7 @@ export const FIELDS = [
   "company",
   "role_title",
   "job_url",
+  "job_description",
   "source",
   "status",
   "salary_min",
@@ -61,6 +62,7 @@ export function applicationBody(form: FormData): { body: Body } | { invalid: Fie
       company: value(form, "company"),
       role_title: value(form, "role_title"),
       job_url: optional(value(form, "job_url")),
+      job_description: optional(value(form, "job_description")),
       source: (SOURCES as readonly string[]).includes(source)
         ? (source as ApplicationSource)
         : "other",

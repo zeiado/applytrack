@@ -5,6 +5,8 @@ export type ExtractedJob = {
   role_title: string;
   job_url: string;
   source: Source;
+  /** Plain text, "" when the page has none we can read. */
+  job_description: string;
 };
 
 /**
@@ -16,10 +18,52 @@ export type ExtractedJob = {
  * signed out have one), LinkedIn's tab title when signed in ("Role | Company |
  * LinkedIn"), then the page's title. The user checks and corrects the result before
  * saving, so a rough guess is fine.
+ *
+ * The job description comes from the JobPosting too (usually HTML), or from LinkedIn's
+ * description box when signed in. It becomes plain text with its paragraphs and lists.
  */
 export function extractJob(doc: Document = document, href: string = location.href): ExtractedJob {
   const clean = (value: unknown): string =>
     typeof value === "string" ? value.replace(/\s+/g, " ").trim().slice(0, 200) : "";
+
+  const MAX_DESCRIPTION = 20_000; // the API's limit
+  const NL = String.fromCharCode(10);
+  // Plain text from HTML: blocks become paragraphs, list items "- " lines.
+  const textOf = (root: Node): string => {
+    const BLOCK = /^(P|DIV|UL|OL|H[1-6]|SECTION|ARTICLE|TABLE|TR|BLOCKQUOTE|PRE|HEADER|FOOTER)$/;
+    const SKIP = /^(SCRIPT|STYLE|NOSCRIPT|TEMPLATE|BUTTON|SVG)$/;
+    let out = "";
+    const walk = (node: Node): void => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        out += node.nodeValue ?? "";
+        return;
+      }
+      if (node.nodeType !== Node.ELEMENT_NODE) return;
+      const tag = (node as Element).tagName.toUpperCase();
+      if (SKIP.test(tag)) return;
+      if (tag === "BR") {
+        out += NL;
+        return;
+      }
+      if (tag === "LI") out += NL + "- ";
+      else if (BLOCK.test(tag)) out += NL + NL;
+      for (const child of Array.from(node.childNodes)) walk(child);
+      if (BLOCK.test(tag)) out += NL + NL;
+    };
+    walk(root);
+    const lines = out.split(NL).map((line) => line.replace(/\s+/g, " ").trim());
+    // At most one empty line in a row.
+    const kept = lines.filter((line, i) => line !== "" || (i > 0 && lines[i - 1] !== ""));
+    return kept.join(NL).trim().slice(0, MAX_DESCRIPTION);
+  };
+  // DOMParser makes an inert document: nothing in it runs or loads. Some sites send the
+  // HTML escaped ("&lt;p&gt;"), so a result that still has tags is read once more.
+  const htmlText = (html: unknown): string => {
+    if (typeof html !== "string") return "";
+    const read = (value: string) => textOf(new DOMParser().parseFromString(value, "text/html").body);
+    const text = read(html);
+    return /<\/?(p|br|li|ul|div|strong)[\s/>]/i.test(text) ? read(text) : text;
+  };
 
   const url = new URL(href);
   const host = url.hostname.toLowerCase().replace(/^www\./, "");
@@ -45,8 +89,10 @@ export function extractJob(doc: Document = document, href: string = location.hre
   const posting = items.find((item) => {
     const type = (item as { "@type"?: unknown } | null)?.["@type"];
     return type === "JobPosting" || (Array.isArray(type) && type.includes("JobPosting"));
-  }) as { title?: unknown; hiringOrganization?: unknown } | undefined;
+  }) as { title?: unknown; hiringOrganization?: unknown; description?: unknown } | undefined;
+  let description = "";
   if (posting) {
+    description = htmlText(posting.description);
     role = clean(posting.title);
     const org = posting.hiringOrganization;
     company = clean(typeof org === "string" ? org : (org as { name?: unknown } | undefined)?.name);
@@ -67,6 +113,12 @@ export function extractJob(doc: Document = document, href: string = location.hre
       // The search page shows a job beside the list; its link in the list names the role.
       role = clean(doc.querySelector(`a[href*="/jobs/view/${linkedInId}"]`)?.textContent);
     }
+  }
+
+  // LinkedIn's description box: #job-details when signed in, the other when signed out.
+  if (board === "linkedin.com" && !description) {
+    const box = doc.querySelector("#job-details, .jobs-description__content, .show-more-less-html__markup");
+    if (box) description = textOf(box);
   }
 
   // 3. Any other page: its title. A company's own careers page often names the company
@@ -111,5 +163,6 @@ export function extractJob(doc: Document = document, href: string = location.hre
     role_title: role,
     job_url: jobUrl.slice(0, 2048),
     source: board ? "job_board" : company ? "company_site" : "other",
+    job_description: description,
   };
 }

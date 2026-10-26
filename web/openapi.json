@@ -73,6 +73,19 @@
             ],
             "title": "Follow Up On"
           },
+          "job_description": {
+            "anyOf": [
+              {
+                "description": "Plain text, up to 20000 characters. HTML is removed.",
+                "maxLength": 100000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Job Description"
+          },
           "job_url": {
             "anyOf": [
               {
@@ -149,6 +162,147 @@
           "role_title"
         ],
         "title": "ApplicationCreate",
+        "type": "object"
+      },
+      "ApplicationDetail": {
+        "description": "One application with its long fields, which lists leave out.",
+        "properties": {
+          "applied_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Applied On"
+          },
+          "company": {
+            "title": "Company",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "follow_up_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Follow Up On"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "job_description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Job Description"
+          },
+          "job_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Job Url"
+          },
+          "next_statuses": {
+            "description": "Statuses this application can move to next.",
+            "items": {
+              "$ref": "#/components/schemas/ApplicationStatus"
+            },
+            "readOnly": true,
+            "title": "Next Statuses",
+            "type": "array"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "role_title": {
+            "title": "Role Title",
+            "type": "string"
+          },
+          "salary_max": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Salary Max"
+          },
+          "salary_min": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Salary Min"
+          },
+          "source": {
+            "$ref": "#/components/schemas/ApplicationSource"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ApplicationStatus"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "company",
+          "role_title",
+          "job_url",
+          "source",
+          "status",
+          "salary_min",
+          "salary_max",
+          "applied_on",
+          "follow_up_on",
+          "notes",
+          "created_at",
+          "updated_at",
+          "job_description",
+          "next_statuses"
+        ],
+        "title": "ApplicationDetail",
         "type": "object"
       },
       "ApplicationRead": {
@@ -344,6 +498,19 @@
               }
             ],
             "title": "Follow Up On"
+          },
+          "job_description": {
+            "anyOf": [
+              {
+                "description": "Plain text, up to 20000 characters. HTML is removed.",
+                "maxLength": 100000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Job Description"
           },
           "job_url": {
             "anyOf": [
@@ -956,6 +1123,17 @@
             "title": "Interviews",
             "type": "array"
           },
+          "job_description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Job Description"
+          },
           "job_url": {
             "anyOf": [
               {
@@ -1039,6 +1217,7 @@
           "notes",
           "created_at",
           "updated_at",
+          "job_description",
           "history",
           "interviews",
           "next_statuses"
@@ -2122,7 +2301,7 @@
   "paths": {
     "/api/v1/applications": {
       "get": {
-        "description": "List your applications, filtered, sorted and paginated.",
+        "description": "List your applications, filtered, sorted and paginated. Job descriptions are left\nout; get one application to read its description.",
         "operationId": "list_applications_api_v1_applications_get",
         "parameters": [
           {
@@ -2298,7 +2477,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ApplicationRead"
+                  "$ref": "#/components/schemas/ApplicationDetail"
                 }
               }
             },
@@ -2564,7 +2743,7 @@
         ]
       },
       "get": {
-        "description": "Get one of your applications.",
+        "description": "Get one of your applications, with its job description.",
         "operationId": "get_application_api_v1_applications__application_id__get",
         "parameters": [
           {
@@ -2583,7 +2762,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ApplicationRead"
+                  "$ref": "#/components/schemas/ApplicationDetail"
                 }
               }
             },
@@ -2670,7 +2849,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ApplicationRead"
+                  "$ref": "#/components/schemas/ApplicationDetail"
                 }
               }
             },
@@ -3276,7 +3455,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ApplicationRead"
+                  "$ref": "#/components/schemas/ApplicationDetail"
                 }
               }
             },

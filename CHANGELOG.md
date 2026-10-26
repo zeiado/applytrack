@@ -7,6 +7,14 @@ changes, a minor version for new features, and a patch version for fixes.
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-10-26
+
+Job descriptions on applications, saved by the browser extension too.
+
+### Added
+
+- A job description on each application, for Sekka AI to use: paste it in the form, or the browser extension saves it from the job page (schema.org JobPosting, or LinkedIn's description box) with a checkbox to leave it out. HTML is turned into plain text, up to 20,000 characters. It shows on the application's page and in the data download; lists leave it out ([#116])
+
 ## [0.9.0] - 2026-10-26
 
 CV uploads, and a profile icon in the header.
@@ -153,7 +161,8 @@ First release.
 - Interview times are returned in UTC on create, matching reads ([#25])
 - CI tests the Python version the Docker image ships ([#35])
 
-[Unreleased]: https://github.com/zeiado/applytrack/compare/v0.9.0...HEAD
+[Unreleased]: https://github.com/zeiado/applytrack/compare/v0.10.0...HEAD
+[0.10.0]: https://github.com/zeiado/applytrack/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/zeiado/applytrack/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/zeiado/applytrack/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/zeiado/applytrack/compare/v0.6.0...v0.7.0
@@ -199,5 +208,6 @@ First release.
 [#109]: https://github.com/zeiado/applytrack/issues/109
 [#110]: https://github.com/zeiado/applytrack/issues/110
 [#115]: https://github.com/zeiado/applytrack/issues/115
+[#116]: https://github.com/zeiado/applytrack/issues/116
 [#114]: https://github.com/zeiado/applytrack/issues/114
 [#50]: https://github.com/zeiado/applytrack/issues/50

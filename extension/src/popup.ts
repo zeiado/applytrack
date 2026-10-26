@@ -32,7 +32,7 @@ async function targetTab(): Promise<chrome.tabs.Tab | undefined> {
  * activeTab permission allows nothing else. */
 async function readJob(): Promise<{ job: ExtractedJob; read: boolean }> {
   const tab = await targetTab();
-  const empty: ExtractedJob = { company: "", role_title: "", job_url: "", source: "other" };
+  const empty: ExtractedJob = { company: "", role_title: "", job_url: "", source: "other", job_description: "" };
   if (tab?.id === undefined || !tab.url || !/^https?:/.test(tab.url)) return { job: empty, read: false };
   try {
     const [injection] = await chrome.scripting.executeScript({ target: { tabId: tab.id }, func: extractJob });
@@ -69,12 +69,15 @@ async function main(): Promise<void> {
   const role = element<HTMLInputElement>("role");
   const link = element<HTMLInputElement>("link");
   const status = element<HTMLSelectElement>("status");
+  const includeDescription = element<HTMLInputElement>("description");
   const message = element<HTMLParagraphElement>("message");
   const submit = element<HTMLButtonElement>("save");
 
   company.value = job.company;
   role.value = job.role_title;
   link.value = job.job_url;
+  // Too long to show here: the user reads and edits it on the website.
+  element<HTMLLabelElement>("description-row").hidden = !job.job_description;
   const note = (key: string | null, kind: "info" | "error" = "info") => {
     message.textContent = key ? t(key) : "";
     message.dataset.kind = kind;
@@ -94,6 +97,7 @@ async function main(): Promise<void> {
       role_title: role.value.trim(),
       job_url: link.value.trim(),
       source: job.source,
+      job_description: includeDescription.checked ? job.job_description : "",
       status: status.value === "wishlist" ? "wishlist" : "applied",
     };
     const result = await saveApplication(APP_URL, application);

@@ -230,6 +230,8 @@
     "role_title": "Role",
     "job_url": "Job link",
     "job_urlHint": "The job post, so you can find it again",
+    "job_description": "Job description",
+    "job_descriptionHint": "Paste the job post. Sekka AI uses it to tailor your CV to this job.",
     "source": "Where you found it",
     "status": "Stage",
     "statusApplied": "I've applied",
@@ -258,7 +260,8 @@
       "follow_up_on": "Enter a valid date.",
       "notes": "Notes are too long.",
       "source": "Choose where you found it.",
-      "status": "Choose a stage."
+      "status": "Choose a stage.",
+      "job_description": "The job description is too long: 20,000 characters at most."
     }
   },
   "InterviewKind": {
@@ -281,6 +284,12 @@
     "salaryUpTo": "Up to {max}",
     "notes": "Notes",
     "none": "—",
+    "jobDescription": {
+      "title": "Job description",
+      "empty": "No job description yet. Add it so Sekka AI can tailor your CV to this job.",
+      "add": "Add job description",
+      "label": "Full job description"
+    },
     "move": {
       "title": "Next step",
       "to": "Move to",
