@@ -147,15 +147,51 @@ describe("job description", () => {
     expect(extractJob(doc, "https://forasna.com/job/p/1").job_description).toBe(text("مطلوب محاسب", "", "خبرة سنتين"));
   });
 
-  it("LinkedIn signed in: from the description box", () => {
-    const doc = page("", "Backend Engineer | Valu | LinkedIn");
-    doc.body.innerHTML = '<div id="job-details"><h2>About the job</h2><span><p>Build APIs.</p><button>Show more</button></span></div>';
-    expect(extractJob(doc, "https://www.linkedin.com/jobs/view/1/").job_description).toBe(text("About the job", "", "Build APIs."));
+  // Shaped like LinkedIn signed in, October 2026: generated class names, the text in
+  // expandable boxes, the job's first and the company's second.
+  it("LinkedIn signed in: the box under About the job, not the company's", () => {
+    const doc = page("", "AI Software Engineer | Advansys | LinkedIn");
+    doc.body.innerHTML =
+      '<div class="l4j"><h2>About the job</h2><span data-testid="expandable-text-box"><strong>About The Role<br><br></strong>We build AI.<br><br><ul><li> Design APIs </li><li> Ship models </li></ul></span><button>… more</button></div>' +
+      '<div><h2>About the company</h2><span data-testid="expandable-text-box">Advansys is an engineering firm.</span></div>';
+    expect(extractJob(doc, "https://www.linkedin.com/jobs/search-results/?currentJobId=4476176909").job_description).toBe(
+      text("About The Role", "", "We build AI.", "", "- Design APIs", "- Ship models"),
+    );
   });
 
-  it("other sites' page text isn't taken", () => {
+  it("LinkedIn's older layout", () => {
+    const doc = page("", "Backend Engineer | Valu | LinkedIn");
+    doc.body.innerHTML = '<div id="job-details"><span><p>Build APIs.</p><button>Show more</button></span></div>';
+    expect(extractJob(doc, "https://www.linkedin.com/jobs/view/1/").job_description).toBe("Build APIs.");
+  });
+
+  // Shaped like Indeed's search page, October 2026: the job beside the list, no JobPosting.
+  it("Indeed's search page: role, company, link and the text under the heading", () => {
+    const doc = page("", "200+ Software Engineer Jobs | Indeed");
+    doc.body.innerHTML =
+      '<h1>software engineer jobs in Cairo</h1><div class="jobsearch-RightPane"><div data-testid="desktop-job-header"><h5 data-testid="vj-job-title">Node.js Associate Engineer</h5><a href="https://eg.indeed.com/cmp/Capgemini">Capgemini</a></div>' +
+      '<div><div><h2>Full job description</h2></div><div><style>.x{}</style><h4>Job Description</h4><p>Job Requirements:</p><ul><li><p>1+ years of experience working in software development</p></li><li><p>Strong NodeJS and REST APIs</p></li></ul></div></div></div>';
+    expect(extractJob(doc, "https://eg.indeed.com/jobs?q=software+engineer&l=Cairo&vjk=fcabf3b555d1fdc2")).toEqual({
+      company: "Capgemini",
+      role_title: "Node.js Associate Engineer",
+      job_url: "https://eg.indeed.com/viewjob?jk=fcabf3b555d1fdc2",
+      source: "job_board",
+      job_description: text("Job Requirements:", "", "- 1+ years of experience working in software development", "- Strong NodeJS and REST APIs"),
+    });
+  });
+
+  it("a careers page: the text under a Job description heading, in Arabic too", () => {
     const doc = page("", "Careers");
-    doc.body.innerHTML = '<div id="job-details"><p>Not from LinkedIn</p></div>';
+    doc.body.innerHTML =
+      "<h1>محاسب</h1><section><h3>وصف الوظيفة</h3><p>مطلوب محاسب بخبرة سنتين في شركة توزيع، يجيد Excel والتقارير الشهرية، ويقدر يتعامل مع الموردين والعملاء.</p></section>";
+    expect(extractJob(doc, "https://careers.example.com/jobs/1").job_description).toBe(
+      "مطلوب محاسب بخبرة سنتين في شركة توزيع، يجيد Excel والتقارير الشهرية، ويقدر يتعامل مع الموردين والعملاء.",
+    );
+  });
+
+  it("takes nothing from a page without a JobPosting or a description heading", () => {
+    const doc = page("", "Careers");
+    doc.body.innerHTML = '<div id="job-details"><p>Not from LinkedIn</p></div><h2>Our values</h2><p>' + "We care. ".repeat(30) + "</p>";
     expect(extractJob(doc, "https://example.org/jobs/1").job_description).toBe("");
   });
 

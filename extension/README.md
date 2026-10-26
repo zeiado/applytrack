@@ -8,10 +8,13 @@ Save the job you're looking at to Sekka in one click (#69). Chrome, Manifest V3.
    apply*, and can untick *Save the job description*.
 3. *Save to Sekka* adds the application, and *Open in Sekka* opens it in the web app.
 
-It reads LinkedIn, Wuzzuf, Bayt and Forasna, and makes a rough guess on any other page
+It reads LinkedIn, Wuzzuf, Bayt, Forasna and Indeed, and makes a rough guess on any other page
 (`src/extract.ts`): first the page's schema.org `JobPosting`, then LinkedIn's tab
 title, then the page's heading or title. The job description comes from the
-`JobPosting` (HTML turned into plain text) or LinkedIn's description box.
+`JobPosting` (HTML turned into plain text), LinkedIn's description box, or the text
+under a "Job description" heading (Indeed's search page, careers pages). Job sites
+change their pages: the tests in `test/extract.test.ts` copy each site's layout as
+checked, so update them when a site changes.
 
 ## How it signs in
 
