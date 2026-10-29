@@ -634,6 +634,82 @@
       "company": "Sekka",
       "extension": "Chrome extension",
       "contact": "Contact"
+    },
+    "features": {
+      "title": "Features",
+      "heading": "Everything Sekka does",
+      "intro": "One place for your job search, from the first saved job to the offer. Free to use, in Arabic and English.",
+      "sections": {
+        "board": {
+          "title": "Every application on one board",
+          "points": {
+            "move": "Drag a card to the next stage, or use its menu.",
+            "list": "Switch to a list with filters by status and source, and sorting.",
+            "export": "Download all your applications as a CSV file."
+          }
+        },
+        "followUps": {
+          "title": "Follow-ups that don't slip",
+          "points": {
+            "date": "Pick a day to check in with each company.",
+            "email": "That morning, an email lists who to write to.",
+            "snooze": "Mark a follow-up done or snooze it from one inbox.",
+            "stop": "Stop the emails in one click, from any email."
+          }
+        },
+        "details": {
+          "title": "The whole story of each job",
+          "points": {
+            "description": "Keep the job description, so you can read it before the interview.",
+            "interviews": "Log every interview with its date, type and notes.",
+            "history": "See when each application moved, from saved to the answer."
+          }
+        },
+        "stats": {
+          "title": "See what's working",
+          "points": {
+            "rates": "Your response, interview and offer rates.",
+            "funnel": "A funnel from applied to accepted.",
+            "sources": "Which sources bring you interviews, and how long each stage takes."
+          }
+        },
+        "extension": {
+          "title": "Save jobs in one click",
+          "points": {
+            "sites": "Works on LinkedIn, Wuzzuf, Bayt, Forasna and Indeed.",
+            "fields": "Saves the company, role, link and job description for you.",
+            "private": "It only reads the page when you click it."
+          }
+        },
+        "cvs": {
+          "title": "Your CVs, kept private",
+          "points": {
+            "upload": "Upload your CVs as PDF or Word files.",
+            "storage": "They're kept in private storage that only your account can open.",
+            "download": "Download, replace or delete them any time."
+          }
+        }
+      },
+      "more": {
+        "languages": {
+          "title": "Arabic and English, on any screen",
+          "body": "Arabic from right to left or English, light or dark, on your laptop or installed on your phone. Sign in with Google or your email."
+        },
+        "data": {
+          "title": "Your data stays yours",
+          "body": "Download everything Sekka keeps about you, or delete your account and all of it at any time. No ads, and we don't sell your data.",
+          "link": "Read the privacy policy"
+        }
+      },
+      "demo": {
+        "interview": "Technical interview",
+        "interviewWhen": "Sunday, 11:00",
+        "screening": "HR call",
+        "screeningWhen": "Done",
+        "cv": "cv-2026.pdf",
+        "cvWhen": "Uploaded today"
+      },
+      "cta": "Try it with your next application"
     }
   }
 }
