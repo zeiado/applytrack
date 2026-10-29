@@ -11,19 +11,36 @@
       "yes": "Yes!",
       "label": "A road through the stages of a job search: wishlist, applied, screening, interviewing, offer, and finally a yes"
     },
-    "features": {
-      "board": {
-        "title": "Every application on one board",
-        "body": "From applied to offer, see your whole search at a glance."
+    "journey": {
+      "title": "From a saved job to a yes",
+      "steps": {
+        "save": {
+          "title": "Save the job",
+          "body": "Found a job on LinkedIn or Wuzzuf? Save it with the Chrome extension, description and all."
+        },
+        "track": {
+          "title": "See where everything stands",
+          "body": "Every application sits on one board, from wishlist to offer. Move a card when something changes."
+        },
+        "followUp": {
+          "title": "Follow up on time",
+          "body": "Pick a day to check in. That morning, an email tells you who to write to."
+        },
+        "yes": {
+          "title": "Hear yes",
+          "body": "When an offer comes in, it's the first thing you see."
+        }
       },
-      "reminders": {
-        "title": "Never forget a follow-up",
-        "body": "A morning email tells you who to follow up with today."
+      "demo": {
+        "company": "Nile Labs",
+        "role": "Junior frontend developer",
+        "place": "Cairo",
+        "saved": "Saved to Sekka",
+        "otherCompany": "Delta Pay",
+        "otherRole": "QA engineer",
+        "applied": "Applied 3 days ago"
       },
-      "insights": {
-        "title": "Learn what works",
-        "body": "See which sources get you interviews and how fast companies reply."
-      }
+      "cta": "Start with your next application"
     },
     "deleted": "Your account and all its data have been deleted."
   },

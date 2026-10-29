@@ -26,7 +26,6 @@ describe("HomeHero", () => {
     expect(screen.getByRole("heading", { level: 1 }).textContent).toBe(en.Home.tagline);
     expect(screen.getAllByRole("link")).toHaveLength(1);
     expect(screen.getByRole("link", { name: en.Home.getStarted }).getAttribute("href")).toBe("/register");
-    expect(screen.getAllByRole("heading", { level: 2 })).toHaveLength(3);
   });
 
   it("draws the road through the stages to a yes", () => {
