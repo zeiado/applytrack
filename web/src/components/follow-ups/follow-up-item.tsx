@@ -39,7 +39,7 @@ export function FollowUpItem({ reminder, today, date }: { reminder: DueReminder;
             <span
               className={cn(
                 "rounded-md px-2 py-0.5 text-xs",
-                late >= 0 ? "bg-primary/10 text-primary font-medium" : "bg-muted text-muted-foreground",
+                late >= 0 ? "bg-primary-container text-primary-container-foreground font-medium" : "bg-muted text-muted-foreground",
               )}
             >
               {late > 0 ? t("overdueBy", { days: late }) : late === 0 ? t("dueToday") : t("dueIn", { days: -late })}

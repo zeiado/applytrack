@@ -7,7 +7,7 @@ export function CompanyInitial({ company, locale, className }: { company: string
     <span
       aria-hidden
       className={cn(
-        "bg-primary/10 text-primary flex size-[34px] shrink-0 items-center justify-center rounded-lg font-semibold",
+        "bg-primary-container text-primary-container-foreground flex size-[34px] shrink-0 items-center justify-center rounded-lg font-semibold",
         className,
       )}
     >

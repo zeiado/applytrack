@@ -10,7 +10,7 @@ export function NativeSelect({ className, children, ...props }: ComponentProps<"
     <div className="relative">
       <select
         className={cn(
-          "border-input bg-background focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:border-destructive h-10 w-full appearance-none rounded-lg border ps-3 pe-9 text-sm outline-none focus-visible:ring-3",
+          "bg-transparent h-12 w-full appearance-none rounded-xs border ps-4 pe-10 text-base outline-none transition-[border-color,box-shadow] border-input hover:border-foreground focus-visible:border-primary focus-visible:shadow-[inset_0_0_0_1px_var(--primary)] aria-invalid:border-destructive aria-invalid:shadow-[inset_0_0_0_1px_var(--destructive)]",
           className,
         )}
         {...props}
@@ -19,7 +19,7 @@ export function NativeSelect({ className, children, ...props }: ComponentProps<"
       </select>
       <ChevronDown
         aria-hidden
-        className="text-muted-foreground pointer-events-none absolute end-3 top-1/2 size-4 -translate-y-1/2"
+        className="text-muted-foreground pointer-events-none absolute end-3.5 top-1/2 size-4 -translate-y-1/2"
       />
     </div>
   );
