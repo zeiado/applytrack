@@ -34,16 +34,19 @@ export default async function ApplicationsPage({ params, searchParams }: PagePro
     <>
       <div className="flex items-center gap-2.5">
         <h1 className="flex-1 text-2xl font-semibold">{t("title")}</h1>
-        {/* A square icon button on phones, with its words from `sm` up. */}
-        <Link
-          href="/applications/new"
-          aria-label={t("add")}
-          className={buttonVariants({ className: "size-11 gap-1.5 rounded-xl p-0 sm:h-10 sm:w-auto sm:px-4" })}
-        >
-          <Plus aria-hidden className="size-5 sm:size-4" />
-          <span className="sr-only sm:not-sr-only">{t("add")}</span>
+        <Link href="/applications/new" className={buttonVariants({ className: "hidden md:inline-flex" })} data-icon="inline-start">
+          <Plus aria-hidden />
+          {t("add")}
         </Link>
       </div>
+      {/* Phones: a Material 3 floating action button above the tab bar, in reach of a thumb. */}
+      <Link
+        href="/applications/new"
+        aria-label={t("add")}
+        className="bg-primary-container text-primary-container-foreground state-layer fixed end-4 bottom-[calc(6rem+env(safe-area-inset-bottom))] z-40 flex size-14 items-center justify-center rounded-xl shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring md:hidden"
+      >
+        <Plus aria-hidden className="size-6" />
+      </Link>
       {/* The session and the URL are only known per request: everything below streams in. */}
       <Suspense fallback={<Loading />}>
         <Content searchParams={searchParams} />
@@ -117,7 +120,7 @@ async function StageChips({ applications }: { applications: Application[] }) {
           <li key={status}>
             <a
               href={`#column-${status}`}
-              className="bg-card hover:bg-accent inline-flex h-9 items-center gap-1.5 rounded-full border px-3.5 text-sm whitespace-nowrap"
+              className="state-layer relative inline-flex h-8 items-center gap-1.5 rounded-sm border border-input px-3 text-sm font-medium whitespace-nowrap"
             >
               {t(`Status.${status}`)}
               <span className="text-muted-foreground tabular-nums">
