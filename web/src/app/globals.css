@@ -135,6 +135,99 @@
   }
 }
 
+/* The home page's opening moment (components/brand/road.tsx): the road draws itself, a
+ * traveller rides it, each stop lights up as it passes and the amber "yes" arrives last.
+ * Plays once. Without motion, everything simply shows in its final place. */
+.road-intro-traveller,
+.road-intro-ripple {
+  opacity: 0;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .road-intro-track {
+    stroke-dasharray: 1;
+    animation: road-draw 1.6s cubic-bezier(0.3, 0, 0.2, 1) both;
+  }
+  .road-intro-lines {
+    animation: road-fade 0.6s 1.2s both;
+  }
+  .road-intro-stop {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: road-pop 0.45s var(--road-at) cubic-bezier(0.3, 1.5, 0.5, 1) both;
+  }
+  .road-intro-traveller {
+    offset-rotate: 0deg;
+    animation: road-travel 2s 0.3s linear both;
+  }
+  .road-intro-yes,
+  .road-intro-yes-label {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: road-pop 0.6s 2.25s cubic-bezier(0.3, 1.6, 0.5, 1) both;
+  }
+  .road-intro-ripple {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: road-ripple 1s 2.45s ease-out forwards;
+  }
+}
+@keyframes road-draw {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
+@keyframes road-fade {
+  from { opacity: 0; }
+}
+@keyframes road-pop {
+  from { opacity: 0; transform: scale(0.2); }
+}
+@keyframes road-travel {
+  0% { offset-distance: 0%; opacity: 0; }
+  6% { opacity: 1; }
+  92% { opacity: 1; }
+  100% { offset-distance: 100%; opacity: 0; }
+}
+@keyframes road-ripple {
+  from { opacity: 0.9; transform: scale(1); }
+  to { opacity: 0; transform: scale(2.4); }
+}
+
+/* The journey below the hero: as you scroll, the road fills down to each stop and the
+ * stop's screen slides in from the reading end. Only where the browser ties animations to
+ * scrolling; elsewhere (and without motion) it's all simply there. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .journey-rail {
+      transform-origin: top;
+      animation: journey-fill linear both;
+      animation-timeline: view();
+      animation-range: entry 60% cover 55%;
+    }
+    .journey-stop {
+      animation: journey-arrive linear both;
+      animation-timeline: view();
+      animation-range: entry 20% entry 70%;
+    }
+    .journey-preview {
+      animation: journey-slide linear both;
+      animation-timeline: view();
+      animation-range: entry 10% cover 35%;
+    }
+  }
+}
+@keyframes journey-fill {
+  from { transform: scaleY(0); }
+}
+@keyframes journey-arrive {
+  from { opacity: 0; transform: scale(0.4); }
+}
+@keyframes journey-slide {
+  from { opacity: 0; translate: calc(2.5rem * var(--reading, 1)) 0; }
+}
+[dir="rtl"] {
+  --reading: -1;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

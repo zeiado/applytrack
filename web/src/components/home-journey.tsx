@@ -37,14 +37,14 @@ export function HomeJourney() {
               {/* The road: a thick teal track with a dashed centre line, as in the hero. It runs
                   into the next stop, so the steps read as one road. */}
               {!last && (
-                <span aria-hidden className="bg-primary absolute start-[13px] top-3 -bottom-3 w-3 rounded-full">
+                <span aria-hidden className="journey-rail bg-primary absolute start-[13px] top-3 -bottom-3 w-3 rounded-full">
                   <span className="absolute inset-y-2 inset-x-0 mx-auto w-0.5 bg-[repeating-linear-gradient(to_bottom,var(--background)_0_6px,transparent_6px_12px)]" />
                 </span>
               )}
               <span
                 aria-hidden
                 className={cn(
-                  "absolute top-1 z-10 rounded-full",
+                  "journey-stop absolute top-1 z-10 rounded-full",
                   last ? "bg-yes start-[3px] size-8" : "border-primary bg-background start-[5px] size-7 border-[6px]",
                 )}
               />
@@ -53,7 +53,7 @@ export function HomeJourney() {
                 <p className="text-muted-foreground max-w-md text-pretty">{t(`steps.${step}.body`)}</p>
               </div>
               {/* A picture of the screen, so hidden from screen readers: the text says it all. */}
-              <div aria-hidden className="max-w-md select-none md:max-w-none">
+              <div aria-hidden className="journey-preview max-w-md select-none md:max-w-none">
                 <Preview />
               </div>
             </li>
