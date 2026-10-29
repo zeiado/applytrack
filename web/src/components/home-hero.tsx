@@ -4,7 +4,6 @@ import { RoadIllustration } from "@/components/brand/road";
 import { buttonVariants } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import { STATUSES } from "@/lib/applications/model";
-import { cn } from "@/lib/utils";
 
 /** The road's five stops: wishlist through offer. */
 const STOPS = STATUSES.slice(0, STATUSES.indexOf("offer") + 1);
@@ -20,7 +19,7 @@ export function HomeHero() {
         </h1>
         <p className="text-muted-foreground max-w-xl text-lg text-pretty lg:text-xl">{t("Home.intro")}</p>
         {/* One clear way in; "Log in" lives in the header. */}
-        <Link href="/register" className={cn(buttonVariants(), "h-14 rounded-2xl px-7 text-lg")}>
+        <Link href="/register" className={buttonVariants({ size: "xl" })}>
           {t("Home.getStarted")}
         </Link>
       </div>

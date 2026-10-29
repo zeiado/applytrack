@@ -22,7 +22,7 @@ export function UnsubscribeForm() {
     return (
       <div className="grid gap-4">
         <FormSuccess>{t("done")}</FormSuccess>
-        <Link href="/settings" className={buttonVariants({ variant: "outline", className: "h-12 w-full rounded-2xl" })}>
+        <Link href="/settings" className={buttonVariants({ variant: "outline", size: "lg", className: "w-full" })}>
           {t("settings")}
         </Link>
       </div>

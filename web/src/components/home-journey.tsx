@@ -61,7 +61,7 @@ export function HomeJourney() {
       </ol>
       <div className="mt-20 grid justify-items-start gap-6 border-t pt-12">
         <h2 className="text-2xl font-semibold tracking-tight text-balance sm:text-3xl rtl:font-bold">{t("cta")}</h2>
-        <Link href="/register" className={cn(buttonVariants(), "h-14 rounded-2xl px-7 text-lg")}>
+        <Link href="/register" className={buttonVariants({ size: "xl" })}>
           {tHome("getStarted")}
         </Link>
       </div>
@@ -87,7 +87,7 @@ function Preview({ step }: { step: Step }) {
               {demo("company")}, {demo("place")}
             </span>
           </div>
-          <span className="bg-primary/10 text-primary inline-flex w-fit items-center gap-1.5 rounded-md px-2.5 py-1 text-sm font-medium">
+          <span className="bg-primary-container text-primary-container-foreground inline-flex w-fit items-center gap-1.5 rounded-md px-2.5 py-1 text-sm font-medium">
             <Check className="size-4" />
             {demo("saved")}
           </span>
@@ -129,7 +129,7 @@ function Preview({ step }: { step: Step }) {
             <span className="truncate font-semibold">{demo("otherCompany")}</span>
             <span className="text-muted-foreground truncate text-sm">{demo("otherRole")}</span>
           </div>
-          <span className="bg-primary/10 text-primary shrink-0 rounded-md px-2 py-0.5 text-xs font-medium">
+          <span className="bg-primary-container text-primary-container-foreground shrink-0 rounded-md px-2 py-0.5 text-xs font-medium">
             {t("Applications.card.followUpDue")}
           </span>
         </div>

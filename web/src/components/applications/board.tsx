@@ -199,7 +199,7 @@ function Card({
             <span
               className={cn(
                 "ms-auto rounded-md px-2 py-0.5",
-                followUp === "upcoming" ? "bg-muted text-muted-foreground" : "bg-primary/10 text-primary font-medium",
+                followUp === "upcoming" ? "bg-muted text-muted-foreground" : "bg-primary-container text-primary-container-foreground font-medium",
               )}
             >
               {followUp === "overdue"

@@ -107,6 +107,34 @@
   --status-withdrawn: oklch(0.431 0.011 179.1); /* #4A5250 */
 }
 
+/* Material 3 state layer: a wash of the element's own text colour over its background,
+ * 8% on hover and 10% on focus or press. The element must be positioned (relative etc.). */
+@utility state-layer {
+  isolation: isolate;
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background-color: currentColor;
+    opacity: 0;
+    transition: opacity 150ms;
+    pointer-events: none;
+  }
+  &:hover::before {
+    opacity: 0.08;
+  }
+  &:focus-visible::before,
+  &:active::before {
+    opacity: 0.1;
+  }
+  &:disabled::before,
+  &[aria-disabled="true"]::before {
+    opacity: 0;
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

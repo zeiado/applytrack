@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { ActionError } from "@/lib/auth/errors";
-import { cn } from "@/lib/utils";
 
 const Large = createContext(false);
 
@@ -26,17 +25,11 @@ export function Field({
   id,
   ...input
 }: { label: string; hint?: string; id: string } & ComponentProps<"input">) {
-  const large = useContext(Large);
   return (
     <div className="grid gap-1.5">
       <Label htmlFor={id}>{label}</Label>
       <Input
         id={id}
-        className={cn(
-          "h-10",
-          large &&
-            "bg-card dark:bg-card focus-visible:border-primary focus-visible:ring-primary h-12 rounded-xl px-3.5 text-base focus-visible:ring-1 md:text-base",
-        )}
         // Emails and passwords are Latin text; left to right keeps them readable
         // in Arabic too.
         dir={input.type === "email" || input.type === "password" ? "ltr" : undefined}
@@ -60,7 +53,8 @@ export function SubmitButton({ children }: { children: React.ReactNode }) {
   return (
     <Button
       type="submit"
-      className={cn("h-10 w-full text-base", large && "h-13 rounded-2xl font-semibold")}
+      size={large ? "lg" : "default"}
+      className="w-full"
       disabled={pending}
       aria-busy={pending}
     >

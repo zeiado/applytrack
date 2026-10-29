@@ -91,7 +91,7 @@ function InterviewItem({
             <CalendarClock aria-hidden className="text-primary size-4" />
             {formatDateTime(interview.scheduled_at, locale, timeZone)}
             {upcoming && (
-              <span className="bg-primary/10 text-primary rounded-full px-2 py-0.5 text-xs font-medium">
+              <span className="bg-primary-container text-primary-container-foreground rounded-sm px-2 py-0.5 text-xs font-medium">
                 {t("upcoming")}
               </span>
             )}
