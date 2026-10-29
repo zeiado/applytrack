@@ -849,5 +849,29 @@
   },
   "Toast": {
     "close": "Close"
+  },
+  "Palette": {
+    "title": "Search",
+    "placeholder": "Search applications, pages and actions",
+    "loading": "Loading your applications…",
+    "empty": "Nothing matches. Try a company or a role.",
+    "list": "Applications as a list",
+    "newApplication": "Add an application",
+    "toggleTheme": "Switch light or dark theme",
+    "groups": {
+      "applications": "Applications",
+      "goTo": "Go to",
+      "actions": "Actions"
+    },
+    "shortcuts": {
+      "title": "Keyboard shortcuts",
+      "search": "Search",
+      "new": "Add an application",
+      "board": "Go to applications",
+      "followUps": "Go to follow-ups",
+      "stats": "Go to stats",
+      "profile": "Go to your profile",
+      "close": "Close this box"
+    }
   }
 }

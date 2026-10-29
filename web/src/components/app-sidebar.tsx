@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { Suspense } from "react";
 
 import { Logo } from "@/components/brand/logo";
+import { SearchButton } from "@/components/command-palette";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { FEEDBACK_URL } from "@/config/brand";
@@ -73,6 +74,8 @@ export function AppSidebarView({ current, followUpBadge }: { current: string | n
           <span className="sr-only hidden collapsed:inline">{t("expand")}</span>
         </button>
       </div>
+
+      <SearchButton variant="sidebar" />
 
       <Link
         href="/applications/new"
