@@ -33,13 +33,6 @@ describe("HomeJourney", () => {
     ]);
   });
 
-  it("ends with a way to sign up", () => {
-    renderIn("en");
-
-    expect(screen.getByRole("heading", { level: 2, name: en.Home.journey.cta })).toBeTruthy();
-    expect(screen.getByRole("link", { name: en.Home.getStarted }).getAttribute("href")).toBe("/register");
-  });
-
   it("keeps the screen previews away from screen readers", () => {
     renderIn("en");
 

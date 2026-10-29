@@ -42,7 +42,79 @@
       },
       "cta": "Start with your next application"
     },
-    "deleted": "Your account and all its data have been deleted."
+    "deleted": "Your account and all its data have been deleted.",
+    "try": {
+      "title": "Try it right here",
+      "body": "Move the cards the way you would on your own board. Nothing here is saved.",
+      "moveTo": "Move {company} to {status}",
+      "dropHint": "Drag a card, or use its arrows.",
+      "offer": "{company} sent you an offer",
+      "reset": "Start again",
+      "thirdCompany": "Kemet Soft",
+      "thirdRole": "Data analyst"
+    },
+    "extension": {
+      "title": "Save a job without copying anything",
+      "body": "On LinkedIn, Wuzzuf, Bayt, Forasna or Indeed, click the Sekka icon. The company, role, link and description are filled in for you.",
+      "hint": "Click the Sekka icon to try it.",
+      "openPopup": "Open the Sekka extension",
+      "company": "Company",
+      "role": "Role",
+      "link": "Link",
+      "save": "Save to Sekka",
+      "saved": "Saved. It's on your board.",
+      "again": "Try again",
+      "jobUrl": "jobs.example.com/frontend-developer",
+      "apply": "Apply"
+    },
+    "email": {
+      "title": "A short email in the morning",
+      "body": "On the days you planned to follow up, Sekka emails you the list. One look, and you know who to write to.",
+      "from": "Sekka",
+      "subject": "Time to follow up",
+      "time": "8:00",
+      "dueToday": "Follow up today",
+      "overdue": "2 days overdue",
+      "open": "Open follow-ups"
+    },
+    "languages": {
+      "title": "Arabic first. English too.",
+      "body": "Sekka is written for job seekers in Egypt, in the way people actually talk. Switch any time, and your board flips with you.",
+      "switchLabel": "Show the preview in"
+    },
+    "faq": {
+      "title": "Questions people ask",
+      "items": {
+        "free": {
+          "q": "Is Sekka free?",
+          "a": "Yes. Your board, follow-ups, reminder emails, stats and the Chrome extension are free. A Pro plan with extras, like more Sekka AI, is coming later."
+        },
+        "arabic": {
+          "q": "Does it work in Arabic?",
+          "a": "Arabic comes first, from right to left, and English is one click away. You can switch any time."
+        },
+        "private": {
+          "q": "Who can see my applications?",
+          "a": "Only you. Your profile stays private too, unless you turn on Open to recruiters."
+        },
+        "extension": {
+          "q": "Do I need the Chrome extension?",
+          "a": "No. You can add applications by hand on any device. The extension just saves you the copying on your computer."
+        },
+        "phone": {
+          "q": "Can I use it on my phone?",
+          "a": "Yes, in your phone's browser. You can also install it on your home screen like an app."
+        },
+        "data": {
+          "q": "Can I take my data with me, or delete it?",
+          "a": "Yes. Download everything Sekka keeps about you, or delete your account and all of it, from Settings."
+        }
+      }
+    },
+    "finale": {
+      "title": "Your next application is a good place to start",
+      "body": "Add it in a minute, set a follow-up date, and let Sekka keep track of the rest."
+    }
   },
   "LanguageSwitcher": {
     "label": "Language",
