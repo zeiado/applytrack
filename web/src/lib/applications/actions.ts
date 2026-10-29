@@ -136,6 +136,22 @@ export async function moveApplication(id: string, status: ApplicationStatus): Pr
   return result.data ? { ok: true } : { error: toActionError(result.error, result.response) };
 }
 
+/** Takes back the latest move (the "Undo" in the toast). Works for 10 minutes after it. */
+export async function undoMove(id: string): Promise<MoveResult> {
+  let result;
+  try {
+    const api = await memberApi();
+    result = await api.POST("/api/v1/applications/{application_id}/status/undo", {
+      params: { path: { application_id: id } },
+    });
+  } catch (error) {
+    return { error: failed(error) };
+  }
+  if (result.response.status === 401) return toLogin();
+  refresh();
+  return result.data ? { ok: true } : { error: toActionError(result.error, result.response) };
+}
+
 /** Moves to another status with an optional note, which the history shows. */
 export async function changeStatus(
   id: string,

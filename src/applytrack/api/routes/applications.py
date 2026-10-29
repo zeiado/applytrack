@@ -137,6 +137,24 @@ def change_status(
     return ApplicationDetail.model_validate(application)
 
 
+@router.post(
+    "/{application_id}/status/undo",
+    responses={
+        **NOT_FOUND,
+        status.HTTP_409_CONFLICT: {
+            "model": ErrorResponse,
+            "description": "`undo_unavailable`: no move in the last 10 minutes to take back",
+        },
+    },
+)
+def undo_status_change(
+    application_id: uuid.UUID, db: DbSession, user: CurrentUser, now: Now
+) -> ApplicationDetail:
+    """Take back the latest status change, within 10 minutes of making it."""
+    application = ApplicationService(db, user).undo_status_change(application_id, now)
+    return ApplicationDetail.model_validate(application)
+
+
 @router.get("/{application_id}/history", responses=NOT_FOUND)
 def status_history(
     application_id: uuid.UUID, db: DbSession, user: CurrentUser
