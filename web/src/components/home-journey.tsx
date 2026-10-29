@@ -1,15 +1,14 @@
-import { Check, ChevronRight } from "lucide-react";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 
-import { CompanyInitial } from "@/components/applications/company-initial";
-import { Logo } from "@/components/brand/logo";
+import { BoardPreview, FollowUpPreview, OfferPreview, SavePreview } from "@/components/site/previews";
 import { buttonVariants } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
-import type en from "../../messages/en.json";
 
 const STEPS = ["save", "track", "followUp", "yes"] as const;
-type Step = (typeof STEPS)[number];
+
+/** The screen each step happens on. */
+const PREVIEWS = { save: SavePreview, track: BoardPreview, followUp: FollowUpPreview, yes: OfferPreview };
 
 /** Below the hero: the road keeps going down the page, one stop per step of a job search,
  * each next to a small, static copy of the screen it happens on. It ends at the amber "yes". */
@@ -28,6 +27,7 @@ export function HomeJourney() {
       <ol>
         {STEPS.map((step, index) => {
           const last = index === STEPS.length - 1;
+          const Preview = PREVIEWS[step];
           return (
             <li
               key={step}
@@ -53,7 +53,7 @@ export function HomeJourney() {
               </div>
               {/* A picture of the screen, so hidden from screen readers: the text says it all. */}
               <div aria-hidden className="max-w-md select-none md:max-w-none">
-                <Preview step={step} />
+                <Preview />
               </div>
             </li>
           );
@@ -67,88 +67,4 @@ export function HomeJourney() {
       </div>
     </section>
   );
-}
-
-/** Static copies of real screens, built from the same pieces and colours as the app. */
-function Preview({ step }: { step: Step }) {
-  const t = useTranslations();
-  const locale = useLocale();
-  const demo = (key: keyof typeof en.Home.journey.demo) => t(`Home.journey.demo.${key}`);
-
-  switch (step) {
-    case "save":
-      // The Chrome extension's popup on a job page.
-      return (
-        <div className="bg-card grid gap-4 rounded-2xl border p-4">
-          <Logo variant="symbol" className="h-5" />
-          <div className="grid gap-0.5">
-            <span className="font-semibold">{demo("role")}</span>
-            <span className="text-muted-foreground text-sm">
-              {demo("company")}, {demo("place")}
-            </span>
-          </div>
-          <span className="bg-primary-container text-primary-container-foreground inline-flex w-fit items-center gap-1.5 rounded-md px-2.5 py-1 text-sm font-medium">
-            <Check className="size-4" />
-            {demo("saved")}
-          </span>
-        </div>
-      );
-    case "track":
-      // One board column, as on the applications page.
-      return (
-        <div className="bg-muted grid gap-2.5 rounded-2xl p-3">
-          <div className="flex px-1 text-sm">
-            <span className="font-semibold">{t("Status.applied")}</span>
-            <span className="text-muted-foreground ms-auto">2</span>
-          </div>
-          {(
-            [
-              [demo("company"), demo("role")],
-              [demo("otherCompany"), demo("otherRole")],
-            ] as const
-          ).map(([company, role]) => (
-            <div key={company} className="bg-card grid gap-2 rounded-xl border p-3.5">
-              <div className="flex items-center gap-2.5">
-                <CompanyInitial company={company} locale={locale} />
-                <div className="grid min-w-0">
-                  <span className="truncate font-semibold">{company}</span>
-                  <span className="text-muted-foreground truncate text-[0.8125rem]">{role}</span>
-                </div>
-              </div>
-              <span className="text-muted-foreground text-xs">{demo("applied")}</span>
-            </div>
-          ))}
-        </div>
-      );
-    case "followUp":
-      // An item in the follow-ups inbox, with the calm teal "today" chip.
-      return (
-        <div className="bg-card flex items-center gap-3 rounded-xl border p-4">
-          <CompanyInitial company={demo("otherCompany")} locale={locale} />
-          <div className="grid min-w-0 flex-1">
-            <span className="truncate font-semibold">{demo("otherCompany")}</span>
-            <span className="text-muted-foreground truncate text-sm">{demo("otherRole")}</span>
-          </div>
-          <span className="bg-primary-container text-primary-container-foreground shrink-0 rounded-md px-2 py-0.5 text-xs font-medium">
-            {t("Applications.card.followUpDue")}
-          </span>
-        </div>
-      );
-    case "yes":
-      // The offer banner from the top of the board: the one place amber shows up.
-      return (
-        <div className="bg-yes text-yes-foreground flex items-center gap-3 rounded-2xl px-4 py-3.5">
-          <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-white/85">
-            <span className="bg-yes size-3 rounded-full" />
-          </span>
-          <span className="grid min-w-0 flex-1 gap-px">
-            <span className="truncate font-semibold">
-              {t("Applications.offer.title", { company: demo("company") })}
-            </span>
-            <span className="truncate text-sm">{demo("role")}</span>
-          </span>
-          <ChevronRight className="size-5 shrink-0 rtl:-scale-x-100" />
-        </div>
-      );
-  }
 }
