@@ -137,6 +137,35 @@ export async function moveApplication(id: string, status: ApplicationStatus): Pr
   return result.data ? { ok: true } : { error: toActionError(result.error, result.response) };
 }
 
+/** "+ New" on the board: just a company and a role, in that column (Applied gets today as
+ * the applied date). The card shows up when the board refreshes. */
+export async function quickCreate(
+  status: "wishlist" | "applied",
+  company: string,
+  roleTitle: string,
+  today: string,
+): Promise<MoveResult> {
+  if (!company.trim() || !roleTitle.trim()) return { error: { code: "validation_error" } };
+  let result;
+  try {
+    const api = await memberApi();
+    result = await api.POST("/api/v1/applications", {
+      body: {
+        company: company.trim(),
+        role_title: roleTitle.trim(),
+        source: "other",
+        status,
+        applied_on: status === "applied" && /^\d{4}-\d{2}-\d{2}$/.test(today) ? today : null,
+      },
+    });
+  } catch (error) {
+    return { error: failed(error) };
+  }
+  if (result.response.status === 401) return toLogin();
+  refresh();
+  return result.data ? { ok: true } : { error: toActionError(result.error, result.response) };
+}
+
 /** Takes back the latest move (the "Undo" in the toast). Works for 10 minutes after it. */
 export async function undoMove(id: string): Promise<MoveResult> {
   let result;

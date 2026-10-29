@@ -6,6 +6,7 @@ import { useOptimistic, useState, useTransition } from "react";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/toast";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,13 +17,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Link, useRouter } from "@/i18n/navigation";
-import { moveApplication } from "@/lib/applications/actions";
+import { moveApplication, undoMove } from "@/lib/applications/actions";
 import { followUpState, formatDate } from "@/lib/applications/dates";
 import { type Application, type ApplicationStatus, STATUSES } from "@/lib/applications/model";
 import type { ActionError } from "@/lib/auth/errors";
 import { cn } from "@/lib/utils";
 
 import { CompanyInitial } from "./company-initial";
+import { QuickAdd } from "./quick-add";
 import { StatusDot } from "./status-badge";
 
 type Move = { id: string; status: ApplicationStatus };
@@ -37,6 +39,7 @@ export function Board({ applications, today }: { applications: Application[]; to
   const [error, setError] = useState<ActionError>();
   const [dragging, setDragging] = useState<Application | null>(null);
   const [, startTransition] = useTransition();
+  const toast = useToast();
   // The card shows in its new column at once; if the move fails, the page's data
   // (refreshed by the action) puts it back.
   const [shown, showMove] = useOptimistic(applications, (current, move: Move) =>
@@ -49,7 +52,24 @@ export function Board({ applications, today }: { applications: Application[]; to
     startTransition(async () => {
       showMove({ id: app.id, status });
       const result = await moveApplication(app.id, status);
-      if ("error" in result) setError(result.error);
+      if ("error" in result) {
+        setError(result.error);
+        return;
+      }
+      // Moves only go forward, so a slip of the finger gets an Undo (for 10 minutes).
+      toast.add({
+        title: t("Applications.moved", { company: app.company, status: t(`Status.${status}`) }),
+        actionProps: { children: t("Toast.undo"), onClick: () => undo(app) },
+      });
+    });
+  }
+
+  function undo(app: Application) {
+    startTransition(async () => {
+      const result = await undoMove(app.id);
+      toast.add({
+        title: "error" in result ? t("Applications.undoFailed") : t("Applications.undone", { company: app.company }),
+      });
     });
   }
 
@@ -75,7 +95,7 @@ export function Board({ applications, today }: { applications: Application[]; to
               aria-labelledby={`column-${status}`}
               className={cn(
                 "bg-muted flex w-[85vw] max-w-[300px] shrink-0 snap-start scroll-mx-4 flex-col gap-2.5 rounded-2xl p-3 transition sm:w-[300px]",
-                dragging && (canDrop ? "ring-primary bg-primary/5 ring-2" : "opacity-60"),
+                dragging && (canDrop ? "outline-primary/60 bg-primary/5 outline-2 outline-dashed" : "opacity-50"),
               )}
               onDragOver={(event) => {
                 if (canDrop) event.preventDefault();
@@ -90,12 +110,15 @@ export function Board({ applications, today }: { applications: Application[]; to
                 id={`column-${status}`}
                 className="flex scroll-mt-4 items-center gap-2 px-1 pt-0.5 pb-1 text-[0.9375rem] font-semibold"
               >
+                <StatusDot status={status} />
                 {t(`Status.${status}`)}
                 <span className="text-muted-foreground ms-auto text-sm font-normal tabular-nums">{cards.length}</span>
               </h2>
               <ul className="flex min-h-16 flex-col gap-2.5">
                 {cards.map((app) => (
-                  <li key={app.id}>
+                  // Keyed by status too, so a moved card mounts afresh in its new column and
+                  // plays its arrival (globals.css, .card-arrive).
+                  <li key={`${app.id}-${app.status}`} className="card-arrive">
                     <Card
                       app={app}
                       today={today}
@@ -106,6 +129,14 @@ export function Board({ applications, today }: { applications: Application[]; to
                   </li>
                 ))}
               </ul>
+              {/* New applications start as Wishlist or Applied, so only those columns add. */}
+              {(status === "wishlist" || status === "applied") && (
+                <QuickAdd
+                  status={status}
+                  today={today}
+                  label={t("Applications.quickAdd.open", { status: t(`Status.${status}`) })}
+                />
+              )}
             </section>
           );
         })}
@@ -144,7 +175,7 @@ function Card({
         onDragStart();
       }}
       onDragEnd={onDragEnd}
-      className="bg-card hover:border-primary/40 relative grid grid-cols-1 gap-2 rounded-xl border p-3.5 transition-colors"
+      className="group/card bg-card hover:border-primary/40 relative grid grid-cols-1 gap-2 rounded-xl border p-3.5 transition-[border-color,box-shadow,translate] hover:shadow-md motion-safe:hover:-translate-y-px"
     >
       <div className="flex items-center gap-2.5">
         <CompanyInitial company={app.company} locale={locale} />
@@ -168,7 +199,11 @@ function Card({
         <DropdownMenu>
           <DropdownMenuTrigger
             render={
-              <Button variant="ghost" size="icon-sm" className="relative z-10" aria-label={t("Applications.card.move", { company: app.company })}>
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                className="pointer-fine:opacity-0 pointer-fine:group-hover/card:opacity-100 relative z-10 transition-opacity focus-visible:opacity-100 aria-expanded:opacity-100"
+                aria-label={t("Applications.card.move", { company: app.company })}>
                 <MoreHorizontal aria-hidden />
               </Button>
             }
