@@ -109,9 +109,21 @@ export function GoogleIdentityButton({
   );
 }
 
-/** "Continue with Google" above the email forms. Redirects on success. */
+/** "Continue with Google" above the email forms. On success the server has set the session
+ * cookies, and the page loads the next one in full. */
 export function GoogleButton({ next }: { next: string | null }) {
-  const onCredential = useCallback((idToken: string) => signInWithGoogle(idToken, next), [next]);
+  const onCredential = useCallback(
+    async (idToken: string): Promise<ActionState> => {
+      const result = await signInWithGoogle(idToken, next);
+      if (result?.redirectTo) {
+        window.location.assign(result.redirectTo);
+        // Stay busy until the next page shows.
+        return new Promise<ActionState>(() => {});
+      }
+      return result;
+    },
+    [next],
+  );
   if (!CLIENT_ID) return null;
   return (
     <div className="grid gap-4">
