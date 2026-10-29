@@ -132,6 +132,8 @@ function Card({
   const router = useRouter();
   const followUp = app.follow_up_on ? followUpState(app.follow_up_on, today) : null;
   const href = `/applications/${app.id}`;
+  // The card opens the side panel on the board; the menu's "Edit" goes to the edit page.
+  const peek = `/applications?open=${app.id}`;
 
   return (
     <article
@@ -151,7 +153,8 @@ function Card({
             {/* The link covers the whole card, so a click anywhere opens it. draggable={false}
                 keeps a drag on the card moving the card, not dragging the link's URL. */}
             <Link
-              href={href}
+              href={peek}
+              scroll={false}
               draggable={false}
               className="after:absolute after:inset-0 after:rounded-xl hover:underline focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-ring"
             >

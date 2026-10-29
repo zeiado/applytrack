@@ -11,6 +11,7 @@ import { finishGuide } from "@/lib/onboarding/guide";
 
 import { applicationBody, type Field, type FormValues, formValues, invalidFields } from "./form";
 import { type InterviewField, interviewBody, type InterviewValues, interviewValues } from "./interview-form";
+import { type InlineField, inlineBody } from "./inline";
 import type { ApplicationStatus } from "./model";
 
 export type FormState =
@@ -196,6 +197,29 @@ export async function setFollowUp(
   }
   if (result.response.status === 401) return toLogin();
   if (result.data?.follow_up_on) await finishGuide();
+  refresh();
+  return result.data ? { ok: true } : { error: toActionError(result.error, result.response) };
+}
+
+/** Saves one property edited in place (the side panel and the application's page). */
+export async function updateField(
+  id: string,
+  field: InlineField,
+  values: Record<string, string>,
+): Promise<MoveResult> {
+  const body = inlineBody(field, values);
+  if (!body) return { error: { code: "validation_error" } };
+  let result;
+  try {
+    const api = await memberApi();
+    result = await api.PATCH("/api/v1/applications/{application_id}", {
+      params: { path: { application_id: id } },
+      body,
+    });
+  } catch (error) {
+    return { error: failed(error) };
+  }
+  if (result.response.status === 401) return toLogin();
   refresh();
   return result.data ? { ok: true } : { error: toActionError(result.error, result.response) };
 }

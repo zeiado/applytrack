@@ -3,7 +3,9 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Suspense } from "react";
 
+import { ApplicationView } from "@/components/applications/application-view";
 import { Board } from "@/components/applications/board";
+import { PeekSheet } from "@/components/applications/peek-sheet";
 import { RoadLine } from "@/components/brand/road";
 import { ListView } from "@/components/applications/list-view";
 import { VerifyBanner } from "@/components/auth/verify-banner";
@@ -63,6 +65,14 @@ async function Content({ searchParams }: { searchParams: PageProps<"/[locale]/ap
       {user && !user.email_verified && <VerifyBanner email={user.email} />}
       <ViewTabs view={view} />
       {view === "list" ? <List params={params} today={today} /> : <BoardView today={today} />}
+      {typeof params.open === "string" && /^[0-9a-f-]{36}$/i.test(params.open) && (
+        // The side panel: a new id remounts it, so it slides in again.
+        <PeekSheet key={params.open} id={params.open} closeHref={view === "list" ? "/applications?view=list" : "/applications"}>
+          <Suspense fallback={<PeekLoading />}>
+            <ApplicationView id={params.open} variant="panel" />
+          </Suspense>
+        </PeekSheet>
+      )}
     </>
   );
 }
@@ -182,6 +192,20 @@ function Loading() {
     <div className="flex gap-3 overflow-hidden" aria-busy>
       {[0, 1, 2, 3].map((i) => (
         <div key={i} className="bg-muted h-64 w-[300px] shrink-0 animate-pulse rounded-2xl" />
+      ))}
+    </div>
+  );
+}
+
+/** While the side panel's application loads: the title and a few property rows. */
+async function PeekLoading() {
+  const t = await getTranslations("Peek");
+  return (
+    <div role="status" aria-label={t("loading")} className="grid gap-4">
+      <div className="bg-muted h-8 w-2/3 animate-pulse rounded-md" />
+      <div className="bg-muted h-5 w-1/2 animate-pulse rounded-md" />
+      {[0, 1, 2, 3].map((row) => (
+        <div key={row} className="bg-muted/70 h-5 w-full animate-pulse rounded-md" />
       ))}
     </div>
   );
