@@ -710,6 +710,66 @@
         "cvWhen": "Uploaded today"
       },
       "cta": "Try it with your next application"
+    },
+    "roadmap": {
+      "title": "What's coming",
+      "heading": "What's coming to Sekka",
+      "intro": "Here's what we're building next. There are no dates yet: each one ships when it's ready.",
+      "soon": "Coming soon",
+      "ai": {
+        "title": "Sekka AI",
+        "body": "Help with the hardest parts of applying, right next to your applications. You choose whether to use it, and your CV is only sent when you ask.",
+        "items": {
+          "tailor": "Tailor your CV to a job: see which skills it asks for and how to show yours.",
+          "interview": "Practise the interview questions likely for the role you applied to.",
+          "profile": "Fill in your profile from your CV in one step."
+        }
+      },
+      "pro": {
+        "title": "A Pro plan",
+        "body": "For people who want more, such as more Sekka AI each month."
+      },
+      "store": {
+        "title": "Sekka in the Chrome Web Store",
+        "body": "Add the extension to Chrome in one click from Chrome's own store."
+      },
+      "ideas": {
+        "title": "Have an idea?",
+        "body": "Tell us what would make your job search easier.",
+        "action": "Send feedback"
+      }
+    },
+    "about": {
+      "title": "About",
+      "heading": "Why Sekka exists",
+      "story": {
+        "first": "I'm Zeyad, a software engineer in Egypt. I built Sekka because looking for your first job here is hard: dozens of applications, most of them never answered, and no clear picture of what's working.",
+        "second": "Sekka keeps that search in one calm place. You see every application, you know who to follow up with, and you learn from your own numbers instead of guessing."
+      },
+      "arabic": {
+        "title": "Arabic first",
+        "body": "Sekka is made for job seekers in Egypt, so Arabic comes first: right to left, in the way people actually talk. English is always one click away."
+      },
+      "calm": {
+        "title": "Calm, not hustle",
+        "body": "A job search is stressful enough. Sekka never shames you for a late follow-up or a quiet week. It just helps you take the next step."
+      },
+      "data": {
+        "title": "Your data is yours",
+        "body": "Sekka keeps only what it needs, doesn't show ads and doesn't sell your data. You can download everything or delete your account at any time.",
+        "link": "Read the privacy policy"
+      },
+      "contact": {
+        "title": "Contact",
+        "email": "Questions or ideas? Email <email>{address}</email>.",
+        "noEmail": "Questions or ideas? Use the feedback link in the app."
+      }
+    },
+    "aiTeaser": {
+      "soon": "Coming soon",
+      "title": "Sekka AI is on the way",
+      "body": "Tailor your CV to a job, practise interview questions, and fill your profile from your CV. You choose whether to use it.",
+      "action": "See what's coming"
     }
   }
 }
