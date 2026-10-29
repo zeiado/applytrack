@@ -25,7 +25,7 @@ export function FollowUpItem({ reminder, today, date }: { reminder: DueReminder;
   const late = reminder.days_overdue;
 
   return (
-    <li className="bg-card grid gap-3 rounded-xl border p-4 sm:flex sm:items-center sm:justify-between">
+    <li className="bg-card grid grid-cols-1 gap-3 rounded-xl border p-4 sm:flex sm:items-center sm:justify-between">
       <div className="flex min-w-0 items-start gap-3">
         <CompanyInitial company={reminder.company} locale={locale} />
         <div className="grid min-w-0 gap-1">

@@ -136,7 +136,7 @@ function CvItem({ cv, busy, onReplace }: { cv: Cv; busy: boolean; onReplace: () 
   const uploaded = cv.status !== "uploading";
 
   return (
-    <li className="bg-card grid gap-3 rounded-xl border p-4">
+    <li className="bg-card grid grid-cols-1 gap-3 rounded-xl border p-4">
       <div className="flex items-start gap-3">
         <FileText aria-hidden className="text-muted-foreground mt-0.5 size-5 shrink-0" />
         <div className="grid min-w-0 flex-1 gap-1">
