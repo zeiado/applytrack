@@ -13,8 +13,8 @@ test.beforeEach(async ({ page }) => {
 test("the guide ticks off each step and goes away once a follow-up is set", async ({ page }) => {
   await expect(guide(page)).toContainText("0 of 2 done");
   await guide(page).getByRole("link", { name: "Add an application" }).click();
-  await page.getByLabel("Company").fill("Paymob");
-  await page.getByLabel("Role").fill("Data Analyst");
+  await page.getByRole("textbox", { name: "Company" }).fill("Paymob");
+  await page.getByRole("textbox", { name: "Role" }).fill("Data Analyst");
   await page.getByRole("button", { name: "Add application" }).click();
   await expect(page).toHaveURL(/\/en\/applications$/, AUTH_TIMEOUT);
 

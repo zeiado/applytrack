@@ -13,8 +13,8 @@ async function addApplication(
 ) {
   await page.getByRole("link", { name: "Add application" }).first().click();
   await expect(page).toHaveURL(/\/en\/applications\/new$/);
-  await page.getByLabel("Company").fill(fields.company);
-  await page.getByLabel("Role").fill(fields.role);
+  await page.getByRole("textbox", { name: "Company" }).fill(fields.company);
+  await page.getByRole("textbox", { name: "Role" }).fill(fields.role);
   if (fields.wishlist) await page.getByLabel("Stage").selectOption("wishlist");
   if (fields.followUp) await page.getByLabel(/Follow up on/).fill(fields.followUp);
   await page.getByRole("button", { name: "Add application" }).click();
@@ -79,7 +79,7 @@ test("edit an application", async ({ page }) => {
   await page.getByRole("link", { name: "Paymob" }).click();
   await page.getByRole("link", { name: "Edit details" }).click();
   await expect(page.getByRole("heading", { name: "Edit application" })).toBeVisible();
-  await page.getByLabel("Role").fill("Senior Frontend Engineer");
+  await page.getByRole("textbox", { name: "Role" }).fill("Senior Frontend Engineer");
   await page.getByLabel("From", { exact: true }).fill("40,000");
   await page.getByLabel("To", { exact: true }).fill("55000");
   await page.getByRole("button", { name: "Save" }).click();
@@ -94,15 +94,15 @@ test("edit an application", async ({ page }) => {
 
 test("mistakes are pointed out and nothing typed is lost", async ({ page }) => {
   await page.getByRole("link", { name: "Add application" }).first().click();
-  await page.getByLabel("Company").fill("Breadfast");
-  await page.getByLabel("Role").fill("Ops Analyst");
+  await page.getByRole("textbox", { name: "Company" }).fill("Breadfast");
+  await page.getByRole("textbox", { name: "Role" }).fill("Ops Analyst");
   await page.getByLabel("From", { exact: true }).fill("30000");
   await page.getByLabel("To", { exact: true }).fill("20000");
   await page.getByRole("button", { name: "Add application" }).click();
 
   await expect(page.getByText("Enter a whole number at least as big as “From”.")).toBeVisible(AUTH_TIMEOUT);
   await expect(page.getByLabel("To", { exact: true })).toHaveAttribute("aria-invalid", "true");
-  await expect(page.getByLabel("Company")).toHaveValue("Breadfast");
+  await expect(page.getByRole("textbox", { name: "Company" })).toHaveValue("Breadfast");
   await expect(page.getByLabel("From", { exact: true })).toHaveValue("30000");
   await expect(formAlert(page).filter({ hasText: "Check the fields" })).toBeVisible();
 });
@@ -115,7 +115,7 @@ test("the list filters by status and company", async ({ page }) => {
   await page.getByRole("link", { name: "List" }).click();
   await expect(page.getByRole("status")).toHaveText("3 applications");
 
-  await page.getByLabel("Company").fill("vodafone");
+  await page.getByRole("searchbox", { name: "Company" }).fill("vodafone");
   await page.getByRole("checkbox", { name: "Wishlist" }).check();
   await page.getByRole("button", { name: "Apply" }).click();
 

@@ -431,7 +431,11 @@
       "title": "History",
       "created": "Added as {status}",
       "moved": "{from} → {to}"
-    }
+    },
+    "status": "Status",
+    "jobLink": "Job link",
+    "company": "Company",
+    "role": "Role"
   },
   "Settings": {
     "title": "Settings",
@@ -873,5 +877,18 @@
       "profile": "Go to your profile",
       "close": "Close this box"
     }
+  },
+  "Inline": {
+    "edit": "Edit {field}",
+    "empty": "Add",
+    "invalid": "{field} doesn't look right. Check it and try again.",
+    "failed": "Couldn't save that. Check your connection and try again.",
+    "from": "From",
+    "to": "To"
+  },
+  "Peek": {
+    "close": "Close",
+    "openPage": "Open as page",
+    "loading": "Loading the application…"
   }
 }

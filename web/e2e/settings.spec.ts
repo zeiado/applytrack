@@ -36,8 +36,8 @@ test("shows the account and changes preferences", async ({ page }) => {
 
 test("interview times follow the timezone setting", async ({ page }) => {
   await page.goto("/en/applications/new");
-  await page.getByLabel("Company").fill("Instabug");
-  await page.getByLabel("Role").fill("Backend Engineer");
+  await page.getByRole("textbox", { name: "Company" }).fill("Instabug");
+  await page.getByRole("textbox", { name: "Role" }).fill("Backend Engineer");
   await page.getByRole("button", { name: "Add application" }).click();
   await expect(page).toHaveURL(/\/en\/applications$/, AUTH_TIMEOUT);
   await page.getByRole("link", { name: "Instabug" }).click();
@@ -49,6 +49,8 @@ test("interview times follow the timezone setting", async ({ page }) => {
   await expect(interviews.locator("article")).toContainText("2:00", AUTH_TIMEOUT);
   const applicationUrl = page.url();
 
+  // The application opened in the side panel over the board; close it to reach the sidebar.
+  await page.keyboard.press("Escape");
   await openSettings(page);
   await section(page, "Preferences").getByLabel("Timezone").selectOption("UTC");
   await section(page, "Preferences").getByRole("button", { name: "Save preferences" }).click();
