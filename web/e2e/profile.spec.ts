@@ -41,11 +41,11 @@ test("the profile page in Arabic", async ({ page }) => {
   await expect(page.getByLabel("متاح لأصحاب الشغل")).not.toBeChecked();
 });
 
-test("the header links to the profile from any page", async ({ page }) => {
+test("the sidebar links to the profile from any page", async ({ page }) => {
   await register(page);
-  await page.getByRole("banner").getByRole("link", { name: "Your profile" }).click();
+  await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Your profile" }).click();
   await expect(page).toHaveURL(/\/en\/profile$/);
-  await expect(page.getByRole("banner").getByRole("link", { name: "Your profile" })).toHaveAttribute(
+  await expect(page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Your profile" })).toHaveAttribute(
     "aria-current",
     "page",
   );

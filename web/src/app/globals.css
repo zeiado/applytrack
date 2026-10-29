@@ -4,6 +4,8 @@
 @import "./m3-tokens.css";
 
 @custom-variant dark (&:is(.dark *));
+/* The app sidebar is collapsed to icons (lib/sidebar.ts). */
+@custom-variant collapsed (&:where([data-sidebar="collapsed"] *));
 
 @theme inline {
   --color-background: var(--background);
