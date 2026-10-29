@@ -1,8 +1,9 @@
 import uuid
+from datetime import datetime, timedelta
 
 from sqlalchemy.orm import Session
 
-from applytrack.core.errors import NotFoundError, ValidationFailedError
+from applytrack.core.errors import ConflictError, NotFoundError, ValidationFailedError
 from applytrack.models import Application, ApplicationStatus, StatusChange, User
 from applytrack.repositories.applications import ApplicationRepository
 from applytrack.schemas.applications import (
@@ -11,6 +12,9 @@ from applytrack.schemas.applications import (
     ApplicationUpdate,
 )
 from applytrack.services.workflow import ensure_can_transition
+
+# How long after a move "Undo" still works (the web app shows it in a toast).
+UNDO_WINDOW = timedelta(minutes=10)
 
 
 class ApplicationService:
@@ -78,6 +82,22 @@ class ApplicationService:
             )
         )
         application.status = target
+        self.session.commit()
+        return application
+
+    def undo_status_change(self, application_id: uuid.UUID, now: datetime) -> Application:
+        """Take back the latest move, if it's less than UNDO_WINDOW old.
+
+        The move's history row goes too, so the history and the time-in-stage stats read as
+        if it never happened. The first row (the application being added) can't be undone.
+        """
+        application = self.get(application_id, for_update=True)
+        changes = self.repo.history(application.id)
+        last = changes[-1] if changes else None
+        if last is None or last.from_status is None or now - last.changed_at > UNDO_WINDOW:
+            raise ConflictError("There is no recent status change to undo", code="undo_unavailable")
+        application.status = last.from_status
+        self.repo.remove_status_change(last)
         self.session.commit()
         return application
 

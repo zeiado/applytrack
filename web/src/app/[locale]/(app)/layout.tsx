@@ -7,6 +7,7 @@ import { FeedbackLink } from "@/components/feedback-link";
 import { ProfileLink } from "@/components/profile-link";
 import { SiteHeader } from "@/components/site-header";
 import { Button } from "@/components/ui/button";
+import { ToastProvider } from "@/components/ui/toast";
 import type { Locale } from "@/i18n/routing";
 import { logOut } from "@/lib/auth/actions";
 
@@ -17,7 +18,7 @@ export default async function AppLayout({ children, params }: LayoutProps<"/[loc
   const t = await getTranslations("Nav");
 
   return (
-    <>
+    <ToastProvider>
       <SiteHeader>
         <Suspense fallback={<AppNavLinks kind="header" current={null} />}>
           <AppNav kind="header" />
@@ -41,6 +42,6 @@ export default async function AppLayout({ children, params }: LayoutProps<"/[loc
       <Suspense fallback={<AppNavLinks kind="tabs" current={null} />}>
         <AppNav kind="tabs" />
       </Suspense>
-    </>
+    </ToastProvider>
   );
 }

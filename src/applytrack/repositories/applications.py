@@ -38,6 +38,11 @@ class ApplicationRepository:
         self.session.add(change)
         self.session.flush()
 
+    def remove_status_change(self, change: StatusChange) -> None:
+        """Only for undoing the latest move (ApplicationService.undo_status_change)."""
+        self.session.delete(change)
+        self.session.flush()
+
     def history(self, application_id: uuid.UUID) -> list[StatusChange]:
         return list(
             self.session.scalars(

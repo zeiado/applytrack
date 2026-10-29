@@ -1,5 +1,6 @@
 import threading
 import uuid
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 import pytest
@@ -7,6 +8,7 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from sqlalchemy import func, select
 
+from applytrack.api.deps import get_now
 from applytrack.core.errors import ConflictError
 from applytrack.models import Application, ApplicationStatus, StatusChange, User
 from applytrack.services.applications import ApplicationService
@@ -212,3 +214,49 @@ def test_concurrent_status_changes_are_serialized(
         )
         assert count == 2  # initial + one change
         assert session.get(Application, app_id).status == ApplicationStatus.SCREENING
+
+
+def undo(client: TestClient, headers: dict[str, str], app_id: str) -> Any:
+    return client.post(f"{URL}/{app_id}/status/undo", headers=headers)
+
+
+def test_undo_takes_back_the_latest_move(client: TestClient, headers: dict[str, str]) -> None:
+    app_id = new_application(client, headers, status="applied")
+    assert move(client, headers, app_id, "interviewing").status_code == 200
+
+    response = undo(client, headers, app_id)
+
+    assert response.status_code == 200, response.text
+    assert response.json()["status"] == "applied"
+    assert [entry["to_status"] for entry in history(client, headers, app_id)] == ["applied"]
+    # A second undo has nothing left to take back: adding the application isn't a move.
+    second = undo(client, headers, app_id)
+    assert second.status_code == 409
+    assert second.json()["error"]["code"] == "undo_unavailable"
+
+
+def test_undo_only_within_ten_minutes(
+    app: FastAPI, client: TestClient, headers: dict[str, str]
+) -> None:
+    app_id = new_application(client, headers, status="applied")
+    assert move(client, headers, app_id, "screening").status_code == 200
+    later = datetime.now(UTC) + timedelta(minutes=11)
+    app.dependency_overrides[get_now] = lambda: later
+    try:
+        response = undo(client, headers, app_id)
+    finally:
+        app.dependency_overrides.pop(get_now, None)
+
+    assert response.status_code == 409
+    assert response.json()["error"]["code"] == "undo_unavailable"
+
+
+def test_undo_someone_elses_application_is_not_found(
+    client: TestClient, headers: dict[str, str], auth: AuthHelper
+) -> None:
+    app_id = new_application(client, headers, status="applied")
+    move(client, headers, app_id, "screening")
+
+    response = undo(client, auth.headers("grace@example.com"), app_id)
+
+    assert response.status_code == 404

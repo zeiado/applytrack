@@ -843,5 +843,8 @@
       "body": "Tailor your CV to a job, practise interview questions, and fill your profile from your CV. You choose whether to use it.",
       "action": "See what's coming"
     }
+  },
+  "Toast": {
+    "close": "Close"
   }
 }

@@ -10,7 +10,8 @@ from applytrack.models.enums import ApplicationStatus
 
 
 class StatusChange(Base):
-    """One row per status change. Append-only: rows are never updated."""
+    """One row per status change. Append-only: rows are never updated, and only the newest
+    can be removed, by undoing that move within a few minutes."""
 
     __tablename__ = "status_changes"
     __table_args__ = (Index("ix_status_changes_application_id_id", "application_id", "id"),)

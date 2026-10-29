@@ -56,6 +56,10 @@ const ROLES = {
   "sidebar-accent-foreground": "onSecondaryContainer",
   "sidebar-border": "outlineVariant",
   "sidebar-ring": "primary",
+  // Toasts (M3 snackbars) use the inverse roles: dark in light mode, light in dark mode.
+  "inverse-surface": "inverseSurface",
+  "inverse-surface-foreground": "inverseOnSurface",
+  "inverse-primary": "inversePrimary",
 };
 
 /** [text, background, minimum ratio]: every pair the app puts on screen. */
@@ -77,6 +81,8 @@ const PAIRS = [
   ["input", "background", 3],
   ["input", "card", 3],
   ["ring", "background", 3],
+  ["inverse-surface-foreground", "inverse-surface", 4.5],
+  ["inverse-primary", "inverse-surface", 4.5],
 ];
 
 function luminance(hex) {

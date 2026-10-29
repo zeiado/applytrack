@@ -3,12 +3,12 @@
 import { ChevronLeft, ChevronRight, RotateCcw } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
-import { flushSync } from "react-dom";
 
 import { CompanyInitial } from "@/components/applications/company-initial";
 import { StatusDot } from "@/components/applications/status-badge";
 import { Button } from "@/components/ui/button";
 import type { ApplicationStatus } from "@/lib/applications/model";
+import { withTransition } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
 /** The demo's four stages, in order. A card moves one stage at a time, like on the real board. */
@@ -16,14 +16,6 @@ const COLUMNS = ["wishlist", "applied", "interviewing", "offer"] as const satisf
 type Column = (typeof COLUMNS)[number];
 
 type DemoCard = { id: string; company: string; role: string; column: Column };
-
-/** Animate a change with the browser's view transitions when it has them and motion is welcome.
- * Each card has its own view-transition-name, so it glides to its new column. */
-function withTransition(update: () => void) {
-  const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? true;
-  if (reduce || !("startViewTransition" in document)) return update();
-  document.startViewTransition(() => flushSync(update));
-}
 
 /** A small board on the home page that visitors can play with: drag a card or use its arrows.
  * Nothing is saved. Reaching "Offer" shows the amber banner, as on the real board. */
