@@ -4,19 +4,20 @@ import { cn } from "cn"
 
 // Material 3 buttons: pill shaped, with a state layer for hover, focus and press
 // (globals.css). default = filled, secondary = tonal, outline = outlined, text = text,
-// ghost = a neutral icon or menu button.
+// ghost = a neutral icon or menu button. Each variant sets its own border colour: `cn` keeps
+// both of two conflicting classes, so the base can't set one.
 const buttonVariants = cva(
-  "group/button state-layer relative inline-flex shrink-0 items-center justify-center rounded-full border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-[color,background-color,border-color,box-shadow] outline-none select-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-40 aria-invalid:border-destructive [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-[1.125rem]",
+  "group/button state-layer relative inline-flex shrink-0 items-center justify-center rounded-full border bg-clip-padding text-sm font-medium whitespace-nowrap transition-[color,background-color,border-color,box-shadow] outline-none select-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-40 aria-invalid:border-destructive [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-[1.125rem]",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:shadow-sm",
-        secondary: "bg-secondary text-secondary-foreground",
+        default: "border-transparent bg-primary text-primary-foreground hover:shadow-sm",
+        secondary: "border-transparent bg-secondary text-secondary-foreground",
         outline: "border-input text-primary aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
-        text: "text-primary",
-        ghost: "text-foreground aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
-        destructive: "bg-destructive/10 text-destructive dark:bg-destructive/20",
-        link: "text-primary underline-offset-4 before:hidden hover:underline",
+        text: "border-transparent text-primary",
+        ghost: "border-transparent text-foreground aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
+        destructive: "border-transparent bg-destructive/10 text-destructive dark:bg-destructive/20",
+        link: "border-transparent text-primary underline-offset-4 before:hidden hover:underline",
       },
       size: {
         default: "h-10 gap-2 px-6 has-data-[icon=inline-end]:pe-4 has-data-[icon=inline-start]:ps-4",
