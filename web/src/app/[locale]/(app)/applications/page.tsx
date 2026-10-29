@@ -34,10 +34,14 @@ export default async function ApplicationsPage({ params, searchParams }: PagePro
     <>
       <div className="flex items-center gap-2.5">
         <h1 className="flex-1 text-2xl font-semibold">{t("title")}</h1>
-        <Link href="/applications/new" className={buttonVariants({ className: "hidden md:inline-flex" })} data-icon="inline-start">
-          <Plus aria-hidden />
-          {t("add")}
-        </Link>
+        {/* From md up; phones get the floating button below. A wrapper, because `hidden` on
+            the button itself would fight its own inline-flex. */}
+        <div className="hidden md:block">
+          <Link href="/applications/new" className={buttonVariants()} data-icon="inline-start">
+            <Plus aria-hidden />
+            {t("add")}
+          </Link>
+        </div>
       </div>
       {/* Phones: a Material 3 floating action button above the tab bar, in reach of a thumb. */}
       <Link
