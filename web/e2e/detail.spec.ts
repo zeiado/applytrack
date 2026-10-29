@@ -4,8 +4,8 @@ import { AUTH_TIMEOUT, register } from "./helpers";
 
 async function openNewApplication(page: Page, company: string) {
   await page.goto("/en/applications/new");
-  await page.getByLabel("Company").fill(company);
-  await page.getByLabel("Role").fill("Software Engineer");
+  await page.getByRole("textbox", { name: "Company" }).fill(company);
+  await page.getByRole("textbox", { name: "Role" }).fill("Software Engineer");
   await page.getByRole("button", { name: "Add application" }).click();
   await expect(page).toHaveURL(/\/en\/applications$/, AUTH_TIMEOUT);
   await page.getByRole("link", { name: company }).click();

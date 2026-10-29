@@ -36,8 +36,8 @@ test("shows the account and changes preferences", async ({ page }) => {
 
 test("interview times follow the timezone setting", async ({ page }) => {
   await page.goto("/en/applications/new");
-  await page.getByLabel("Company").fill("Instabug");
-  await page.getByLabel("Role").fill("Backend Engineer");
+  await page.getByRole("textbox", { name: "Company" }).fill("Instabug");
+  await page.getByRole("textbox", { name: "Role" }).fill("Backend Engineer");
   await page.getByRole("button", { name: "Add application" }).click();
   await expect(page).toHaveURL(/\/en\/applications$/, AUTH_TIMEOUT);
   await page.getByRole("link", { name: "Instabug" }).click();
