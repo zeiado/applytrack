@@ -76,14 +76,27 @@ test("signing up with an email that's taken explains what to do", async ({ page,
   const visitor = await browser.newPage();
   await visitor.goto("/en/register");
   await visitor.getByLabel("Email").fill(email);
-  await visitor.getByLabel("Password").fill(PASSWORD);
+  await visitor.getByLabel("Password").fill("not-the-password");
   await visitor.getByRole("button", { name: "Create account" }).click();
 
   await expect(formAlert(visitor)).toHaveText(
-    "An account with this email already exists. Log in instead.",
+    "An account with this email already exists. Log in, or use Continue with Google if you signed up with Google.",
     AUTH_TIMEOUT,
   );
   await visitor.close();
+});
+
+test("signing up again with your own email and password logs you in", async ({ page, browser }) => {
+  const email = await register(page);
+
+  const again = await browser.newPage();
+  await again.goto("/en/register");
+  await again.getByLabel("Email").fill(email);
+  await again.getByLabel("Password").fill(PASSWORD);
+  await again.getByRole("button", { name: "Create account" }).click();
+
+  await expect(again).toHaveURL(/\/en\/applications$/, AUTH_TIMEOUT);
+  await again.close();
 });
 
 test("forgot password always says the email is on its way", async ({ page }) => {

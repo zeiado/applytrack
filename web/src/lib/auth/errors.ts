@@ -48,7 +48,9 @@ export type ActionError = { code: ErrorCode; retryAfter?: number };
 /** A form action's result: nothing yet, done, or an error to show. `email` is what
  * the user typed: React resets a form after its action runs, so the field shows it
  * again instead of going blank after, say, a wrong password. */
-export type ActionState = { ok?: true; error?: ActionError; email?: string } | undefined;
+/** What an action hands back. `redirectTo` (a same-site path) asks the page to load it in
+ * full, for flows that don't come from a form (see signInWithGoogle). */
+export type ActionState = { ok?: true; error?: ActionError; email?: string; redirectTo?: string } | undefined;
 
 export function toActionError(error: ApiError | undefined, response?: Response): ActionError {
   const code = error?.error?.code ?? "";

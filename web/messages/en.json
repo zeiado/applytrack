@@ -105,7 +105,7 @@
   },
   "Errors": {
     "invalid_credentials": "That email and password don't match.",
-    "email_taken": "An account with this email already exists. Log in instead.",
+    "email_taken": "An account with this email already exists. Log in, or use Continue with Google if you signed up with Google.",
     "too_many_login_attempts": "Too many attempts. Try again in {seconds} seconds.",
     "too_many_reset_requests": "Too many requests. Try again in {seconds} seconds.",
     "too_many_emails": "We've sent several emails already. Try again in {seconds} seconds.",

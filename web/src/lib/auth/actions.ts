@@ -65,10 +65,19 @@ export async function register(_state: ActionState, form: FormData): Promise<Act
     const created = await api.POST("/api/v1/auth/register", {
       body: { email, password, locale: await getLocale() },
     });
-    if (!created.data) return { error: toActionError(created.error, created.response), email };
-    const login = await requestTokens(email, password);
-    if (!login.data) return { error: toActionError(login.error, login.response), email };
-    tokens = login.data;
+    if (!created.data) {
+      const error = toActionError(created.error, created.response);
+      if (error.code !== "email_taken") return { error, email };
+      // Signing up again with your own email and password just logs you in. A wrong
+      // password (or a Google-only account) still gets "this email already exists".
+      const existing = await requestTokens(email, password);
+      if (!existing.data) return { error, email };
+      tokens = existing.data;
+    } else {
+      const login = await requestTokens(email, password);
+      if (!login.data) return { error: toActionError(login.error, login.response), email };
+      tokens = login.data;
+    }
   } catch (error) {
     return { ...networkError(error), email };
   }
@@ -86,7 +95,13 @@ export async function signInWithGoogle(idToken: string, next: string | null): Pr
     return networkError(error);
   }
   if (!result.data) return { error: toActionError(result.error, result.response) };
-  return startSession(result.data, next);
+  // Google's button calls this from its own callback, not from a form. A redirect() here
+  // reaches the page as a rejected promise that the router has to catch, and that hand-off
+  // could leave people signed in on a broken page. So: set the cookies, hand back where to
+  // go, and let the page load it in full.
+  setSessionCookies(await cookies(), result.data);
+  const locale = await getLocale();
+  return { ok: true, redirectTo: `/${locale}${safeNextPath(next) ?? HOME_AFTER_LOGIN}` };
 }
 
 export async function logOut(): Promise<void> {
