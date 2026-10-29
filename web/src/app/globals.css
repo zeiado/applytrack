@@ -228,6 +228,54 @@
   --reading: -1;
 }
 
+/* The home page's demos answer what you do: the offer banner pops in, the extension's icon
+ * pulses until you click it and its popup grows out of it, the language preview slides in
+ * from its reading side, FAQ answers fade in, and demo cards glide (view transitions). */
+@media (prefers-reduced-motion: no-preference) {
+  .try-offer {
+    animation: road-pop 0.5s cubic-bezier(0.3, 1.5, 0.5, 1) both;
+  }
+  .extension-hint::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow: 0 0 0 0 var(--primary);
+    animation: extension-pulse 2s 1s ease-out 3;
+  }
+  .extension-popup {
+    transform-origin: top right;
+    animation: extension-open 0.25s cubic-bezier(0.2, 0, 0, 1) both;
+  }
+  [dir="rtl"] .extension-popup {
+    transform-origin: top left;
+  }
+  .language-flip {
+    animation: journey-slide 0.45s cubic-bezier(0.2, 0, 0, 1) both;
+  }
+  .faq[open] > p {
+    animation: road-fade 0.3s ease-out both;
+  }
+  ::view-transition-group(*) {
+    animation-duration: 0.35s;
+    animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none;
+  }
+}
+@keyframes extension-pulse {
+  from { box-shadow: 0 0 0 0 color-mix(in oklch, var(--primary) 45%, transparent); }
+  to { box-shadow: 0 0 0 14px transparent; }
+}
+@keyframes extension-open {
+  from { opacity: 0; transform: scale(0.85); }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
