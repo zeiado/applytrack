@@ -18,7 +18,11 @@ import {
 import { Link, useRouter } from "@/i18n/navigation";
 import { moveApplication } from "@/lib/applications/actions";
 import { followUpState, formatDate } from "@/lib/applications/dates";
-import { type Application, type ApplicationStatus, STATUSES } from "@/lib/applications/model";
+import {
+  type Application,
+  type ApplicationStatus,
+  STATUSES,
+} from "@/lib/applications/model";
 import type { ActionError } from "@/lib/auth/errors";
 import { cn } from "@/lib/utils";
 
@@ -32,7 +36,13 @@ type Move = { id: string; status: ApplicationStatus };
  * phones and keyboards) or by dragging it onto a column (mouse). Either way only the
  * moves the API allows for that card (its next_statuses) are offered.
  */
-export function Board({ applications, today }: { applications: Application[]; today: string }) {
+export function Board({
+  applications,
+  today,
+}: {
+  applications: Application[];
+  today: string;
+}) {
   const t = useTranslations();
   const [error, setError] = useState<ActionError>();
   const [dragging, setDragging] = useState<Application | null>(null);
@@ -40,7 +50,11 @@ export function Board({ applications, today }: { applications: Application[]; to
   // The card shows in its new column at once; if the move fails, the page's data
   // (refreshed by the action) puts it back.
   const [shown, showMove] = useOptimistic(applications, (current, move: Move) =>
-    current.map((app) => (app.id === move.id ? { ...app, status: move.status, next_statuses: [] } : app)),
+    current.map((app) =>
+      app.id === move.id
+        ? { ...app, status: move.status, next_statuses: [] }
+        : app,
+    ),
   );
 
   function move(app: Application, status: ApplicationStatus) {
@@ -59,11 +73,15 @@ export function Board({ applications, today }: { applications: Application[]; to
         <Alert variant="destructive">
           <CircleAlert aria-hidden />
           <AlertDescription>
-            {t("Applications.moveFailed", { reason: t(`Errors.${error.code}`, { seconds: 60 }) })}
+            {t("Applications.moveFailed", {
+              reason: t(`Errors.${error.code}`, { seconds: 60 }),
+            })}
           </AlertDescription>
         </Alert>
       )}
-      <p className="text-muted-foreground hidden text-xs md:block">{t("Applications.card.dragHint")}</p>
+      <p className="text-muted-foreground hidden text-xs md:block">
+        {t("Applications.card.dragHint")}
+      </p>
       {/* Scrolls sideways on small screens, one column per swipe. */}
       <div className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-4">
         {STATUSES.map((status) => {
@@ -75,7 +93,8 @@ export function Board({ applications, today }: { applications: Application[]; to
               aria-labelledby={`column-${status}`}
               className={cn(
                 "bg-muted flex w-[85vw] max-w-[300px] shrink-0 snap-start scroll-mx-4 flex-col gap-2.5 rounded-2xl p-3 transition sm:w-[300px]",
-                dragging && (canDrop ? "ring-primary bg-primary/5 ring-2" : "opacity-60"),
+                dragging &&
+                  (canDrop ? "ring-primary bg-primary/5 ring-2" : "opacity-60"),
               )}
               onDragOver={(event) => {
                 if (canDrop) event.preventDefault();
@@ -91,7 +110,9 @@ export function Board({ applications, today }: { applications: Application[]; to
                 className="flex scroll-mt-4 items-center gap-2 px-1 pt-0.5 pb-1 text-[0.9375rem] font-semibold"
               >
                 {t(`Status.${status}`)}
-                <span className="text-muted-foreground ms-auto text-sm font-normal tabular-nums">{cards.length}</span>
+                <span className="text-muted-foreground ms-auto text-sm font-normal tabular-nums">
+                  {cards.length}
+                </span>
               </h2>
               <ul className="flex min-h-16 flex-col gap-2.5">
                 {cards.map((app) => (
@@ -130,7 +151,9 @@ function Card({
   const t = useTranslations();
   const locale = useLocale();
   const router = useRouter();
-  const followUp = app.follow_up_on ? followUpState(app.follow_up_on, today) : null;
+  const followUp = app.follow_up_on
+    ? followUpState(app.follow_up_on, today)
+    : null;
   const href = `/applications/${app.id}`;
 
   return (
@@ -158,14 +181,24 @@ function Card({
               {app.company}
             </Link>
           </h3>
-          <p className="text-muted-foreground truncate text-[0.8125rem]" title={app.role_title}>
+          <p
+            className="text-muted-foreground truncate text-[0.8125rem]"
+            title={app.role_title}
+          >
             {app.role_title}
           </p>
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger
             render={
-              <Button variant="ghost" size="icon-sm" className="relative z-10" aria-label={t("Applications.card.move", { company: app.company })}>
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                className="relative z-10"
+                aria-label={t("Applications.card.move", {
+                  company: app.company,
+                })}
+              >
                 <MoreHorizontal aria-hidden />
               </Button>
             }
@@ -173,7 +206,9 @@ function Card({
           <DropdownMenuContent align="end" className="w-auto min-w-44">
             <DropdownMenuGroup>
               <DropdownMenuLabel>
-                {app.next_statuses.length > 0 ? t("Applications.card.moveTo") : t("Applications.card.noMoves")}
+                {app.next_statuses.length > 0
+                  ? t("Applications.card.moveTo")
+                  : t("Applications.card.noMoves")}
               </DropdownMenuLabel>
               {app.next_statuses.map((status) => (
                 <DropdownMenuItem key={status} onClick={() => onMove(status)}>
@@ -183,7 +218,9 @@ function Card({
               ))}
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => router.push(`${href}/edit`)}>{t("Applications.card.edit")}</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => router.push(`${href}/edit`)}>
+              {t("Applications.card.edit")}
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
@@ -191,7 +228,9 @@ function Card({
         <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
           {app.applied_on && (
             <span className="text-muted-foreground">
-              {t("Applications.card.applied", { date: formatDate(app.applied_on, locale, today) })}
+              {t("Applications.card.applied", {
+                date: formatDate(app.applied_on, locale, today),
+              })}
             </span>
           )}
           {followUp && app.follow_up_on && (
@@ -199,14 +238,18 @@ function Card({
             <span
               className={cn(
                 "ms-auto rounded-md px-2 py-0.5",
-                followUp === "upcoming" ? "bg-muted text-muted-foreground" : "bg-primary/10 text-primary font-medium",
+                followUp === "upcoming"
+                  ? "bg-muted text-muted-foreground"
+                  : "bg-primary/10 text-primary font-medium",
               )}
             >
               {followUp === "overdue"
                 ? t("Applications.card.followUpOverdue")
                 : followUp === "due"
                   ? t("Applications.card.followUpDue")
-                  : t("Applications.card.followUp", { date: formatDate(app.follow_up_on, locale, today) })}
+                  : t("Applications.card.followUp", {
+                      date: formatDate(app.follow_up_on, locale, today),
+                    })}
             </span>
           )}
         </div>
