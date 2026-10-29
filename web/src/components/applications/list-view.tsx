@@ -51,7 +51,7 @@ export async function ListView({ query, page, today }: { query: ListQuery; page:
               <li key={app.id}>
                 <Link
                   href={`/applications/${app.id}`}
-                  className="bg-card hover:bg-muted/50 grid gap-1 rounded-lg border p-3"
+                  className="bg-card hover:bg-muted/50 grid grid-cols-1 gap-1 rounded-lg border p-3"
                 >
                   <span className="flex items-center justify-between gap-2">
                     <span className="truncate font-semibold">{app.company}</span>

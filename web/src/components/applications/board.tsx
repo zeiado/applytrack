@@ -142,22 +142,30 @@ function Card({
         onDragStart();
       }}
       onDragEnd={onDragEnd}
-      className="bg-card grid gap-2 rounded-xl border p-3.5"
+      className="bg-card hover:border-primary/40 relative grid grid-cols-1 gap-2 rounded-xl border p-3.5 transition-colors"
     >
       <div className="flex items-center gap-2.5">
         <CompanyInitial company={app.company} locale={locale} />
         <div className="min-w-0 flex-1">
           <h3 className="truncate font-semibold">
-            <Link href={href} className="hover:underline">
+            {/* The link covers the whole card, so a click anywhere opens it. draggable={false}
+                keeps a drag on the card moving the card, not dragging the link's URL. */}
+            <Link
+              href={href}
+              draggable={false}
+              className="after:absolute after:inset-0 after:rounded-xl hover:underline focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-ring"
+            >
               {app.company}
             </Link>
           </h3>
-          <p className="text-muted-foreground truncate text-[0.8125rem]">{app.role_title}</p>
+          <p className="text-muted-foreground truncate text-[0.8125rem]" title={app.role_title}>
+            {app.role_title}
+          </p>
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger
             render={
-              <Button variant="ghost" size="icon-sm" aria-label={t("Applications.card.move", { company: app.company })}>
+              <Button variant="ghost" size="icon-sm" className="relative z-10" aria-label={t("Applications.card.move", { company: app.company })}>
                 <MoreHorizontal aria-hidden />
               </Button>
             }
