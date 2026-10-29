@@ -25,29 +25,44 @@ export function AppNavLinks({ kind, current }: { kind: Kind; current: string | n
       aria-label={t("menu")}
       className={
         tabs
-          ? "bg-card fixed inset-x-0 bottom-0 z-40 grid grid-cols-4 border-t px-3 pt-2 pb-[max(0.875rem,env(safe-area-inset-bottom))] md:hidden"
-          : "hidden items-center gap-5 md:flex"
+          ? // Material 3 navigation bar: the active icon sits on a pill.
+            "bg-surface-container fixed inset-x-0 bottom-0 z-40 grid grid-cols-4 px-2 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))] md:hidden"
+          : "hidden items-center gap-1 md:flex"
       }
     >
       {ITEMS.map(({ href, label, icon: Icon }) => {
         const active = current !== null && (current === href || current.startsWith(`${href}/`));
-        return (
+        return tabs ? (
           <Link
             key={href}
             href={href}
             aria-current={active ? "page" : undefined}
             className={cn(
-              tabs
-                ? "flex min-h-11 flex-col items-center justify-center gap-1 text-xs"
-                : "flex items-center gap-1.5 text-sm font-medium",
-              active
-                ? tabs
-                  ? "text-primary font-semibold"
-                  : "text-foreground"
-                : "text-muted-foreground hover:text-foreground",
+              "group flex min-h-14 flex-col items-center gap-1 text-xs font-medium outline-none",
+              active ? "text-foreground font-semibold" : "text-muted-foreground",
             )}
           >
-            <Icon aria-hidden className={tabs ? "size-6" : "size-4"} strokeWidth={tabs ? 1.9 : 2} />
+            <span
+              className={cn(
+                "state-layer relative flex h-8 w-16 items-center justify-center rounded-full transition-colors group-focus-visible:outline-2 group-focus-visible:outline-ring",
+                active && "bg-secondary text-secondary-foreground",
+              )}
+            >
+              <Icon aria-hidden className="size-6" strokeWidth={active ? 2.2 : 1.9} />
+            </span>
+            {t(label)}
+          </Link>
+        ) : (
+          <Link
+            key={href}
+            href={href}
+            aria-current={active ? "page" : undefined}
+            className={cn(
+              "state-layer relative flex h-10 items-center gap-2 rounded-full px-4 text-sm font-medium focus-visible:outline-2 focus-visible:outline-ring",
+              active ? "bg-secondary text-secondary-foreground" : "text-muted-foreground hover:text-foreground",
+            )}
+          >
+            <Icon aria-hidden className="size-4" />
             {t(label)}
           </Link>
         );

@@ -133,7 +133,7 @@ async function Filters({ query }: { query: ListQuery }) {
           {STATUSES.map((status) => (
             <label
               key={status}
-              className="has-checked:border-primary has-checked:bg-primary/10 flex cursor-pointer items-center gap-2 rounded-full border px-3 py-1.5 text-sm"
+              className="state-layer has-checked:bg-secondary has-checked:text-secondary-foreground relative flex h-8 cursor-pointer items-center gap-2 rounded-sm border border-input px-3 text-sm font-medium has-checked:border-transparent has-focus-visible:outline-2 has-focus-visible:outline-ring"
             >
               <input
                 type="checkbox"

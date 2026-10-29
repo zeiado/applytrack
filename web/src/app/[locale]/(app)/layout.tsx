@@ -34,7 +34,7 @@ export default async function AppLayout({ children, params }: LayoutProps<"/[loc
           </Button>
         </form>
       </SiteHeader>
-      <main className="mx-auto grid w-full max-w-7xl flex-1 content-start gap-6 px-4 pt-4 pb-28 sm:pt-6 md:pb-6">
+      <main className="mx-auto grid w-full max-w-7xl flex-1 content-start gap-6 px-4 pt-4 pb-44 sm:pt-6 md:pb-6">
         {children}
       </main>
       {/* Phones: the sections as a tab bar at the bottom, in reach of a thumb. */}
