@@ -18,15 +18,15 @@ export default function GlobalError({ error, reset }: { error: Error & { digest?
           minHeight: "100vh",
           display: "grid",
           placeItems: "center",
-          background: "#FAF8F4",
-          color: "#1B1F1E",
+          background: "#F5FBF7",
+          color: "#171D1B",
           fontFamily: "system-ui, sans-serif",
           textAlign: "center",
         }}
       >
         <main style={{ padding: 24 }}>
           <h1 style={{ fontSize: 24, margin: "0 0 8px" }}>حصلت مشكلة</h1>
-          <p lang="en" dir="ltr" style={{ margin: "0 0 24px", color: "#5C6461" }}>
+          <p lang="en" dir="ltr" style={{ margin: "0 0 24px", color: "#3F4946" }}>
             Something went wrong.
           </p>
           <button
