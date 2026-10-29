@@ -15,6 +15,7 @@ const PREVIEWS = { save: SavePreview, track: BoardPreview, followUp: FollowUpPre
 export function HomeJourney() {
   const t = useTranslations("Home.journey");
   const tHome = useTranslations("Home");
+  const tSite = useTranslations("Site");
 
   return (
     <section aria-labelledby="journey-title" className="mx-auto w-full max-w-7xl px-4 pb-24">
@@ -59,6 +60,22 @@ export function HomeJourney() {
           );
         })}
       </ol>
+      {/* What's next, in one quiet tonal block: the road above stays the bold part. */}
+      <section
+        aria-labelledby="ai-teaser-title"
+        className="bg-surface-container-high mt-24 grid justify-items-start gap-3 rounded-2xl p-6 sm:p-10"
+      >
+        <span className="bg-primary-container text-primary-container-foreground rounded-sm px-2.5 py-1 text-xs font-medium">
+          {tSite("aiTeaser.soon")}
+        </span>
+        <h2 id="ai-teaser-title" className="text-2xl font-semibold tracking-tight sm:text-3xl rtl:font-bold">
+          {tSite("aiTeaser.title")}
+        </h2>
+        <p className="text-muted-foreground max-w-2xl text-pretty">{tSite("aiTeaser.body")}</p>
+        <Link href="/roadmap" className={buttonVariants({ variant: "secondary", className: "mt-2" })}>
+          {tSite("aiTeaser.action")}
+        </Link>
+      </section>
       <div className="mt-20 grid justify-items-start gap-6 border-t pt-12">
         <h2 className="text-2xl font-semibold tracking-tight text-balance sm:text-3xl rtl:font-bold">{t("cta")}</h2>
         <Link href="/register" className={buttonVariants({ size: "xl" })}>
