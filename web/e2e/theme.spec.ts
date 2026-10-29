@@ -39,13 +39,13 @@ test("the theme stays when switching language", async ({ page }) => {
   await page.reload();
   await expect(html(page)).toHaveClass(/\bdark\b/);
 
-  // The language link changes page without a full reload.
-  await page.getByRole("link", { name: "العربية" }).click();
+  // The language link in the header (the footer has one too) changes page without a full reload.
+  await page.getByRole("banner").getByRole("link", { name: "العربية" }).click();
   await expect(page).toHaveURL(/\/ar$/);
   await expect(html(page)).toHaveAttribute("dir", "rtl");
   await expect(html(page)).toHaveClass(/\bdark\b/);
 
-  await page.getByRole("link", { name: "English" }).click();
+  await page.getByRole("banner").getByRole("link", { name: "English" }).click();
   await expect(html(page)).toHaveAttribute("dir", "ltr");
   await expect(html(page)).toHaveClass(/\bdark\b/);
 });
