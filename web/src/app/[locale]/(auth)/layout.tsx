@@ -2,6 +2,7 @@ import { setRequestLocale } from "next-intl/server";
 import { Suspense } from "react";
 
 import { Logo } from "@/components/brand/logo";
+import { RoadBackdrop } from "@/components/brand/road-backdrop";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { SiteHeader } from "@/components/site-header";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -16,6 +17,7 @@ export default async function AuthLayout({ children, params }: LayoutProps<"/[lo
 
   return (
     <>
+      <RoadBackdrop />
       {/* Phones: just the logo, centred, with the theme and language switches in the corners. */}
       <div className="relative flex justify-center px-4 pt-12 pb-2 sm:hidden">
         <Link href="/">

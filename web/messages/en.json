@@ -619,5 +619,21 @@
       "no_text": "We found no text in this file; it may be a scanned image. Upload a PDF made from Word or Google Docs.",
       "storage_error": "We couldn't read this file just now. Delete it and upload it again."
     }
+  },
+  "Site": {
+    "nav": {
+      "main": "Main",
+      "menu": "Open menu",
+      "close": "Close menu",
+      "features": "Features",
+      "roadmap": "What's coming",
+      "about": "About"
+    },
+    "footer": {
+      "product": "Product",
+      "company": "Sekka",
+      "extension": "Chrome extension",
+      "contact": "Contact"
+    }
   }
 }
