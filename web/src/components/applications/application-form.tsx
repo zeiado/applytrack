@@ -32,10 +32,10 @@ export function ApplicationForm({ action, application }: { action: Action; appli
   };
 
   function field(name: Field, props: ComponentProps<"input"> = {}, hint?: string) {
-    const describedBy = [hint && `${name}-hint`, invalid.has(name) && `${name}-error`].filter(Boolean).join(" ");
+    const describedBy = [hint && `app-${name}-hint`, invalid.has(name) && `app-${name}-error`].filter(Boolean).join(" ");
     return (
       <div className="grid gap-1.5">
-        <Label htmlFor={name}>
+        <Label htmlFor={`app-${name}`}>
           {t(name)}
           {/* The salary pair says "optional" once, on its group. */}
           {!props.required && !name.startsWith("salary") && (
@@ -43,7 +43,7 @@ export function ApplicationForm({ action, application }: { action: Action; appli
           )}
         </Label>
         <Input
-          id={name}
+          id={`app-${name}`}
           name={name}
           defaultValue={initial(name)}
           aria-invalid={invalid.has(name) || undefined}
@@ -52,7 +52,7 @@ export function ApplicationForm({ action, application }: { action: Action; appli
           {...props}
         />
         {hint && (
-          <p id={`${name}-hint`} className="text-muted-foreground text-xs">
+          <p id={`app-${name}-hint`} className="text-muted-foreground text-xs">
             {hint}
           </p>
         )}
@@ -69,29 +69,29 @@ export function ApplicationForm({ action, application }: { action: Action; appli
       </div>
       {field("job_url", { type: "url", dir: "ltr", maxLength: 2048, placeholder: "https://" }, t("job_urlHint"))}
       <div className="grid gap-1.5">
-        <Label htmlFor="job_description">
+        <Label htmlFor="app-job_description">
           {t("job_description")} <span className="text-muted-foreground text-xs font-normal">({t("optional")})</span>
         </Label>
         <Textarea
-          id="job_description"
+          id="app-job_description"
           name="job_description"
           rows={6}
           maxLength={20_000}
           dir="auto"
           defaultValue={initial("job_description")}
           aria-invalid={invalid.has("job_description") || undefined}
-          aria-describedby={invalid.has("job_description") ? "job_description-hint job_description-error" : "job_description-hint"}
+          aria-describedby={invalid.has("job_description") ? "app-job_description-hint app-job_description-error" : "app-job_description-hint"}
           className="max-h-96"
         />
-        <p id="job_description-hint" className="text-muted-foreground text-xs">
+        <p id="app-job_description-hint" className="text-muted-foreground text-xs">
           {t("job_descriptionHint")}
         </p>
         <FieldError name="job_description" show={invalid.has("job_description")} />
       </div>
       <div className="grid gap-5 sm:grid-cols-2">
         <div className="grid gap-1.5">
-          <Label htmlFor="source">{t("source")}</Label>
-          <NativeSelect id="source" name="source" defaultValue={initial("source") || "job_board"}>
+          <Label htmlFor="app-source">{t("source")}</Label>
+          <NativeSelect id="app-source" name="source" defaultValue={initial("source") || "job_board"}>
             {SOURCES.map((source) => (
               <option key={source} value={source}>
                 {tSource(source)}
@@ -102,8 +102,8 @@ export function ApplicationForm({ action, application }: { action: Action; appli
         {/* Only when adding; later stages are moves on the board. */}
         {!application && (
           <div className="grid gap-1.5">
-            <Label htmlFor="status">{t("status")}</Label>
-            <NativeSelect id="status" name="status" defaultValue={initial("status") || "applied"}>
+            <Label htmlFor="app-status">{t("status")}</Label>
+            <NativeSelect id="app-status" name="status" defaultValue={initial("status") || "applied"}>
               <option value="applied">{t("statusApplied")}</option>
               <option value="wishlist">{t("statusWishlist")}</option>
             </NativeSelect>
@@ -124,11 +124,11 @@ export function ApplicationForm({ action, application }: { action: Action; appli
         {field("follow_up_on", { type: "date" }, t("follow_up_onHint"))}
       </div>
       <div className="grid gap-1.5">
-        <Label htmlFor="notes">
+        <Label htmlFor="app-notes">
           {t("notes")} <span className="text-muted-foreground text-xs font-normal">({t("optional")})</span>
         </Label>
         <Textarea
-          id="notes"
+          id="app-notes"
           name="notes"
           rows={4}
           maxLength={10_000}
@@ -157,7 +157,7 @@ function FieldError({ name, show }: { name: Field; show: boolean }) {
   const t = useTranslations("ApplicationForm.invalid");
   if (!show) return null;
   return (
-    <p id={`${name}-error`} className="text-destructive text-xs">
+    <p id={`app-${name}-error`} className="text-destructive text-xs">
       {t(name)}
     </p>
   );
