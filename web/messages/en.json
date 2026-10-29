@@ -231,7 +231,10 @@
     "followUps": "Follow-ups",
     "stats": "Stats",
     "feedback": "Feedback",
-    "profile": "Your profile"
+    "profile": "Your profile",
+    "collapse": "Collapse sidebar",
+    "expand": "Expand sidebar",
+    "due": "{count, plural, one {# follow-up due} other {# follow-ups due}}"
   },
   "Status": {
     "wishlist": "Wishlist",

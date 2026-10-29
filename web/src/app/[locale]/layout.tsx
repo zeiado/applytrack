@@ -9,6 +9,7 @@ import { ThemeSync } from "@/components/theme-sync";
 import { DirectionProvider } from "@/components/ui/direction";
 import { APP_NAME } from "@/config/brand";
 import { direction, routing } from "@/i18n/routing";
+import { SIDEBAR_SCRIPT } from "@/lib/sidebar";
 import { THEME_SCRIPT } from "@/lib/theme/theme";
 
 import "../globals.css";
@@ -52,6 +53,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
     <html lang={locale} dir={dir} className={`${fontSans.variable} h-full antialiased`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+        <script dangerouslySetInnerHTML={{ __html: SIDEBAR_SCRIPT }} />
       </head>
       <body className="flex min-h-full flex-col">
         <DirectionProvider direction={dir}>

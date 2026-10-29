@@ -14,7 +14,7 @@ export function ThemeToggle() {
     <button
       type="button"
       onClick={() => saveTheme(document.documentElement.classList.contains("dark") ? "light" : "dark")}
-      className="text-muted-foreground hover:text-foreground hover:bg-muted flex size-9 items-center justify-center rounded-lg"
+      className="state-layer text-muted-foreground hover:text-foreground relative flex size-9 items-center justify-center rounded-full focus-visible:outline-2 focus-visible:outline-ring"
     >
       <Moon aria-hidden className="size-4 dark:hidden" />
       <Sun aria-hidden className="hidden size-4 dark:block" />
