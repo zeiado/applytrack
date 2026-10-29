@@ -313,7 +313,20 @@
     "offer": {
       "title": "{company} sent you an offer"
     },
-    "columns": "Board columns"
+    "columns": "Board columns",
+    "moved": "Moved {company} to {status}",
+    "undone": "{company} is back where it was",
+    "undoFailed": "Couldn't undo that move. It may be more than 10 minutes old.",
+    "quickAdd": {
+      "open": "Add to {status}",
+      "new": "New",
+      "company": "Company",
+      "role": "Role",
+      "add": "Add",
+      "cancel": "Cancel",
+      "added": "Added {company}",
+      "failed": "Couldn't add it. Check your connection and try again."
+    }
   },
   "ApplicationForm": {
     "newTitle": "Add an application",
@@ -852,7 +865,8 @@
     }
   },
   "Toast": {
-    "close": "Close"
+    "close": "Close",
+    "undo": "Undo"
   },
   "Palette": {
     "title": "Search",

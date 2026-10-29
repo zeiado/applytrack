@@ -313,7 +313,20 @@
     "offer": {
       "title": "{company} بعتتلك عرض شغل"
     },
-    "columns": "أعمدة اللوحة"
+    "columns": "أعمدة اللوحة",
+    "moved": "نقلت {company} لـ {status}",
+    "undone": "{company} رجع مكانه",
+    "undoFailed": "معرفناش نرجّع النقلة دي. ممكن يكون عدّى عليها أكتر من 10 دقايق.",
+    "quickAdd": {
+      "open": "ضيف في {status}",
+      "new": "جديد",
+      "company": "الشركة",
+      "role": "الوظيفة",
+      "add": "ضيف",
+      "cancel": "إلغاء",
+      "added": "ضفنا {company}",
+      "failed": "معرفناش نضيفه. اتأكد من النت وجرّب تاني."
+    }
   },
   "ApplicationForm": {
     "newTitle": "ضيف تقديم",
@@ -852,7 +865,8 @@
     }
   },
   "Toast": {
-    "close": "اقفل"
+    "close": "اقفل",
+    "undo": "تراجع"
   },
   "Palette": {
     "title": "بحث",
