@@ -23,7 +23,11 @@ test("fill in the profile from settings, and it's kept", async ({ page }) => {
   await page.reload();
   await expect(page.getByLabel("Name")).toHaveValue("Ada Lovelace");
   await expect(page.getByLabel("Experience")).toHaveValue("student");
-  await expect(page.getByLabel("Skills")).toHaveValue("Python, SQL, Excel");
+  // Skills are chips now: one each, duplicates (in any case) dropped.
+  for (const skill of ["Python", "SQL", "Excel"]) {
+    await expect(page.getByRole("button", { name: `Remove ${skill}`, exact: true })).toBeVisible();
+  }
+  await expect(page.getByRole("button", { name: /^Remove / })).toHaveCount(5); // and Arabic, English
   await expect(page.getByLabel("Open to recruiters")).toBeChecked();
 
   // Emptying a field clears it.

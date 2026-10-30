@@ -520,7 +520,8 @@
       "ios": "In Safari, tap Share, then “Add to Home Screen”.",
       "manual": "In your browser's menu, choose “Install app” or “Add to Home screen”.",
       "installed": "You're using the installed app."
-    }
+    },
+    "sections": "Sections"
   },
   "FollowUps": {
     "title": "Follow-ups",
@@ -660,12 +661,12 @@
       "skills": {
         "label": "Skills",
         "placeholder": "e.g. Python, SQL, Excel",
-        "hint": "Separate them with commas. Up to 30."
+        "hint": "Press Enter or a comma after each one. Up to 30."
       },
       "languages": {
         "label": "Languages",
         "placeholder": "e.g. Arabic, English",
-        "hint": "Separate them with commas. Up to 10."
+        "hint": "Press Enter or a comma after each one. Up to 10."
       }
     },
     "levels": {
@@ -680,7 +681,19 @@
       "hint": "Coming soon: verified employers on Sekka will be able to find your profile. Your applications and notes are never shown."
     },
     "save": "Save profile",
-    "saved": "Saved."
+    "saved": "Saved.",
+    "groups": {
+      "about": "About you",
+      "experience": "Experience and education",
+      "skills": "Skills and languages",
+      "visibility": "Who can see it"
+    },
+    "unsaved": "You have unsaved changes",
+    "noName": "Add your name below",
+    "chips": {
+      "remove": "Remove {item}",
+      "more": "Add another"
+    }
   },
   "Cvs": {
     "title": "Your CV",
