@@ -7,8 +7,29 @@ changes, a minor version for new features, and a patch version for fixes.
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-10-30
+
+A new look on Google's Material 3, a full public website, and a calmer, quicker app: a sidebar, search, a side panel with editing in place, and Undo.
+
+### Added
+
+- A sidebar in the app on computers (collapses to icons), with Add application, how many follow-ups are due, your profile and settings. Phones keep the bottom nav bar and a floating Add button
+- Search (Ctrl/⌘K or "/"): find an application by company or role, go to a page, or run an action. It ignores Arabic spelling variants. Keyboard shortcuts: N adds an application, G then B/F/S/P goes to a page, ? lists them
+- Clicking a card on the board opens the application in a side panel; the company, role, source, applied date, job link, salary and notes are edited in place
+- Quick add on the board ("+ New" in Wishlist and Applied), and Undo after moving a card, marking a follow-up done or snoozing it (`POST /api/v1/applications/{id}/status/undo`, within 10 minutes)
+- Skills and languages on the profile as chips; the profile and settings are grouped into sections with a save bar that shows unsaved changes
+- A public website: a header and footer, Features, What's coming (Sekka AI, a Pro plan, the Chrome Web Store) and About pages, a sitemap and robots.txt (`NEXT_PUBLIC_SITE_URL`)
+- The home page shows how Sekka works: an animated road, a board visitors can try, the extension and the morning email, Arabic and English side by side, and an FAQ
+
+### Changed
+
+- The web app follows Material 3: colours generated from the brand teal (contrast-checked), pill buttons, outlined fields, tonal surfaces and a faint road-map background on public pages ([ADR 0013](docs/adr/0013-material-3-design-tokens.md))
+- Animations answer what you do, and are turned off when the device asks for reduced motion
+
 ### Fixed
 
+- Signing in with Google lands on your applications instead of leaving you on a broken page; signing up again with your own email and password logs you in
+- Long job titles stay inside board cards, and a click anywhere on a card opens it
 - The browser extension reads job descriptions from LinkedIn's new page layout, and from Indeed (the job page and the job shown beside search results, with its role, company and link). On other pages it takes the text under a "Job description" heading, in English or Arabic
 
 ## [0.10.0] - 2026-10-26
