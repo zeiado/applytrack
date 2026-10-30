@@ -1,6 +1,6 @@
 [project]
 name = "applytrack"
-version = "0.10.0"
+version = "0.11.0"
 description = "REST API for tracking job applications, interviews and follow-ups"
 readme = "README.md"
 license = "LicenseRef-Proprietary"
