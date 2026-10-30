@@ -542,7 +542,10 @@
       "action": "روح لتقديماتك"
     },
     "doneFor": "خلّص متابعة {company}",
-    "snoozeFor": "فكّرني بـ{company} بعد {days} أيام"
+    "snoozeFor": "فكّرني بـ{company} بعد {days} أيام",
+    "marked": "خلّصت متابعة {company}",
+    "snoozed": "أجّلنا {company} {days} أيام",
+    "undo": "تراجع"
   },
   "Stats": {
     "title": "الإحصائيات",

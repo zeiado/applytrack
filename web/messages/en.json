@@ -542,7 +542,10 @@
       "action": "Go to applications"
     },
     "doneFor": "Mark {company} done",
-    "snoozeFor": "Remind me about {company} in {days} days"
+    "snoozeFor": "Remind me about {company} in {days} days",
+    "marked": "Marked {company} done",
+    "snoozed": "{company} moved {days} days later",
+    "undo": "Undo"
   },
   "Stats": {
     "title": "Stats",

@@ -8,8 +8,9 @@ import { CompanyInitial } from "@/components/applications/company-initial";
 import { StatusBadge } from "@/components/applications/status-badge";
 import { FormError } from "@/components/auth/form-parts";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/toast";
 import { Link } from "@/i18n/navigation";
-import { setFollowUp } from "@/lib/applications/actions";
+import { type DetailFormState, setFollowUp } from "@/lib/applications/actions";
 import { addDays } from "@/lib/applications/dates";
 import type { DueReminder } from "@/lib/applications/model";
 import { cn } from "@/lib/utils";
@@ -20,7 +21,26 @@ const SNOOZE_DAYS = 3;
  * Both just change the application's follow-up date, so the inbox refreshes itself. */
 export function FollowUpItem({ reminder, today, date }: { reminder: DueReminder; today: string; date: string }) {
   const t = useTranslations("FollowUps");
-  const [state, action, pending] = useActionState(setFollowUp.bind(null, reminder.application_id), undefined);
+  const toast = useToast();
+  // Done and snooze both change the follow-up date; the toast's Undo puts the old one back.
+  const [state, action, pending] = useActionState(async (previous: DetailFormState, form: FormData) => {
+    const result = await setFollowUp(reminder.application_id, previous, form);
+    if (result?.ok) {
+      const snoozed = String(form.get("follow_up_on") ?? "") !== "";
+      const restore = new FormData();
+      restore.set("follow_up_on", reminder.follow_up_on);
+      toast.add({
+        title: snoozed
+          ? t("snoozed", { company: reminder.company, days: SNOOZE_DAYS })
+          : t("marked", { company: reminder.company }),
+        actionProps: {
+          children: t("undo"),
+          onClick: () => void setFollowUp(reminder.application_id, undefined, restore),
+        },
+      });
+    }
+    return result;
+  }, undefined);
   const locale = useLocale();
   const late = reminder.days_overdue;
 
