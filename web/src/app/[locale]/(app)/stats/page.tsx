@@ -4,6 +4,7 @@ import { getLocale, getTranslations, setRequestLocale } from "next-intl/server";
 import { Suspense } from "react";
 
 import { buttonVariants } from "@/components/ui/button";
+import { CountUp } from "@/components/stats/count-up";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { getStats } from "@/lib/applications/data";
@@ -124,7 +125,9 @@ function Tile({ label, value, note }: { label: string; value: string; note: stri
   return (
     <div className="bg-card grid gap-1 rounded-xl border p-4">
       <dt className="text-muted-foreground text-sm">{label}</dt>
-      <dd className="text-3xl font-semibold">{value}</dd>
+      <dd className="text-3xl font-semibold tabular-nums">
+        <CountUp value={value} />
+      </dd>
       <dd className="text-muted-foreground text-xs">{note}</dd>
     </div>
   );
@@ -154,7 +157,7 @@ function Bar({ label, value, share }: { label: string; value: string; share: num
       </div>
       <div className="bg-muted h-3 rounded-sm">
         <div
-          className="bg-primary h-full rounded-e-sm"
+          className="bar-grow bg-primary h-full rounded-e-sm"
           // At least a sliver for anything above zero, so it doesn't read as none.
           style={{
             width: share > 0 ? `max(${(share * 100).toFixed(1)}%, 4px)` : 0,
