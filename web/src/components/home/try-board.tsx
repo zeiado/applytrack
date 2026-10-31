@@ -8,8 +8,12 @@ import { CompanyInitial } from "@/components/applications/company-initial";
 import { StatusDot } from "@/components/applications/status-badge";
 import { Button } from "@/components/ui/button";
 import type { ApplicationStatus } from "@/lib/applications/model";
+import { wait } from "@/lib/autoplay";
 import { withTransition } from "@/lib/motion";
 import { cn } from "@/lib/utils";
+
+import { DemoBar, GuideCursor } from "./guide-cursor";
+import { useAutoplay } from "./use-autoplay";
 
 /** The demo's four stages, in order. A card moves one stage at a time, like on the real board. */
 const COLUMNS = ["wishlist", "applied", "interviewing", "offer"] as const satisfies readonly ApplicationStatus[];
@@ -18,7 +22,8 @@ type Column = (typeof COLUMNS)[number];
 type DemoCard = { id: string; company: string; role: string; column: Column };
 
 /** A small board on the home page that visitors can play with: drag a card or use its arrows.
- * Nothing is saved. Reaching "Offer" shows the amber banner, as on the real board. */
+ * Nothing is saved. Reaching "Offer" shows the amber banner, as on the real board. Until the
+ * visitor touches it, a guide cursor plays it: one card dragged, two moved with their arrows. */
 export function TryBoard() {
   const t = useTranslations();
   const locale = useLocale();
@@ -33,6 +38,40 @@ export function TryBoard() {
 
   const move = (id: string, column: Column) =>
     withTransition(() => setCards((all) => all.map((card) => (card.id === id ? { ...card, column } : card))));
+  const reset = () => withTransition(() => setCards(start()));
+
+  const { attachRoot, attachPointer, ...play } = useAutoplay(
+    async (cursor, signal) => {
+      reset();
+      await cursor.home(signal);
+      // Drag the wishlist card over to Applied; it glides into place when let go.
+      await cursor.grab("card-a", signal);
+      setDragging("a");
+      await cursor.moveTo("col-applied", signal);
+      const carried = cursor.drop();
+      setDragging(null);
+      withTransition(() => {
+        if (carried) carried.style.transform = "";
+        setCards((all) => all.map((card) => (card.id === "a" ? { ...card, column: "applied" } : card)));
+      });
+      await wait(900, signal);
+      // Then the arrows: one card on to Interviewing, the other to an offer.
+      await cursor.moveTo("forward-b", signal);
+      await cursor.click(signal);
+      move("b", "interviewing");
+      await wait(900, signal);
+      await cursor.moveTo("forward-c", signal);
+      await cursor.click(signal);
+      move("c", "offer");
+      await wait(2600, signal);
+      await cursor.moveTo("reset", signal);
+      await cursor.click(signal);
+      reset();
+      await wait(1200, signal);
+    },
+    () => setDragging(null),
+  );
+
   const step = (card: DemoCard, by: 1 | -1) => {
     const next = COLUMNS[COLUMNS.indexOf(card.column) + by];
     if (next) move(card.id, next);
@@ -43,7 +82,7 @@ export function TryBoard() {
   const Forward = rtl ? ChevronLeft : ChevronRight;
 
   return (
-    <div className="grid gap-4">
+    <div ref={attachRoot} className="relative grid gap-4">
       {offer && (
         <div
           role="status"
@@ -58,7 +97,8 @@ export function TryBoard() {
             variant="ghost"
             size="sm"
             className="text-yes-foreground"
-            onClick={() => withTransition(() => setCards(start()))}
+            data-demo="reset"
+            onClick={reset}
           >
             <RotateCcw aria-hidden />
             {t("Home.try.reset")}
@@ -72,6 +112,7 @@ export function TryBoard() {
             <section
               key={column}
               aria-label={t(`Status.${column}`)}
+              data-demo={`col-${column}`}
               onDragOver={(event) => dragging && event.preventDefault()}
               onDrop={(event) => {
                 event.preventDefault();
@@ -95,6 +136,7 @@ export function TryBoard() {
                 return (
                   <article
                     key={card.id}
+                    data-demo={`card-${card.id}`}
                     draggable
                     onDragStart={(event) => {
                       event.dataTransfer.effectAllowed = "move";
@@ -129,6 +171,7 @@ export function TryBoard() {
                         <Button
                           variant="ghost"
                           size="icon-sm"
+                          data-demo={`forward-${card.id}`}
                           aria-label={t("Home.try.moveTo", { company: card.company, status: t(`Status.${forward}`) })}
                           onClick={() => step(card, 1)}
                         >
@@ -145,7 +188,8 @@ export function TryBoard() {
           );
         })}
       </div>
-      <p className="text-muted-foreground text-sm">{t("Home.try.dropHint")}</p>
+      <DemoBar demo={play} hint={t("Home.try.dropHint")} />
+      <GuideCursor attach={attachPointer} />
     </div>
   );
 }

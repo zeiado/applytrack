@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
-import { describe, expect, it, vi } from "vitest";
+import { act } from "react";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import ar from "../../../messages/ar.json";
 import en from "../../../messages/en.json";
@@ -48,6 +49,49 @@ describe("ExtensionDemo", () => {
     fireEvent.click(screen.getByRole("button", { name: en.Home.extension.save }));
 
     expect(screen.getByRole("status").textContent).toContain(en.Home.extension.saved);
+  });
+});
+
+describe("the demos playing themselves", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  // A browser that welcomes motion, with the demo on screen.
+  function onScreenWithMotion() {
+    vi.stubGlobal("matchMedia", (query: string) => ({ matches: query.includes("no-preference"), addEventListener() {}, removeEventListener() {} }));
+    vi.stubGlobal(
+      "IntersectionObserver",
+      class {
+        constructor(private callback: IntersectionObserverCallback) {}
+        observe() {
+          this.callback([{ isIntersecting: true } as IntersectionObserverEntry], this as unknown as IntersectionObserver);
+        }
+        disconnect() {}
+      },
+    );
+  }
+
+  it("can be paused, and is the visitor's once they touch it", async () => {
+    onScreenWithMotion();
+    inEnglish(<ExtensionDemo />);
+
+    const pause = await screen.findByRole("button", { name: en.Home.demo.pause });
+    expect(screen.getByText(en.Home.demo.watching)).toBeTruthy();
+    fireEvent.click(pause);
+    expect(screen.getByRole("button", { name: en.Home.demo.play })).toBeTruthy();
+
+    act(() => {
+      fireEvent.pointerDown(screen.getByRole("button", { name: en.Home.extension.openPopup }));
+    });
+    expect(screen.queryByRole("button", { name: en.Home.demo.play })).toBeNull();
+    expect(screen.getByText(en.Home.extension.hint)).toBeTruthy();
+  });
+
+  it("stays still when the visitor asked for less motion", () => {
+    inEnglish(<TryBoard />);
+    expect(screen.queryByRole("button", { name: en.Home.demo.pause })).toBeNull();
+    expect(screen.getByText(en.Home.try.dropHint)).toBeTruthy();
   });
 });
 
