@@ -6,19 +6,55 @@ import { useState } from "react";
 
 import { Logo } from "@/components/brand/logo";
 import { Button } from "@/components/ui/button";
+import { wait } from "@/lib/autoplay";
 import { cn } from "@/lib/utils";
+
+import { DemoBar, GuideCursor } from "./guide-cursor";
+import { useAutoplay } from "./use-autoplay";
 
 type Step = "closed" | "open" | "saved";
 
 /** A made-up job page in a browser window with the Sekka extension: click its icon to open
- * the popup (filled in from the page), then save. Nothing is saved for real. */
+ * the popup (filled in from the page), then save. Nothing is saved for real. Until the
+ * visitor touches it, a guide cursor plays it through: the fields fill in one by one. */
 export function ExtensionDemo() {
   const t = useTranslations("Home.extension");
   const demo = useTranslations("Home.journey.demo");
   const [step, setStep] = useState<Step>("closed");
+  // How many of the popup's fields are filled in; only the guide fills them one at a time.
+  const [fill, setFill] = useState(3);
+
+  const { attachRoot, attachPointer, ...play } = useAutoplay(async (cursor, signal) => {
+    setStep("closed");
+    await cursor.home(signal);
+    await cursor.moveTo("icon", signal);
+    await cursor.click(signal);
+    setFill(0);
+    setStep("open");
+    await wait(450, signal);
+    for (const filled of [1, 2, 3]) {
+      setFill(filled);
+      await wait(550, signal);
+    }
+    await cursor.moveTo("save", signal);
+    await cursor.click(signal);
+    setStep("saved");
+    await wait(2200, signal);
+    await cursor.moveTo("again", signal);
+    await cursor.click(signal);
+    setStep("closed");
+    await wait(900, signal);
+  });
+  const filled = play.playing ? fill : 3;
+
+  const fields = [
+    [t("company"), demo("company")],
+    [t("role"), demo("role")],
+    [t("link"), t("jobUrl")],
+  ];
 
   return (
-    <div className="grid gap-3">
+    <div ref={attachRoot} className="relative grid gap-3">
       <div className="bg-card relative min-h-[25rem] overflow-hidden rounded-2xl border shadow-sm">
         {/* The browser's top bar: the page address, and the extension's icon at the end. */}
         <div className="bg-surface-container flex items-center gap-3 border-b px-4 py-2.5">
@@ -32,12 +68,16 @@ export function ExtensionDemo() {
           </span>
           <button
             type="button"
+            data-demo="icon"
             aria-label={t("openPopup")}
             aria-expanded={step !== "closed"}
-            onClick={() => setStep(step === "closed" ? "open" : "closed")}
+            onClick={() => {
+              setFill(3);
+              setStep(step === "closed" ? "open" : "closed");
+            }}
             className={cn(
               "state-layer relative flex size-9 items-center justify-center rounded-full focus-visible:outline-2 focus-visible:outline-ring",
-              step === "closed" && "extension-hint",
+              step === "closed" && !play.active && "extension-hint",
             )}
           >
             <Logo variant="symbol" className="h-5" />
@@ -67,30 +107,35 @@ export function ExtensionDemo() {
               <>
                 <Logo variant="symbol" className="h-5" />
                 <dl className="grid gap-2 text-sm">
-                  {[
-                    [t("company"), demo("company")],
-                    [t("role"), demo("role")],
-                    [t("link"), t("jobUrl")],
-                  ].map(([label, value]) => (
+                  {fields.map(([label, value], index) => (
                     <div key={label} className="grid gap-0.5">
                       <dt className="text-muted-foreground text-xs">{label}</dt>
-                      <dd className="border-input truncate rounded-xs border px-2 py-1" dir="auto">
-                        {value}
+                      <dd
+                        className={cn(
+                          "border-input truncate rounded-xs border px-2 py-1 transition-colors",
+                          index === filled - 1 && play.playing && "bg-primary-container/50",
+                        )}
+                        dir="auto"
+                      >
+                        {/* Typed in from the page, one field after another. */}
+                        <span className={cn("block", index < filled ? play.playing && "type-in" : "invisible")}>
+                          {value}
+                        </span>
                       </dd>
                     </div>
                   ))}
                 </dl>
-                <Button size="sm" onClick={() => setStep("saved")}>
+                <Button size="sm" data-demo="save" onClick={() => setStep("saved")}>
                   {t("save")}
                 </Button>
               </>
             ) : (
               <div role="status" className="grid justify-items-start gap-3">
-                <span className="bg-primary-container text-primary-container-foreground flex size-10 items-center justify-center rounded-full">
+                <span className="saved-check bg-primary-container text-primary-container-foreground flex size-10 items-center justify-center rounded-full">
                   <Check className="size-5" aria-hidden />
                 </span>
                 <span className="font-medium">{t("saved")}</span>
-                <Button variant="text" size="sm" className="-ms-3" onClick={() => setStep("closed")}>
+                <Button variant="text" size="sm" data-demo="again" className="-ms-3" onClick={() => setStep("closed")}>
                   {t("again")}
                 </Button>
               </div>
@@ -98,7 +143,8 @@ export function ExtensionDemo() {
           </div>
         )}
       </div>
-      {step === "closed" && <p className="text-muted-foreground text-sm">{t("hint")}</p>}
+      <DemoBar demo={play} hint={step === "closed" ? t("hint") : undefined} />
+      <GuideCursor attach={attachPointer} />
     </div>
   );
 }

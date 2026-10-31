@@ -261,6 +261,60 @@
   .faq[open] > p {
     animation: road-fade 0.3s ease-out both;
   }
+  /* The guide cursor that plays the demos: it glides between targets, dips on a click with a
+   * ripple at its tip, and carries a lifted card while dragging. Fields it fills type in. */
+  .guide-cursor {
+    transition:
+      transform 0.75s cubic-bezier(0.2, 0, 0, 1),
+      opacity 0.3s ease-out;
+  }
+  .guide-cursor[data-on="false"] {
+    opacity: 0;
+  }
+  .guide-cursor svg {
+    transform-origin: 2px 2px;
+    transition: scale 0.12s ease-out;
+  }
+  .guide-cursor.guide-press svg {
+    scale: 0.85;
+  }
+  .guide-cursor.guide-click svg {
+    animation: guide-dip 0.3s ease-out;
+  }
+  .guide-cursor::before {
+    content: "";
+    position: absolute;
+    top: -14px;
+    left: -14px;
+    width: 30px;
+    height: 30px;
+    border-radius: 999px;
+    background: color-mix(in oklch, var(--primary) 35%, transparent);
+    opacity: 0;
+    scale: 0.3;
+  }
+  .guide-cursor.guide-click::before {
+    animation: guide-ripple 0.5s ease-out;
+  }
+  .guide-cursor.guide-press::before {
+    opacity: 1;
+    scale: 0.7;
+  }
+  .card-lifted {
+    position: relative;
+    z-index: 10;
+    cursor: grabbing;
+    box-shadow: 0 12px 28px -8px rgb(0 0 0 / 0.3);
+    transition:
+      transform 0.75s cubic-bezier(0.2, 0, 0, 1),
+      box-shadow 0.2s ease-out;
+  }
+  .type-in {
+    animation: type-in 0.45s steps(14, end) both;
+  }
+  .saved-check {
+    animation: road-pop 0.45s cubic-bezier(0.3, 1.5, 0.5, 1) both;
+  }
   ::view-transition-group(*) {
     animation-duration: 0.35s;
     animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
@@ -276,6 +330,25 @@
 @keyframes extension-pulse {
   from { box-shadow: 0 0 0 0 color-mix(in oklch, var(--primary) 45%, transparent); }
   to { box-shadow: 0 0 0 14px transparent; }
+}
+@keyframes guide-dip {
+  50% { scale: 0.82; }
+}
+@keyframes guide-ripple {
+  from { opacity: 1; scale: 0.3; }
+  to { opacity: 0; scale: 1.6; }
+}
+/* Reveals text from where it starts reading: the left in English, the right in Arabic. */
+@keyframes type-in {
+  from { clip-path: inset(0 100% 0 0); }
+  to { clip-path: inset(0); }
+}
+@keyframes type-in-rtl {
+  from { clip-path: inset(0 0 0 100%); }
+  to { clip-path: inset(0); }
+}
+.type-in:dir(rtl) {
+  animation-name: type-in-rtl;
 }
 @keyframes bar-grow {
   from { transform: scaleX(0); }

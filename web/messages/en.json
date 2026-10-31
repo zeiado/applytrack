@@ -114,6 +114,12 @@
     "finale": {
       "title": "Your next application is a good place to start",
       "body": "Add it in a minute, set a follow-up date, and let Sekka keep track of the rest."
+    },
+    "demo": {
+      "cursorName": "Sekka",
+      "watching": "Sekka is showing you. Click anywhere in it to try it yourself.",
+      "pause": "Pause",
+      "play": "Play"
     }
   },
   "LanguageSwitcher": {
