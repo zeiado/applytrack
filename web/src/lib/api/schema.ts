@@ -768,6 +768,12 @@ export interface components {
             /** Salary Min */
             salary_min: number | null;
             source: components["schemas"]["ApplicationSource"];
+            /**
+             * Stage Since
+             * Format: date-time
+             * @description When it entered its current status. Still applied or screening 30 days later means no reply yet.
+             */
+            stage_since: string;
             status: components["schemas"]["ApplicationStatus"];
             /**
              * Updated At
@@ -809,6 +815,12 @@ export interface components {
             /** Salary Min */
             salary_min: number | null;
             source: components["schemas"]["ApplicationSource"];
+            /**
+             * Stage Since
+             * Format: date-time
+             * @description When it entered its current status. Still applied or screening 30 days later means no reply yet.
+             */
+            stage_since: string;
             status: components["schemas"]["ApplicationStatus"];
             /**
              * Updated At
@@ -1112,6 +1124,12 @@ export interface components {
             /** Salary Min */
             salary_min: number | null;
             source: components["schemas"]["ApplicationSource"];
+            /**
+             * Stage Since
+             * Format: date-time
+             * @description When it entered its current status. Still applied or screening 30 days later means no reply yet.
+             */
+            stage_since: string;
             status: components["schemas"]["ApplicationStatus"];
             /**
              * Updated At

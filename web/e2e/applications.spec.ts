@@ -9,7 +9,7 @@ function column(page: Page, status: string) {
 
 async function addApplication(
   page: Page,
-  fields: { company: string; role: string; wishlist?: boolean; followUp?: string },
+  fields: { company: string; role: string; wishlist?: boolean; followUp?: string; appliedOn?: string },
 ) {
   await page.getByRole("link", { name: "Add application" }).first().click();
   await expect(page).toHaveURL(/\/en\/applications\/new$/);
@@ -17,6 +17,7 @@ async function addApplication(
   await page.getByRole("textbox", { name: "Role" }).fill(fields.role);
   if (fields.wishlist) await page.getByLabel("Stage").selectOption("wishlist");
   if (fields.followUp) await page.getByLabel(/Follow up on/).fill(fields.followUp);
+  if (fields.appliedOn) await page.getByLabel(/Date applied/).fill(fields.appliedOn);
   await page.getByRole("button", { name: "Add application" }).click();
   await expect(page).toHaveURL(/\/en\/applications$/, AUTH_TIMEOUT);
 }
@@ -150,6 +151,16 @@ test("an overdue follow-up stands out", async ({ page }) => {
   await addApplication(page, { company: "Rabbit", role: "Ops Lead", followUp: "2026-01-05" });
 
   await expect(column(page, "Applied")).toContainText("Follow-up overdue");
+});
+
+test("an application with no reply for 30 days says so", async ({ page }) => {
+  const daysAgo = (days: number) => new Date(Date.now() - days * 86_400_000).toISOString().slice(0, 10);
+  await addApplication(page, { company: "Paymob", role: "Data Engineer", appliedOn: daysAgo(40) });
+  await addApplication(page, { company: "Breadfast", role: "Designer", appliedOn: daysAgo(5) });
+
+  const applied = column(page, "Applied");
+  await expect(applied.getByRole("article").filter({ hasText: "Paymob" })).toContainText(/No reply for (39|4\d) days/);
+  await expect(applied.getByRole("article").filter({ hasText: "Breadfast" })).not.toContainText("No reply");
 });
 
 test("the board in Arabic reads right to left", async ({ page }) => {

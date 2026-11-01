@@ -1,11 +1,11 @@
 import uuid
-from datetime import date
+from datetime import date, datetime
 from enum import StrEnum
 
 from sqlalchemy import CheckConstraint, Date, Enum, ForeignKey, Index, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
-from applytrack.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
+from applytrack.models.base import Base, TimestampMixin, UTCDateTime, UUIDPrimaryKeyMixin, utcnow
 from applytrack.models.enums import ApplicationSource, ApplicationStatus
 
 
@@ -57,3 +57,7 @@ class Application(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     notes: Mapped[str | None] = mapped_column(Text)
     # Plain text, up to 20,000 characters. Loaded only when read: lists don't need it.
     job_description: Mapped[str | None] = mapped_column(Text, deferred=True)
+    # When it entered its current status: the latest move, or for an application added
+    # as "applied", the day it was applied for (applied_on) when that's earlier. Lets the
+    # app tell "no reply for 30 days" without reading the history.
+    stage_since: Mapped[datetime] = mapped_column(UTCDateTime, default=utcnow)

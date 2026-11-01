@@ -129,6 +129,10 @@ class ApplicationRead(BaseModel):
     notes: str | None
     created_at: datetime
     updated_at: datetime
+    stage_since: datetime = Field(
+        description="When it entered its current status. Still applied or screening 30 days "
+        "later means no reply yet."
+    )
 
     @computed_field  # type: ignore[prop-decorator]
     @property

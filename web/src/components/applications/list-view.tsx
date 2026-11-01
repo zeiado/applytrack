@@ -6,7 +6,7 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Link } from "@/i18n/navigation";
-import { followUpState, formatDate } from "@/lib/applications/dates";
+import { followUpState, formatDate, noReplyDays } from "@/lib/applications/dates";
 import { type Application, SORTS, SOURCES, STATUSES } from "@/lib/applications/model";
 import { hasFilters, type ListQuery, PAGE_SIZE, toSearch } from "@/lib/applications/query";
 import { cn } from "@/lib/utils";
@@ -63,6 +63,7 @@ export async function ListView({ query, page, today }: { query: ListQuery; page:
                       {t("card.applied", { date: formatDate(app.applied_on, locale, today) })}
                     </span>
                   )}
+                  <NoReply app={app} today={today} label={t} />
                 </Link>
               </li>
             ))}
@@ -190,6 +191,7 @@ async function Table({ items, today, locale }: { items: Application[]; today: st
               <td className="px-3 py-2">{app.role_title}</td>
               <td className="px-3 py-2">
                 <StatusBadge status={app.status} />
+                <NoReply app={app} today={today} label={t} />
               </td>
               <td className="text-muted-foreground px-3 py-2 whitespace-nowrap">{date(app.applied_on)}</td>
               <td
@@ -235,4 +237,18 @@ function PageLink({
       {children}
     </Link>
   );
+}
+
+function NoReply({
+  app,
+  today,
+  label,
+}: {
+  app: Application;
+  today: string;
+  label: (key: "card.noReply", values: { days: number }) => string;
+}) {
+  const days = noReplyDays(app.status, app.stage_since, today);
+  if (days === null) return null;
+  return <span className="text-muted-foreground mt-1 block text-xs whitespace-nowrap">{label("card.noReply", { days })}</span>;
 }

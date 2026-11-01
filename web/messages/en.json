@@ -280,7 +280,8 @@
       "followUpDue": "Follow up today",
       "followUpOverdue": "Follow-up overdue",
       "applied": "Applied {date}",
-      "dragHint": "Drag a card to a highlighted column, or use its menu."
+      "dragHint": "Drag a card to a highlighted column, or use its menu.",
+      "noReply": "{days, plural, one {No reply for # day} other {No reply for # days}}"
     },
     "moveFailed": "That move didn't work: {reason}",
     "filters": {

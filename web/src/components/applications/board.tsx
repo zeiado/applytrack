@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Link, useRouter } from "@/i18n/navigation";
 import { moveApplication, undoMove } from "@/lib/applications/actions";
-import { followUpState, formatDate } from "@/lib/applications/dates";
+import { followUpState, formatDate, noReplyDays } from "@/lib/applications/dates";
 import { type Application, type ApplicationStatus, STATUSES } from "@/lib/applications/model";
 import type { ActionError } from "@/lib/auth/errors";
 import { cn } from "@/lib/utils";
@@ -43,7 +43,7 @@ export function Board({ applications, today }: { applications: Application[]; to
   // The card shows in its new column at once; if the move fails, the page's data
   // (refreshed by the action) puts it back.
   const [shown, showMove] = useOptimistic(applications, (current, move: Move) =>
-    current.map((app) => (app.id === move.id ? { ...app, status: move.status, next_statuses: [] } : app)),
+    current.map((app) => (app.id === move.id ? { ...app, status: move.status, next_statuses: [], stage_since: new Date().toISOString() } : app)),
   );
 
   function move(app: Application, status: ApplicationStatus) {
@@ -162,6 +162,7 @@ function Card({
   const locale = useLocale();
   const router = useRouter();
   const followUp = app.follow_up_on ? followUpState(app.follow_up_on, today) : null;
+  const waiting = noReplyDays(app.status, app.stage_since, today);
   const href = `/applications/${app.id}`;
   // The card opens the side panel on the board; the menu's "Edit" goes to the edit page.
   const peek = `/applications?open=${app.id}`;
@@ -225,11 +226,17 @@ function Card({
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      {(followUp || app.applied_on) && (
+      {(followUp || app.applied_on || waiting !== null) && (
         <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
           {app.applied_on && (
             <span className="text-muted-foreground">
               {t("Applications.card.applied", { date: formatDate(app.applied_on, locale, today) })}
+            </span>
+          )}
+          {waiting !== null && (
+            // Information, not a warning: many companies never reply.
+            <span className="bg-muted text-muted-foreground rounded-md px-2 py-0.5">
+              {t("Applications.card.noReply", { days: waiting })}
             </span>
           )}
           {followUp && app.follow_up_on && (
