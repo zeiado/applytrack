@@ -276,6 +276,12 @@
           "source": {
             "$ref": "#/components/schemas/ApplicationSource"
           },
+          "stage_since": {
+            "description": "When it entered its current status. Still applied or screening 30 days later means no reply yet.",
+            "format": "date-time",
+            "title": "Stage Since",
+            "type": "string"
+          },
           "status": {
             "$ref": "#/components/schemas/ApplicationStatus"
           },
@@ -299,6 +305,7 @@
           "notes",
           "created_at",
           "updated_at",
+          "stage_since",
           "job_description",
           "next_statuses"
         ],
@@ -405,6 +412,12 @@
           "source": {
             "$ref": "#/components/schemas/ApplicationSource"
           },
+          "stage_since": {
+            "description": "When it entered its current status. Still applied or screening 30 days later means no reply yet.",
+            "format": "date-time",
+            "title": "Stage Since",
+            "type": "string"
+          },
           "status": {
             "$ref": "#/components/schemas/ApplicationStatus"
           },
@@ -428,6 +441,7 @@
           "notes",
           "created_at",
           "updated_at",
+          "stage_since",
           "next_statuses"
         ],
         "title": "ApplicationRead",
@@ -1194,6 +1208,12 @@
           "source": {
             "$ref": "#/components/schemas/ApplicationSource"
           },
+          "stage_since": {
+            "description": "When it entered its current status. Still applied or screening 30 days later means no reply yet.",
+            "format": "date-time",
+            "title": "Stage Since",
+            "type": "string"
+          },
           "status": {
             "$ref": "#/components/schemas/ApplicationStatus"
           },
@@ -1217,6 +1237,7 @@
           "notes",
           "created_at",
           "updated_at",
+          "stage_since",
           "job_description",
           "history",
           "interviews",

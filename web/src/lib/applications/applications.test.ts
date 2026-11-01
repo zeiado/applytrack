@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { addDays, followUpState, formatDate, todayIn } from "./dates";
+import { addDays, followUpState, formatDate, noReplyDays, todayIn } from "./dates";
 import { applicationBody, invalidFields, parseAmount } from "./form";
 import { hasFilters, parseListQuery, searchParamsObject, toApiParams, toExportSearch, toSearch } from "./query";
 
@@ -145,6 +145,14 @@ describe("dates", () => {
     expect(followUpState("2026-10-20", "2026-10-21")).toBe("overdue");
     expect(followUpState("2026-10-21", "2026-10-21")).toBe("due");
     expect(followUpState("2026-10-22", "2026-10-21")).toBe("upcoming");
+  });
+
+  it("counts no-reply days once an application has waited 30", () => {
+    expect(noReplyDays("applied", "2026-10-01T09:00:00Z", "2026-10-31")).toBe(30);
+    expect(noReplyDays("screening", "2026-09-01T00:00:00Z", "2026-11-01")).toBe(61);
+    expect(noReplyDays("applied", "2026-10-02T09:00:00Z", "2026-10-31")).toBeNull();
+    expect(noReplyDays("interviewing", "2026-01-01T00:00:00Z", "2026-11-01")).toBeNull();
+    expect(noReplyDays("wishlist", "2026-01-01T00:00:00Z", "2026-11-01")).toBeNull();
   });
 
   it("adds days across months and leap years", () => {

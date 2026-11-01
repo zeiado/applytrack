@@ -35,3 +35,18 @@ export function addDays(date: string, days: number): string {
   const value = new Date(Date.UTC(year ?? 1970, (month ?? 1) - 1, (day ?? 1) + days));
   return value.toISOString().slice(0, 10);
 }
+
+/** Still applied or in screening this many days after getting there: "no reply". */
+export const NO_REPLY_DAYS = 30;
+
+/** Days without a reply (`stageSince` is the API's stage_since), or null when it isn't
+ * waiting on the company or hasn't waited NO_REPLY_DAYS yet. */
+export function noReplyDays(status: string, stageSince: string, today: string): number | null {
+  if (status !== "applied" && status !== "screening") return null;
+  const [y1, m1, d1] = stageSince.slice(0, 10).split("-").map(Number);
+  const [y2, m2, d2] = today.split("-").map(Number);
+  const days = Math.round(
+    (Date.UTC(y2 ?? 1970, (m2 ?? 1) - 1, d2 ?? 1) - Date.UTC(y1 ?? 1970, (m1 ?? 1) - 1, d1 ?? 1)) / 86_400_000,
+  );
+  return days >= NO_REPLY_DAYS ? days : null;
+}
