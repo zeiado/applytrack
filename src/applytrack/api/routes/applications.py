@@ -78,6 +78,22 @@ def export_applications(
     )
 
 
+@router.get("/same-job")
+def applications_for_job(
+    job_url: Annotated[str, Query(min_length=1, max_length=2048)],
+    db: DbSession,
+    user: CurrentUser,
+) -> list[ApplicationRead]:
+    """Your applications already saved with a link to this job, newest first (up to 5).
+
+    Links match when they differ only in tracking parameters, ``www.``, a trailing slash
+    or the fragment; a LinkedIn search link with ``currentJobId`` matches the job's page.
+    The browser extension calls this to warn before saving the same job twice.
+    """
+    matches = ApplicationService(db, user).with_same_job_url(job_url)
+    return [ApplicationRead.model_validate(a) for a in matches]
+
+
 @router.post("", status_code=status.HTTP_201_CREATED)
 def create_application(
     body: ApplicationCreate,

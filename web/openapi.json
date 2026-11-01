@@ -2671,6 +2671,80 @@
         ]
       }
     },
+    "/api/v1/applications/same-job": {
+      "get": {
+        "description": "Your applications already saved with a link to this job, newest first (up to 5).\n\nLinks match when they differ only in tracking parameters, ``www.``, a trailing slash\nor the fragment; a LinkedIn search link with ``currentJobId`` matches the job's page.\nThe browser extension calls this to warn before saving the same job twice.",
+        "operationId": "applications_for_job_api_v1_applications_same_job_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "job_url",
+            "required": true,
+            "schema": {
+              "maxLength": 2048,
+              "minLength": 1,
+              "title": "Job Url",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ApplicationRead"
+                  },
+                  "title": "Response Applications For Job Api V1 Applications Same Job Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unexpected error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Applications For Job",
+        "tags": [
+          "applications"
+        ]
+      }
+    },
     "/api/v1/applications/{application_id}": {
       "delete": {
         "description": "Delete an application.",

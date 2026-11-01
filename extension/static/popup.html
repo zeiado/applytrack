@@ -24,6 +24,11 @@
 
     <form id="form" data-view="form" hidden novalidate>
       <p id="message" role="status" hidden></p>
+      <div id="duplicate" class="duplicate" role="status" hidden>
+        <p><strong data-i18n="alreadySavedTitle">Already in Sekka</strong></p>
+        <p id="duplicate-text"></p>
+        <a id="duplicate-open" target="_blank" rel="noopener" data-i18n="openSaved">Open it</a>
+      </div>
       <label>
         <span data-i18n="company">Company</span>
         <input id="company" name="company" required maxlength="200" autocomplete="off" />

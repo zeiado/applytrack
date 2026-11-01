@@ -136,3 +136,20 @@ button:disabled {
 .saved {
   color: var(--primary);
 }
+
+.duplicate {
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: #fbecd2;
+  border: 1px solid #e9c98f;
+  color: #5c3b00;
+}
+
+.duplicate p {
+  margin: 0 0 4px;
+}
+
+.duplicate a {
+  color: var(--primary);
+  font-weight: 600;
+}
