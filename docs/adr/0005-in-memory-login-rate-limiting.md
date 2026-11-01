@@ -1,6 +1,6 @@
 # 5. In-memory rate limiting for failed logins
 
-- Status: Accepted
+- Status: Accepted; the counts moved to PostgreSQL in production ([ADR 0014](0014-rate-limits-in-postgres.md))
 - Date: 2026-10-17
 
 ## Context

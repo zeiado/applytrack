@@ -16,6 +16,7 @@ from typing import Any, Protocol
 from sqlalchemy.orm import Session, sessionmaker
 
 from applytrack.core.logging import request_id_var
+from applytrack.core.rate_limit import delete_old_rate_limit_events
 from applytrack.models import Job, JobStatus
 from applytrack.repositories.email_tokens import EmailTokenRepository
 from applytrack.repositories.jobs import JobRepository
@@ -154,7 +155,8 @@ class Worker:
                 logger.exception("Periodic task failed", extra={"task": task.name})
 
     def housekeep(self) -> None:
-        """Delete old finished jobs, and expired refresh tokens and email links."""
+        """Delete old finished jobs, expired refresh tokens and email links, and old
+        rate-limit events."""
         now = self.clock()
         with self.session_factory() as session:
             jobs = JobRepository(session)
@@ -163,14 +165,16 @@ class Worker:
             tokens = RefreshTokenRepository(session).delete_expired(now)
             # Kept a day past expiry: the per-hour email limit counts recent ones.
             links = EmailTokenRepository(session).delete_expired(now - timedelta(days=1))
+            events = delete_old_rate_limit_events(session, now.timestamp())
             session.commit()
-        if done or failed or tokens or links:
+        if done or failed or tokens or links or events:
             logger.info(
                 "Housekeeping",
                 extra={
                     "deleted_jobs": done + failed,
                     "deleted_refresh_tokens": tokens,
                     "deleted_email_tokens": links,
+                    "deleted_rate_limit_events": events,
                 },
             )
 

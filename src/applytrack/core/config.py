@@ -33,6 +33,10 @@ class Settings(BaseSettings):
     login_max_failures_per_account: int = 5
     login_max_failures_per_ip: int = 20
     login_window_seconds: int = 60
+    # Where the rate limits keep their counts (ADR 0014): "database" is shared by every
+    # API process and survives deploys; "memory" is per process. Unset: database in
+    # production, memory elsewhere.
+    rate_limit_store: Literal["memory", "database"] | None = None
 
     # Reverse proxies in front of the app that append to X-Forwarded-For (0 = none).
     # See core/client_ip.py. Measure it for a host; never guess.
@@ -123,6 +127,12 @@ class Settings(BaseSettings):
                     "(they end in .apps.googleusercontent.com)"
                 )
         return client_ids
+
+    @property
+    def rate_limits_in_database(self) -> bool:
+        if self.rate_limit_store is None:
+            return self.environment == "production"
+        return self.rate_limit_store == "database"
 
     @model_validator(mode="after")
     def _require_real_secret_in_production(self) -> Self:

@@ -1,11 +1,20 @@
-"""Rate limiting for failed logins (see docs/adr/0005-in-memory-login-rate-limiting.md)."""
+"""Rate limiting for failed logins and other abuse (docs/adr/0005 and 0014)."""
 
+import hashlib
 import math
 import threading
 import time
 from collections import deque
 from collections.abc import Callable
 from typing import Protocol
+
+from sqlalchemy import delete, func, select
+from sqlalchemy.orm import Session, sessionmaker
+
+from applytrack.models.rate_limit_event import RateLimitEvent
+
+# Events are kept this long, longer than any window; the worker deletes older ones.
+EVENT_RETENTION_SECONDS = 24 * 60 * 60
 
 
 class RateLimiter(Protocol):
@@ -83,6 +92,74 @@ class InMemoryRateLimiter:
         """Drop keys with no recent events, so memory doesn't grow with every email ever tried."""
         for key in list(self._events):
             self._prune(key)
+
+
+class DatabaseRateLimiter:
+    """Sliding-window log kept in the database, so every API process and server shares the
+    counts and a deploy doesn't reset them (ADR 0014).
+
+    Each call uses a short session of its own and commits at once: a failed login is
+    still counted when the request that saw it ends in an error.
+    """
+
+    def __init__(
+        self,
+        session_factory: sessionmaker[Session],
+        *,
+        name: str,
+        limit: int,
+        window_seconds: float,
+        clock: Callable[[], float] = time.time,
+    ) -> None:
+        self.session_factory = session_factory
+        self.name = name
+        self.limit = limit
+        self.window = window_seconds
+        self._clock = clock
+
+    @staticmethod
+    def _hash(key: str) -> str:
+        # Keys hold emails and IP addresses; the table only needs to tell them apart.
+        return hashlib.sha256(key.encode()).hexdigest()
+
+    def retry_after(self, key: str) -> int | None:
+        now = self._clock()
+        with self.session_factory() as session:
+            count, oldest = session.execute(
+                select(func.count(), func.min(RateLimitEvent.at)).where(
+                    RateLimitEvent.limiter == self.name,
+                    RateLimitEvent.key_hash == self._hash(key),
+                    RateLimitEvent.at > now - self.window,
+                )
+            ).one()
+        if count < self.limit or oldest is None:
+            return None
+        return max(1, math.ceil(oldest + self.window - now))
+
+    def hit(self, key: str) -> None:
+        with self.session_factory() as session:
+            session.add(
+                RateLimitEvent(limiter=self.name, key_hash=self._hash(key), at=self._clock())
+            )
+            session.commit()
+
+    def reset(self, key: str) -> None:
+        with self.session_factory() as session:
+            session.execute(
+                delete(RateLimitEvent).where(
+                    RateLimitEvent.limiter == self.name,
+                    RateLimitEvent.key_hash == self._hash(key),
+                )
+            )
+            session.commit()
+
+
+def delete_old_rate_limit_events(session: Session, now: float) -> int:
+    """Housekeeping: drop events older than EVENT_RETENTION_SECONDS. Returns how many."""
+    result = session.execute(
+        delete(RateLimitEvent).where(RateLimitEvent.at < now - EVENT_RETENTION_SECONDS)
+    )
+    return int(getattr(result, "rowcount", 0) or 0)
 
 
 class LoginRateLimiter:

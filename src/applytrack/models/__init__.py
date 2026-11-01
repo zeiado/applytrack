@@ -17,6 +17,7 @@ from applytrack.models.enums import (
 from applytrack.models.interview import Interview
 from applytrack.models.job import Job
 from applytrack.models.profile import Profile
+from applytrack.models.rate_limit_event import RateLimitEvent
 from applytrack.models.refresh_token import RefreshToken
 from applytrack.models.status_change import StatusChange
 from applytrack.models.user import User
@@ -37,6 +38,7 @@ __all__ = [
     "JobStatus",
     "Profile",
     "ProfileVisibility",
+    "RateLimitEvent",
     "RefreshToken",
     "StatusChange",
     "User",
