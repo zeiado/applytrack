@@ -2,7 +2,7 @@ import type { LegalText } from "./types";
 
 // Written from docs/privacy.md: change both together when a service is added.
 export const privacy: LegalText = {
-  updated: "2026-10-26",
+  updated: "2026-11-01",
   en: {
     title: "Privacy policy",
     description: "What Sekka keeps about you, who else receives it, and how to download or delete it.",
@@ -48,6 +48,7 @@ export const privacy: LegalText = {
               "Neon: the database where your account and applications are stored.",
               "Cloudflare R2: stores the CV files you upload, in private storage.",
               "Render and Vercel: the servers that run Sekka and its website.",
+              "Vercel Web Analytics: counts page visits (which page, country, device type and referring site) without cookies and without identifying you.",
               "Resend: sends our emails, so it receives your address and the email.",
               "Google: only if you choose Sign in with Google.",
               "PostHog (EU): the usage counts described above, without your email or what you type.",
@@ -158,6 +159,7 @@ export const privacy: LegalText = {
               "Neon: قاعدة البيانات اللي متخزن فيها حسابك وتقديماتك.",
               "Cloudflare R2: بيخزّن ملفات الـ CV اللي بترفعها في مكان خاص.",
               "Render وVercel: السيرفرات اللي بتشغّل سكة وموقعها.",
+              "Vercel Web Analytics: بيعدّ زيارات الصفحات (أنهي صفحة، والبلد، ونوع الجهاز، والموقع اللي جيت منه) من غير كوكيز ومن غير ما يعرف إنت مين.",
               "Resend: بتبعت إيميلاتنا، فبيوصلها عنوانك والإيميل.",
               "جوجل: بس لو اخترت الدخول بجوجل.",
               "PostHog (أوروبا): أرقام الاستخدام اللي فوق، من غير إيميلك أو اللي بتكتبه.",

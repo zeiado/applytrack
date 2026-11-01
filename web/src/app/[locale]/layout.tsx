@@ -1,3 +1,4 @@
+import { Analytics } from "@vercel/analytics/next";
 import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Sans_Arabic } from "next/font/google";
 import { notFound } from "next/navigation";
@@ -61,8 +62,10 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
             <ThemeSync />
             {children}
           </NextIntlClientProvider>
-        <ServiceWorker />
+          <ServiceWorker />
         </DirectionProvider>
+        {/* Page-visit counts on Vercel, cookieless; it only sends from the deployed site. */}
+        <Analytics />
       </body>
     </html>
   );
