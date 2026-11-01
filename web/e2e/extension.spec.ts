@@ -103,6 +103,25 @@ test("saves the job on the page to the signed-in account", async ({ context, ext
   await expect(description).toContainText("- SQL");
 });
 
+test("warns when the job is already saved, and still lets you save it again", async ({ context, extensionId }) => {
+  const page = await context.newPage();
+  await register(page);
+
+  const first = await openPopup(context, extensionId);
+  await expect(first.getByLabel("Company")).toHaveValue("Valu");
+  await expect(first.getByText("Already in Sekka")).toBeHidden();
+  await first.getByRole("button", { name: "Save to Sekka" }).click();
+  await expect(first.getByText("Saved to Sekka")).toBeVisible();
+  const saved = await first.getByRole("link", { name: "Open in Sekka" }).getAttribute("href");
+
+  const again = await openPopup(context, extensionId);
+  await expect(again.getByText("Already in Sekka")).toBeVisible();
+  await expect(again.getByText(/You saved this job on .+\. Stage: Applied\./)).toBeVisible();
+  await expect(again.getByRole("link", { name: "Open it" })).toHaveAttribute("href", saved ?? "");
+  await again.getByRole("button", { name: "Save again" }).click();
+  await expect(again.getByText("Saved to Sekka")).toBeVisible();
+});
+
 test("asks to log in when no one is", async ({ context, extensionId }) => {
   const popup = await openPopup(context, extensionId);
   await expect(popup.getByText("Log in to Sekka first")).toBeVisible();
@@ -117,4 +136,8 @@ test("websites can't use the extension's routes", async ({ request }) => {
   expect(response.status()).toBe(403);
   const session = await request.get("/api/extension/session", { headers: { Origin: "https://evil.example" } });
   expect(session.status()).toBe(403);
+  const sameJob = await request.get("/api/extension/applications/same-job?url=https://a.example/1", {
+    headers: { Origin: "https://evil.example" },
+  });
+  expect(sameJob.status()).toBe(403);
 });

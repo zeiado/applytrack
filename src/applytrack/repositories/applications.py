@@ -107,6 +107,20 @@ class ApplicationRepository:
         ).all()
         return list(items), total
 
+    def with_job_url_containing(self, user_id: uuid.UUID, text: str) -> list[Application]:
+        """The user's applications whose link contains `text` (any case), newest first.
+        A cheap first pass; the caller compares the links properly."""
+        query = (
+            select(Application)
+            .where(
+                Application.user_id == user_id,
+                Application.job_url.is_not(None),
+                func.lower(Application.job_url).contains(text.lower(), autoescape=True),
+            )
+            .order_by(Application.created_at.desc(), Application.id)
+        )
+        return list(self.session.scalars(query))
+
     def count_for_user(self, user_id: uuid.UUID) -> int:
         query = select(func.count()).select_from(Application).where(Application.user_id == user_id)
         return self.session.scalar(query) or 0

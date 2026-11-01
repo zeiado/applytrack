@@ -22,6 +22,25 @@ export async function isSignedIn(appUrl: string): Promise<boolean | null> {
   }
 }
 
+export type SavedMatch = { id: string; status: string; created_at: string };
+
+/** Applications already saved for the job at `jobUrl`, newest first. Empty when there are
+ * none, or when it can't tell: the warning is a help, never a reason to block saving. */
+export async function findSameJob(appUrl: string, jobUrl: string): Promise<SavedMatch[]> {
+  if (!/^https?:/.test(jobUrl)) return [];
+  try {
+    const response = await fetch(
+      `${appUrl}/api/extension/applications/same-job?url=${encodeURIComponent(jobUrl)}`,
+      { credentials: "include" },
+    );
+    if (!response.ok) return [];
+    const body = (await response.json()) as { matches?: SavedMatch[] };
+    return Array.isArray(body.matches) ? body.matches : [];
+  } catch {
+    return [];
+  }
+}
+
 export async function saveApplication(appUrl: string, application: NewApplication): Promise<SaveResult> {
   let response: Response;
   try {

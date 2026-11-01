@@ -49,6 +49,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/applications/same-job": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Applications For Job
+         * @description Your applications already saved with a link to this job, newest first (up to 5).
+         *
+         *     Links match when they differ only in tracking parameters, ``www.``, a trailing slash
+         *     or the fragment; a LinkedIn search link with ``currentJobId`` matches the job's page.
+         *     The browser extension calls this to warn before saving the same job twice.
+         */
+        get: operations["applications_for_job_api_v1_applications_same_job_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/applications/{application_id}": {
         parameters: {
             query?: never;
@@ -1651,6 +1675,55 @@ export interface operations {
                 };
                 content: {
                     "text/csv": unknown;
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unexpected error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    applications_for_job_api_v1_applications_same_job_get: {
+        parameters: {
+            query: {
+                job_url: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApplicationRead"][];
                 };
             };
             /** @description Unauthorized */

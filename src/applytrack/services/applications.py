@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
 
 from applytrack.core.errors import ConflictError, NotFoundError, ValidationFailedError
+from applytrack.core.job_url import normalize_job_url
 from applytrack.models import Application, ApplicationStatus, StatusChange, User
 from applytrack.repositories.applications import ApplicationRepository
 from applytrack.schemas.applications import (
@@ -43,6 +44,17 @@ class ApplicationService:
             limit=params.limit,
             offset=params.offset,
         )
+
+    def with_same_job_url(self, url: str, limit: int = 5) -> list[Application]:
+        """Applications already saved with a link to the same job, newest first."""
+        key = normalize_job_url(url)
+        if key is None:
+            return []
+        # Any link to the job contains the last part of its path (often the job's id).
+        # Narrow the rows by that in SQL, then compare the links properly.
+        hint = key.split("?", 1)[0].rsplit("/", 1)[-1] or key.split("/", 1)[0]
+        candidates = self.repo.with_job_url_containing(self.user.id, hint)
+        return [a for a in candidates if normalize_job_url(a.job_url) == key][:limit]
 
     def get(self, application_id: uuid.UUID, *, for_update: bool = False) -> Application:
         application = self.repo.get_for_user(self.user.id, application_id, for_update=for_update)

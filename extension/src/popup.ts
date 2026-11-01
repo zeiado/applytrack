@@ -1,4 +1,4 @@
-import { isSignedIn, type NewApplication, saveApplication } from "./api";
+import { findSameJob, isSignedIn, type NewApplication, type SavedMatch, saveApplication } from "./api";
 import { type ExtractedJob, extractJob } from "./extract";
 
 // Set at build time (build.mjs): the web app's address.
@@ -52,6 +52,38 @@ function translatePage(): void {
   }
 }
 
+const STATUS_KEYS: Record<string, string> = {
+  wishlist: "statusWishlist",
+  applied: "statusApplied",
+  screening: "statusScreening",
+  interviewing: "statusInterviewing",
+  offer: "statusOffer",
+  accepted: "statusAccepted",
+  rejected: "statusRejected",
+  withdrawn: "statusWithdrawn",
+};
+
+function describe(match: SavedMatch): string {
+  const date = new Date(match.created_at);
+  const day = Number.isNaN(date.getTime())
+    ? ""
+    : new Intl.DateTimeFormat(chrome.i18n.getUILanguage(), { day: "numeric", month: "short", year: "numeric" }).format(date);
+  const stage = t(STATUS_KEYS[match.status] ?? "statusApplied");
+  return chrome.i18n.getMessage("alreadySaved", [day, stage]) || `${day} · ${stage}`;
+}
+
+/** Shows a note when this job is already in Sekka, with a link to it. Saving again is
+ * still allowed (a second application to the same job happens). */
+async function warnIfSaved(jobUrl: string, submit: HTMLButtonElement): Promise<void> {
+  const [latest] = await findSameJob(APP_URL, jobUrl);
+  if (!latest) return;
+  element<HTMLParagraphElement>("duplicate-text").textContent = describe(latest);
+  element<HTMLAnchorElement>("duplicate-open").href = `${APP_URL}/applications/${latest.id}`;
+  element<HTMLDivElement>("duplicate").hidden = false;
+  submit.textContent = t("saveAgain");
+  submit.dataset.again = "true";
+}
+
 async function main(): Promise<void> {
   translatePage();
   show("loading");
@@ -86,6 +118,7 @@ async function main(): Promise<void> {
   note(signedIn === null ? "errorNetwork" : read ? null : "unreadable", signedIn === null ? "error" : "info");
   show("form");
   (company.value ? role : company).focus();
+  if (signedIn) void warnIfSaved(job.job_url, submit);
 
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -102,7 +135,7 @@ async function main(): Promise<void> {
     };
     const result = await saveApplication(APP_URL, application);
     submit.disabled = false;
-    submit.textContent = t("save");
+    submit.textContent = t(submit.dataset.again ? "saveAgain" : "save");
     if (result.ok) {
       element<HTMLAnchorElement>("open").href = `${APP_URL}/applications/${result.id}`;
       show("saved");
