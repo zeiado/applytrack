@@ -49,6 +49,13 @@ Before an event leaves, these are removed:
 No session replay and no performance tracing. Code: `src/applytrack/core/observability.py`
 and `web/src/lib/sentry.ts`.
 
+## Rate limits
+
+To slow password guessing, the API counts failed logins, password-reset requests and
+invalid Google sign-ins per IP address and email. In production the counts are rows in
+the database holding only a SHA-256 hash of the IP and email, never the values, and
+rows are deleted after a day (ADR 0014).
+
 ## Browser extension
 
 The extension (`extension/`) reads the open page only when the user clicks it

@@ -308,7 +308,8 @@ link to the PR or ADR with the reasoning.
 - **Brute-force protection.** A sliding-window limit per (IP, email) and per IP is
   checked *before* the Argon2 hash, so blocked attempts cost no CPU. It blocks
   attempts rather than locking accounts, so it can't be used to lock someone out.
-  ([ADR 0005](docs/adr/0005-in-memory-login-rate-limiting.md))
+  The counts are kept in PostgreSQL, so deploys don't reset them and every process
+  shares them. ([ADR 0005](docs/adr/0005-in-memory-login-rate-limiting.md), [ADR 0014](docs/adr/0014-rate-limits-in-postgres.md))
 - **Injection defences beyond SQL.** CSV formula injection is escaped. Incoming
   request ids are validated so they can't forge log lines. Login timing is the same
   for unknown emails and wrong passwords. ([#28](https://github.com/zeiado/applytrack/pull/28), [#30](https://github.com/zeiado/applytrack/pull/30), [#21](https://github.com/zeiado/applytrack/pull/21))
@@ -530,6 +531,7 @@ you can read:
 | [0008](docs/adr/0008-one-time-email-tokens.md) | One-time tokens for email links |
 | [0009](docs/adr/0009-sign-in-with-google.md) | Sign in with Google |
 | [0010](docs/adr/0010-web-app.md) | The web app: Next.js in this repo, tokens kept on the server |
+| [0014](docs/adr/0014-rate-limits-in-postgres.md) | Rate-limit counts in PostgreSQL |
 
 ## Roadmap
 
@@ -542,7 +544,7 @@ you can read:
 - [x] Daily follow-up reminder emails
 - [ ] Web app in Arabic and English ([milestone v1.2](https://github.com/zeiado/applytrack/milestone/6)): sign-in, the applications board, application pages and settings are done ([ADR 0010](docs/adr/0010-web-app.md))
 - [x] Chrome extension to save jobs from LinkedIn, Wuzzuf, Bayt and Forasna ([`extension/`](extension/README.md); publishing to the Chrome Web Store is next)
-- [ ] Redis-backed rate limiter for multi-instance deployments (the interface is ready; see ADR 0005)
+- [x] Rate limits shared by every API process and kept across deploys, in PostgreSQL ([ADR 0014](docs/adr/0014-rate-limits-in-postgres.md))
 - [ ] Keyset pagination if lists grow large
 - [ ] Container image scanning with a verified Trivy binary
 

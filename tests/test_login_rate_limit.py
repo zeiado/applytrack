@@ -1,8 +1,13 @@
+from pathlib import Path
+
 import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-from applytrack.core.rate_limit import InMemoryRateLimiter, LoginRateLimiter
+from applytrack.core.config import Settings
+from applytrack.core.rate_limit import DatabaseRateLimiter, InMemoryRateLimiter, LoginRateLimiter
+from applytrack.main import create_app
+from applytrack.models import Base
 from applytrack.services import auth as auth_service
 from tests.conftest import AuthHelper, error_without_request_id
 from tests.test_rate_limit import FakeClock
@@ -144,3 +149,32 @@ def test_limits_come_from_settings(app: FastAPI, client: TestClient) -> None:
 
     assert per_account.limit == app.state.settings.login_max_failures_per_account == 5
     assert per_account.window == app.state.settings.login_window_seconds == 60
+
+
+def test_memory_by_default_and_database_in_production(settings: Settings) -> None:
+    assert not settings.rate_limits_in_database  # environment="test"
+    production = settings.model_copy(update={"environment": "production"})
+    assert production.rate_limits_in_database
+    assert not production.model_copy(update={"rate_limit_store": "memory"}).rate_limits_in_database
+    assert settings.model_copy(update={"rate_limit_store": "database"}).rate_limits_in_database
+
+
+def test_database_store_keeps_counting_after_a_restart(settings: Settings, tmp_path: Path) -> None:
+    """Two app instances on one database: a second process, or the app after a deploy."""
+    database = settings.model_copy(
+        update={"rate_limit_store": "database", "database_url": f"sqlite:///{tmp_path / 'a.db'}"}
+    )
+    first = create_app(database)
+    Base.metadata.create_all(first.state.engine)
+    assert isinstance(first.state.login_limiter.per_account, DatabaseRateLimiter)
+    assert isinstance(first.state.forgot_password_limiter, DatabaseRateLimiter)
+    with TestClient(first) as client:
+        AuthHelper(client).register("ada@example.com", "correct-horse")
+        assert [login(client) for _ in range(5)] == [401] * 5
+    first.state.engine.dispose()
+
+    second = create_app(database)
+    with TestClient(second) as client:
+        assert login(client) == 429
+        assert login(client, password="correct-horse") == 429
+    second.state.engine.dispose()

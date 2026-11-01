@@ -13,7 +13,12 @@ from applytrack.core.google import GoogleIdTokenVerifier
 from applytrack.core.logging import configure_logging
 from applytrack.core.middleware import RequestContextMiddleware
 from applytrack.core.observability import init_error_tracking
-from applytrack.core.rate_limit import InMemoryRateLimiter, LoginRateLimiter
+from applytrack.core.rate_limit import (
+    DatabaseRateLimiter,
+    InMemoryRateLimiter,
+    LoginRateLimiter,
+    RateLimiter,
+)
 from applytrack.db.session import build_engine, build_session_factory
 from applytrack.jobs.worker import WorkerThread
 from applytrack.storage import build_storage
@@ -59,24 +64,26 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.storage = storage
     app.state.analytics = build_analytics(settings)
     app.state.daily_activity = DailyActivity()
-    app.state.login_limiter = LoginRateLimiter(
-        per_account=InMemoryRateLimiter(
-            limit=settings.login_max_failures_per_account,
-            window_seconds=settings.login_window_seconds,
-        ),
-        per_ip=InMemoryRateLimiter(
-            limit=settings.login_max_failures_per_ip,
-            window_seconds=settings.login_window_seconds,
-        ),
-    )
 
-    app.state.forgot_password_limiter = InMemoryRateLimiter(
-        limit=settings.forgot_password_max_per_ip, window_seconds=60 * 60
+    def limiter(name: str, limit: int, window_seconds: float) -> RateLimiter:
+        if settings.rate_limits_in_database:
+            return DatabaseRateLimiter(
+                session_factory, name=name, limit=limit, window_seconds=window_seconds
+            )
+        return InMemoryRateLimiter(limit=limit, window_seconds=window_seconds)
+
+    window = settings.login_window_seconds
+    app.state.login_limiter = LoginRateLimiter(
+        per_account=limiter("login_account", settings.login_max_failures_per_account, window),
+        per_ip=limiter("login_ip", settings.login_max_failures_per_ip, window),
+    )
+    app.state.forgot_password_limiter = limiter(
+        "forgot_password_ip", settings.forgot_password_max_per_ip, 60 * 60
     )
     app.state.google_verifier = GoogleIdTokenVerifier(settings.google_client_ids)
     # Invalid Google tokens per IP, with the same limit as failed password logins.
-    app.state.google_sign_in_limiter = InMemoryRateLimiter(
-        limit=settings.login_max_failures_per_ip, window_seconds=settings.login_window_seconds
+    app.state.google_sign_in_limiter = limiter(
+        "google_sign_in_ip", settings.login_max_failures_per_ip, window
     )
 
     register_exception_handlers(app)
