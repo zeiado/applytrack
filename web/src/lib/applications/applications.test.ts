@@ -153,6 +153,7 @@ describe("dates", () => {
     expect(noReplyDays("applied", "2026-10-02T09:00:00Z", "2026-10-31")).toBeNull();
     expect(noReplyDays("interviewing", "2026-01-01T00:00:00Z", "2026-11-01")).toBeNull();
     expect(noReplyDays("wishlist", "2026-01-01T00:00:00Z", "2026-11-01")).toBeNull();
+    expect(noReplyDays("applied", undefined, "2026-11-01")).toBeNull(); // an older API
   });
 
   it("adds days across months and leap years", () => {

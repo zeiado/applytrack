@@ -41,8 +41,9 @@ export const NO_REPLY_DAYS = 30;
 
 /** Days without a reply (`stageSince` is the API's stage_since), or null when it isn't
  * waiting on the company or hasn't waited NO_REPLY_DAYS yet. */
-export function noReplyDays(status: string, stageSince: string, today: string): number | null {
-  if (status !== "applied" && status !== "screening") return null;
+export function noReplyDays(status: string, stageSince: string | undefined, today: string): number | null {
+  // An API older than the web app doesn't send stage_since yet: show nothing.
+  if (!stageSince || (status !== "applied" && status !== "screening")) return null;
   const [y1, m1, d1] = stageSince.slice(0, 10).split("-").map(Number);
   const [y2, m2, d2] = today.split("-").map(Number);
   const days = Math.round(
