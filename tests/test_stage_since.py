@@ -143,7 +143,8 @@ def test_migration_fills_it_in_for_existing_applications(tmp_path: Path) -> None
     command.upgrade(config, "head")
 
     with engine.connect() as conn:
-        rows = dict(conn.execute(text("SELECT id, stage_since FROM applications")).all())
+        result = conn.execute(text("SELECT id, stage_since FROM applications"))
+        rows: dict[str, object] = {row[0]: row[1] for row in result}
     engine.dispose()
     assert str(rows[moved]).startswith("2026-09-20 12:00:00")  # the latest move
     assert str(rows[old_applied]).startswith("2026-08-20 00:00:00")  # applied_on
